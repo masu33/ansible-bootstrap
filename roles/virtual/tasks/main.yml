@@ -1,0 +1,29 @@
+- name: install packages
+  become_method: sudo
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - virtualbox
+    - docker.io
+    - vagrant
+- name: add user to docker group
+  become_method: sudo
+  become: yes
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
+    state: present
+  ignore_errors: "{{ ansible_check_mode }}"
+- name: add alias dlast
+  lineinfile:
+    dest: "/home/{{ansible_user_id}}/.bashrc"
+    owner: "{{ ansible_user_id }}"
+    regexp: '^alias dlast=.?docker.*$'
+    line: "alias dlast='docker ps -q -l'"
+    state: present
+    create: yes
+    insertafter: EOF
+

@@ -1,0 +1,39 @@
+- name: generate ssh keys
+  become_method: sudo
+  become: yes
+  user:
+    append: yes
+    generate_ssh_key: yes
+    name: "{{ ansible_user_id }}"
+    ssh_key_file: .ssh/id_rsa
+    state: present
+- name: install packages
+  become_method: sudo
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - aptitude
+    - htop
+    - tree
+    - vim
+    - gparted
+    - virtualbox
+    - git
+    - iptables
+    - telnet
+    - traceroute
+    - openssh-server
+- name: enable video-reset
+  lineinfile:
+    dest: "/home/{{ansible_user_id}}/.bashrc"
+    owner: "{{ ansible_user_id }}"
+    regexp: '^setxkbmap -option "terminate:ctrl_alt_bksp"$'
+    line: 'setxkbmap -option "terminate:ctrl_alt_bksp"'
+    state: present
+    create: yes
+    insertafter: EOF
+- name: set up no-internet option
+  include: no-internet.yml
+
