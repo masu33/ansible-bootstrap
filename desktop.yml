@@ -1,0 +1,10 @@
+- hosts: desktop
+  roles:
+  - common
+  - browser
+  - desktop
+  - java
+  - python
+  - virtual
+  - wine
+

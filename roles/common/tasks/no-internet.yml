@@ -1,0 +1,38 @@
+- name: add no-internet group
+  become_method: sudo
+  become: yes
+  group:
+    name: no-internet
+    state: present
+    system: yes
+- name: add user to no-internet group
+  become_method: sudo
+  become: yes
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: no-internet
+    append: yes
+    state: present
+- name: copy iptables rules
+  become_method: sudo
+  become: yes
+  copy:
+    backup: yes
+    dest: /etc/network/if-pre-up.d/
+    follow: yes
+    force: no
+    mode: 0755
+    owner: root
+    src: iptables_no-internet_rule
+- name: copy no-internet command
+  become_method: sudo
+  become: yes
+  copy:
+    backup: yes
+    dest: /usr/bin/
+    follow: yes
+    force: no
+    mode: 0755
+    owner: root
+    src: no-internet.sh
+

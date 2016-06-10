@@ -1,0 +1,54 @@
+- name: install python3
+  become_method: sudo
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python3
+    - python3-pip
+    - virtualenv
+- name: change default python
+  lineinfile: 
+    dest: "/home/{{ansible_user_id}}/.bashrc" 
+    owner: "{{ ansible_user_id }}" 
+    regexp: '^alias python=.*$' 
+    line: "alias python='python3'"
+    state: present 
+    create: yes 
+    insertafter: EOF
+- name: change default pip
+  lineinfile:
+    dest: "/home/{{ansible_user_id}}/.bashrc"
+    owner: "{{ ansible_user_id }}"
+    regexp: '^alias pip=.*$'
+    line: "alias pip='pip3'"
+    state: present
+    create: yes
+    insertafter: EOF
+- name: install packages
+  become_method: sudo
+  become: yes
+  pip:
+    executable: pip3
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - numpy
+    - scipy
+    - scikit-learn
+    - pandas
+    - matplotlib
+    - seaborn
+    - jupyter
+    - pymongo
+- name: create py27 alias
+  lineinfile:
+    dest: "/home/{{ansible_user_id}}/.bashrc"
+    owner: "{{ ansible_user_id }}"
+    regexp: '^alias py27=.*$'
+    line: "alias py27='python2.7'"
+    state: present
+    create: yes
+    insertafter: EOF
+

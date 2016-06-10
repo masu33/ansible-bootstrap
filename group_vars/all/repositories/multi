@@ -1,0 +1,6 @@
+# REPO universe, multiverse
+repo_multi1: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+repo_multi2: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+repo_multi3: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+repo_multi4: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+

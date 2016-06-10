@@ -1,0 +1,45 @@
+- name: add launchpad ppa keys
+  become_method: sudo
+  become: yes
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    state: present
+    id: "{{ item }}"
+  with_items:
+    - "{{ repo_key_webupd8team }}"
+- name: add repositories
+  become_method: sudo
+  become: yes
+  apt_repository:
+    mode: "{{ priv_sources }}"
+    repo: "{{ item }}"
+    state: present
+    update_cache: false
+  with_items:
+    # REPO webupd8team | oracle-java8-installer
+    - "{{ repo_webupd8team }}"
+- name: update apt cache
+  become_method: sudo
+  become: yes
+  apt:
+    update_cache: yes
+- name: accept oracle license
+  become_method: sudo
+  become: yes
+  debconf:
+    name: 'oracle-java8-installer'
+    question: 'shared/accepted-oracle-license-v1-1'
+    value: 'true'
+    vtype: 'select'
+- name: install packages
+  become_method: sudo
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present 
+  with_items:
+    - oracle-java8-installer
+    - ca-certificates
+    - oracle-java8-set-default
+  ignore_errors: "{{ ansible_check_mode }}"
+
