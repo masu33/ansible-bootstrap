@@ -1,12 +1,12 @@
-- name: add launchpad ppa keys
+- name: add repository keys
   become_method: sudo
   become: yes
   apt_key:
-    keyserver: keyserver.ubuntu.com
+    keyserver: "{{ item.keyserver }}"
     state: present
-    id: "{{ item }}"
+    id: "{{ item.key }}"
   with_items:
-    - "{{ repo_key_webupd8team }}"
+    - "{{ repo_webupd8team }}"
 - name: add repositories
   become_method: sudo
   become: yes
@@ -16,8 +16,7 @@
     state: present
     update_cache: false
   with_items:
-    # REPO webupd8team | oracle-java8-installer
-    - "{{ repo_webupd8team }}"
+    - "{{ repo_webupd8team.repo }}"  # key required
 - name: update apt cache
   become_method: sudo
   become: yes

@@ -1,3 +1,2 @@
-# REPO canonical partners
 repo_canonical: 'deb http://archive.canonical.com/ubuntu {{ansible_distribution_release}} partner'
 
