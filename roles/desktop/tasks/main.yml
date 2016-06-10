@@ -1,12 +1,13 @@
-- name: add launchpad ppa keys
+- name: add repository keys
   become_method: sudo
   become: yes
   apt_key:
-    keyserver: keyserver.ubuntu.com
+    keyserver: "{{ item.keyserver }}"
     state: present
-    id: "{{ item }}"
+    id: "{{ item.key }}"
   with_items:
-    - "{{ repo_key_ubuntu_desktop }}"
+    - "{{ repo_ubuntu_desktop }}"
+    - "{{ repo_dropbox }}"
 - name: add repositories
   become_method: sudo
   become: yes
@@ -16,15 +17,13 @@
     state: present
     update_cache: false
   with_items:
-    # REPO universe, multiverse
-    - "{{ repo_multi1 }}"
-    - "{{ repo_multi2 }}"
-    - "{{ repo_multi3 }}"
-    - "{{ repo_multi4 }}"
-    # REPO canonical partners
+    - "{{ repo_multiverse1 }}"
+    - "{{ repo_multiverse2 }}"
+    - "{{ repo_multiverse3 }}"
+    - "{{ repo_multiverse4 }}"
     - "{{ repo_canonical }}"
-    # REPO ubuntu-desktop | ubuntu-make
-    - "{{ repo_ubuntu_desktop }}"
+    - "{{ repo_ubuntu_desktop.repo }}"  # key required
+    - "{{ repo_dropbox.repo }}"  # key required
 - name: update apt cache
   become_method: sudo
   become: yes
@@ -67,7 +66,8 @@
     - clementine
     - virtualbox
     - rdesktop
-    - nautilus-dropbox
+    - dropbox
+#    - nautilus-dropbox
     - unrar
     - deluged
     - deluge-gtk
@@ -80,6 +80,5 @@
 - name: apt upgrade
   become_method: sudo
   become: yes
-  apt:
-    upgrade: yes
+  apt: upgrade=yes
 

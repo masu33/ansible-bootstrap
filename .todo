@@ -8,7 +8,8 @@
 # DISABLE sound by default
 # DISABLE wifi by default
 # SET wallpaper
-# INSTALL dropbox
 # ADD_PLACES dropbox
+# CONFIGURE dropbox
+# CONFIGURE git
 # sources.list.d
 

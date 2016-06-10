@@ -1,4 +1,5 @@
-# REPO webupd8team
-repo_webupd8team: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu {{ansible_distribution_release}} main'
-repo_key_webupd8team: '7B2C3B0889BF5709A105D03AC2518248EEA14886' 
+repo_webupd8team:
+  repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu {{ansible_distribution_release}} main'
+  key: '7B2C3B0889BF5709A105D03AC2518248EEA14886' 
+  keyserver: 'keyserver.ubuntu.com'
 
