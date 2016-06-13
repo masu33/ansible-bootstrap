@@ -1,0 +1,48 @@
+repos:
+  - "{{ repo_multiverse1 }}"
+  - "{{ repo_multiverse2 }}"
+  - "{{ repo_multiverse3 }}"
+  - "{{ repo_multiverse4 }}"
+  - "{{ repo_canonical }}"
+  - "{{ repo_ubuntu_desktop }}"
+  - "{{ repo_dropbox }}"
+  - "{{ repo_webupd8team }}"
+packages:
+  - libfreetype6  # fonts
+  - libfreetype6-dev  # fonts
+  - libfontconfig  # fonts
+  - ttf-mscorefonts-installer  # fonts
+  - ttf-ubuntu-font-family  # fonts
+  - fonts-ubuntu-font-family-console  # fonts
+  - caffeine
+  - unity-tweak-tool
+  - pinta
+  - gimp
+  - inkscape
+  - ubuntu-restricted-extras  # codecs
+  - libavcodec-extra  # codecs
+  - ffmpeg  # codec
+  - mplayer
+  - smplayer
+  - youtube-dl
+  - lame  # codec
+  - clementine
+  - virtualbox
+  - rdesktop
+  - dropbox
+  - unrar
+  - deluged
+  - deluge-gtk
+  - deluge-console
+  - deluge-webui
+  - skype
+  - gtk2-engines-murrine:i386  # Skype visual
+  - gtk2-engines-pixbuf:i386  # Skype visual
+  - firefox
+  - chromium-browser
+  - chromium-codecs-ffmpeg
+  - flashplugin-installer
+  - oracle-java8-installer
+  - ca-certificates
+  - oracle-java8-set-default
+

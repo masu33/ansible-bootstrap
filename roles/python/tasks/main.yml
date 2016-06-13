@@ -1,13 +1,4 @@
-- name: install python3
-  become_method: sudo
-  become: yes
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - python3
-    - python3-pip
-    - virtualenv
+- include: commons/install.yml
 - name: change default python
   lineinfile: 
     dest: "/home/{{ansible_user_id}}/.bashrc" 

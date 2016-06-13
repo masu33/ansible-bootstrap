@@ -1,5 +1,9 @@
-repo_multiverse1: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
-repo_multiverse2: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
-repo_multiverse3: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
-repo_multiverse4: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+repo_multiverse1:
+  repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+repo_multiverse2:
+  repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+repo_multiverse3:
+  repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+repo_multiverse4:
+  repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
 

@@ -1,0 +1,14 @@
+repos:
+packages:
+  - aptitude
+  - htop
+  - tree
+  - vim
+  - gparted
+  - virtualbox
+  - git
+  - iptables
+  - telnet
+  - traceroute
+  - openssh-server
+

@@ -1,9 +1,0 @@
-- name: install packages 
-  become_method: sudo
-  become: yes
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - firefox
-

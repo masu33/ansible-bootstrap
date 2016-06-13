@@ -1,4 +1,7 @@
+- include: commons/apt_mscorefonts.yml
+- include: commons/apt_oracle_java.yml
 - name: add repository keys
+  when: "{{ repos }}"
   become_method: sudo
   become: yes
   apt_key:
@@ -6,39 +9,31 @@
     state: present
     id: "{{ item.key }}"
   with_items:
-    - "{{ repo_webupd8team }}"
+    - "{{ repos | selectattr('key', 'defined') | selectattr('keyserver', 'defined') | list }}"
 - name: add repositories
+  when: "{{ repos }}"
   become_method: sudo
   become: yes
   apt_repository:
     mode: "{{ priv_sources }}"
-    repo: "{{ item }}"
+    repo: "{{ item.repo }}"
     state: present
     update_cache: false
   with_items:
-    - "{{ repo_webupd8team.repo }}"  # key required
+    - "{{ repos }}"
 - name: update apt cache
+  when: "{{ repos }}"
   become_method: sudo
   become: yes
   apt:
     update_cache: yes
-- name: accept oracle license
-  become_method: sudo
-  become: yes
-  debconf:
-    name: 'oracle-java8-installer'
-    question: 'shared/accepted-oracle-license-v1-1'
-    value: 'true'
-    vtype: 'select'
 - name: install packages
+  when: "{{ packages }}"
   become_method: sudo
   become: yes
   apt:
     name: "{{ item }}"
-    state: present 
+    state: present
   with_items:
-    - oracle-java8-installer
-    - ca-certificates
-    - oracle-java8-set-default
-  ignore_errors: "{{ ansible_check_mode }}"
+    - "{{ packages }}"
 

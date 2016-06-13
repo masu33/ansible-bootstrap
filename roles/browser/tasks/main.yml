@@ -1,5 +1,0 @@
-- when: desktopenv 
-  include: desktop.yml
-- when: not desktopenv
-  include: non_desktop.yml
- 
