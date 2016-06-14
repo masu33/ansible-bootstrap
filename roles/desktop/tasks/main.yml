@@ -1,4 +1,18 @@
+- name: Projects folder present
+  file:
+    path: "{{ansible_env.HOME}}/Projects"
+    state: directory
 - include: commons/install.yml
+- name: add bookmarks
+  lineinfile:
+    backup: yes
+    dest: "{{ansible_env.HOME}}/.config/gtk-3.0/bookmarks"
+    insertbefore: BOF
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "file://{{ansible_env.HOME}}/Dropbox Dropbox"
+    - "file://{{ansible_env.HOME}}/Project Projects"
 - name: apt upgrade
   become_method: sudo
   become: yes

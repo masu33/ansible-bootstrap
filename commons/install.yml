@@ -1,5 +1,5 @@
-- include: commons/apt_mscorefonts.yml
-- include: commons/apt_oracle_java.yml
+- include: commons/pre_mscorefonts.yml
+- include: commons/pre_oracle_java.yml
 - name: add repository keys
   when: "{{ repos }}"
   become_method: sudo
@@ -36,4 +36,5 @@
     state: present
   with_items:
     - "{{ packages }}"
+- include: commons/post_docker.yml
 

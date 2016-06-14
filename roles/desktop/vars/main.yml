@@ -28,6 +28,8 @@ packages:
   - lame  # codec
   - clementine
   - virtualbox
+  - docker.io
+  - vagrant
   - rdesktop
   - dropbox
   - unrar

@@ -1,14 +1,15 @@
 repos:
 packages:
   - aptitude
-  - htop
-  - tree
-  - vim
-  - gparted
-  - virtualbox
+  - curl
   - git
+  - gparted
+  - htop
   - iptables
+  - openssh-server
   - telnet
   - traceroute
-  - openssh-server
+  - tree
+  - vim
+  - virtualbox
 
