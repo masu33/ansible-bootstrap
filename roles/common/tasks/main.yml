@@ -7,33 +7,47 @@
     name: "{{ ansible_user_id }}"
     ssh_key_file: .ssh/id_rsa
     state: present
-- name: install packages
+- name: profile.d folder present
+  file:
+    path: "/etc/profile.d"
+    state: directory
+- name: bashrc.d folder present
+  file:
+    path: "{{ansible_env.HOME}}/.bashrc.d"
+    mode: 0755
+    owner: "{{ ansible_user_id }}"
+    state: directory
+- name: bashrc.d support
+# DEPRECATED: comparison not needed (done by the module itself)
+#  when: "{{ lookup('file', '~/.bashrc') |
+#            replace('\n', '') |
+#            regex_replace('^.*# ANSIBLE MANAGED [.]bashrc[.]d BEGIN', '') |
+#            regex_replace('# ANSIBLE MANAGED [.]bashrc[.]d END.*$', '')
+#            !=
+#            lookup('file', 'bashrc.app') |
+#            replace('\n', '') }}"
+# ---------------------
+  blockinfile:
+    backup: yes
+    block: "{{ lookup('file', 'bashrc.app') }}"
+    create: yes
+    dest: "{{ansible_env.HOME}}/.bashrc"
+    follow: yes
+    marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
+    mode: 0644
+    state: present
+- include: commons/install.yml
+- name: enable video-reset
   become_method: sudo
   become: yes
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - aptitude
-    - htop
-    - tree
-    - vim
-    - gparted
-    - virtualbox
-    - git
-    - iptables
-    - telnet
-    - traceroute
-    - openssh-server
-- name: enable video-reset
-  lineinfile:
-    dest: "/home/{{ansible_user_id}}/.bashrc"
-    owner: "{{ ansible_user_id }}"
-    regexp: '^setxkbmap -option "terminate:ctrl_alt_bksp"$'
-    line: 'setxkbmap -option "terminate:ctrl_alt_bksp"'
-    state: present
-    create: yes
-    insertafter: EOF
+  copy:
+    backup: yes
+    dest: "/etc/profile.d/"
+    follow: yes
+    force: no
+    mode: 0644
+    owner: root
+    src: "profile.d/setxkbmap.sh"
 - name: set up no-internet option
   include: no-internet.yml
 

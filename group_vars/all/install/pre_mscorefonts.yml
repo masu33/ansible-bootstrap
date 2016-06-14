@@ -1,0 +1,3 @@
+mscorefonts_check_dir: /usr/share/fonts/truetype/msttcorefonts/
+mscorefonts_check_package: ttf-mscorefonts-installer
+

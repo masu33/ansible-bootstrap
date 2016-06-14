@@ -1,0 +1,6 @@
+repos:
+packages:
+  - python3
+  - python3-pip
+  - virtualenv
+
