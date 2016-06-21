@@ -7,6 +7,7 @@ repos:
   - "{{ repo_ubuntu_desktop }}"
   - "{{ repo_dropbox }}"
   - "{{ repo_webupd8team }}"
+
 packages:
   - libfreetype6  # fonts
   - libfreetype6-dev  # fonts
@@ -47,4 +48,71 @@ packages:
   - oracle-java8-installer
   - ca-certificates
   - oracle-java8-set-default
+  - openvpn
+  - network-manager-openvpn
+  - network-manager-openvpn-gnome
+  - easy-rsa
+
+folders:
+  dl: "{{ansible_env.HOME}}/Downloads"
+  dl_firefox: "{{ansible_env.HOME}}/Downloads/firefox"
+  dl_firefox_dta: "{{ansible_env.HOME}}/Downloads/firefox-dta"
+  dl_torrent: "{{ansible_env.HOME}}/Downloads/torrent"
+  dl_torrent_curr: "{{ansible_env.HOME}}/Downloads/torrent/current"
+  dl_torrent_stop: "{{ansible_env.HOME}}/Downloads/torrent/stopped"
+  dl_torrent_watch: "{{ansible_env.HOME}}/Downloads/torrent/watch"
+  dl_torrent_ncore: "{{ansible_env.HOME}}/Downloads/torrent/ncore"
+  dl_torrent_index: "{{ansible_env.HOME}}/Downloads/torrent/index"
+  dropbox: "{{ansible_env.HOME}}/Dropbox"
+  projects: "{{ansible_env.HOME}}/Projects"
+
+nautilus_bookmarks:
+  - name: "DL Firefox"
+    location: "file://{{folders.dl_firefox}}"
+  - name: "DL torrent"
+    location: "file://{{folders.dl_torrent_curr}}"
+  - name: "DL nCore"
+    location: "file://{{folders.dl_torrent_ncore}}"
+  - name: "Dropbox"
+    location: "file://{{folders.dropbox}}"
+  - name: "Projects"
+    location: "file://{{ansible_env.HOME}}/Projects"
+
+downloadables:
+  img_background:
+    dest: "{{ansible_env.HOME}}/background.png"
+    force: yes
+    follow: yes
+    mode: 0644
+    owner: "{{ansible_user_id}}"
+    url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background.png"
+  img_avatar:
+    dest: "/var/lib/AccountsService/icons/{{ansible_user_id}}"
+    force: yes
+    follow: yes
+    mode: 0644
+    owner: root
+    url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar.png"
+
+gsettings_params:
+  workspaces_vertical:
+    state: present
+    user: "{{ ansible_user_id }}"
+    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.vsize"
+    value: 2
+  workspaces_horizontal:
+    state: present
+    user: "{{ ansible_user_id }}"
+    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.hsize"
+    value: 2
+  background_image:
+    state: present
+    user: "{{ ansible_user_id }}"
+    key: "org.gnome.desktop.background.picture-uri"
+    value: "file://{{downloadables.img_background.dest}}"
+  show_login_name:
+    state: present
+    user: "{{ ansible_user_id }}"
+    key: "com.canonical.indicator.session.show-real-name-on-panel"
+    value: "true"
 

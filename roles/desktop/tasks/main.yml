@@ -1,18 +1,102 @@
-- name: Projects folder present
+# ----------
+# Download resources specified in the downloadables variable
+# ----------
+- name: download downloadables
+  become_method: sudo
+  become: yes
+  get_url:
+  args:
+    # -- get_url module params
+    backup: "{{ item.backup | default(omit) }}"
+    checksum: "{{ item.checksum | default(omit) }}"
+    dest: "{{ item.dest | default(omit) }}"
+    force: "{{ item.force | default(omit) }}"
+    force_basic_auth: "{{ item.force_basic_auth | default(omit) }}"
+    headers: "{{ item.headers | default(omit) }}"
+    others: "{{ item.others | default(omit) }}"
+    sha256sum: "{{ item.sha256sum | default(omit) }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+    tmp_dest: "{{ item.tmp_dest | default(omit) }}"
+    url: "{{ item.url | default(omit) }}"
+    url_password: "{{ item.url_password | default(omit) }}"
+    url_username: "{{ item.url_username | default(omit) }}"
+    use_proxy: "{{ item.use_proxy | default(omit) }}"
+    validate_certs: "{{ item.validate_certs | default(omit) }}"
+    # -- file module params
+    follow: "{{ item.follow | default(omit) }}"
+#    force: "{{ item.force | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
+    owner: "{{ item.owner | default(omit) }}"
+    path: "{{ item.path | default(omit) }}"
+    recurse: "{{ item.recurse | default(omit) }}"
+    selevel: "{{ item.selevel | default(omit) }}"
+    serole: "{{ item.serole | default(omit) }}"
+    setype: "{{ item.setype | default(omit) }}"
+    seuser: "{{ item.seuser | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+  with_items: "{{ downloadables.values() }}"
+
+# ----------
+# Create folders speficied in the folders variable
+# ----------
+- name: folders present
   file:
-    path: "{{ansible_env.HOME}}/Projects"
+    path: "{{ item.value }}"
     state: directory
+  with_dict: "{{ folders }}"
+
+# ----------
+# Install repos and packages specified in the repos and packages variables
+# ----------
 - include: commons/install.yml
+
+# ----------
+# Add nautilus bookmarks specified in the nautilus_bookmarks variable
+# ----------
 - name: add bookmarks
   lineinfile:
     backup: yes
     dest: "{{ansible_env.HOME}}/.config/gtk-3.0/bookmarks"
     insertbefore: BOF
-    line: "{{ item }}"
+    line: "{{ item.location }} {{ item.name | default('') }}"
     state: present
   with_items:
-    - "file://{{ansible_env.HOME}}/Dropbox Dropbox"
-    - "file://{{ansible_env.HOME}}/Project Projects"
+    - "{{ nautilus_bookmarks }}"
+
+# ----------
+# Change gsettings specified in the gsettings_params variable
+# ----------
+- name: gsettings
+  become_method: sudo
+  become: yes
+  gsetting:
+    state: "{{ item.value.state }}"
+    user: "{{ item.value.user }}"
+    key: "{{ item.value.key }}"
+    value: "{{ item.value.value }}"
+  with_dict: "{{ gsettings_params }}"
+
+# ----------
+# Set the avatar to use a custom image if it is there
+# ----------
+- name: check avatar presence
+  stat:
+    path: "{{ downloadables.img_avatar.dest }}"
+  register: avatar_file
+- name: set avatar
+  when: "{{ avatar_file.stat.exists }}"
+  lineinfile:
+    backup: yes
+    dest: "/var/lib/AccountsService/users/{{ansible_user_id}}"
+    line: "Icon={{downloadables.img_avatar.dest}}"
+    regexp: "^Icon=.*$"
+    state: present
+
+# ----------
+# Upgrade packages
+# ----------
 - name: apt upgrade
   become_method: sudo
   become: yes

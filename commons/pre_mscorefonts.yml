@@ -8,3 +8,4 @@
   become_method: sudo
   become: yes
   shell: 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections'
+
