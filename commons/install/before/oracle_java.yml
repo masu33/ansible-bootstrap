@@ -1,3 +1,25 @@
+---
+
+############
+# Overview:
+#   TODO
+# ----------
+# Author:
+#   TODO
+# ----------
+# Description:
+#   TODO
+# ----------
+# Usage:
+#   TODO
+# ----------
+# Notes:
+#   TODO
+############
+
+############
+# Accept Oracle license
+# ----------
 - name: accept oracle license
   when: "{{ oracle_java_check_package in packages }}"
   become_method: sudo

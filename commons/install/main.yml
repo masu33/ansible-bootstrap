@@ -1,0 +1,84 @@
+---
+
+############
+# Overview:
+#   TODO
+# ----------
+# Author:
+#   TODO
+# ----------
+# Description:
+#   TODO
+# ----------
+# Usage:
+#   TODO
+# ----------
+# Notes:
+#   TODO
+############
+
+############
+# Installation prerequisites
+# ----------
+- include: commons/install/include.yml
+  vars:
+    group: before
+
+############
+# Set repo keys wrt. the repos variable
+# ----------
+- name: add repository keys
+  when: "{{ repos }}"
+  become_method: sudo
+  become: yes
+  apt_key:
+    keyserver: "{{ item.keyserver | default('keyserver.ubuntu.com') }}"
+    state: "{{ item.state | default('present') }}"
+    id: "{{ item.key }}"
+  with_items:
+    - "{{ repos | selectattr('key', 'defined') | list }}"
+
+############
+# Set repos wrt. the repos variable
+# ----------
+- name: add repositories
+  when: "{{ repos }}"
+  become_method: sudo
+  become: yes
+  apt_repository:
+    mode: 644
+    repo: "{{ item.repo | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+    update_cache: false
+  with_items:
+    - "{{ repos }}"
+
+############
+# Update apt cache
+# ----------
+- name: update apt cache
+  become_method: sudo
+  become: yes
+  apt:
+    update_cache: yes
+
+############
+# Set packages listed in the packages variable
+# ----------
+- name: install packages
+  when: "{{ packages }}"
+  become_method: sudo
+  become: yes
+  apt:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.value | default('present') }}"
+  with_items:
+    - "{{ packages }}"
+
+############
+# Package dependent todos (necessity check inside)
+# ----------
+- include: commons/install/include.yml
+  vars:
+    group: after
+

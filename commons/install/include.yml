@@ -1,0 +1,39 @@
+---
+
+############
+# Overview:
+#   TODO
+# ----------
+# Author:
+#   TODO
+# ----------
+# Description:
+#   TODO
+# ----------
+# Usage:
+#   TODO
+# ----------
+# Notes:
+#   TODO
+############
+
+############
+# Find YAML files
+# ---------
+- find:
+    file_type: file
+    follow: no
+    hidden: no
+    paths: 'commons/install/{{group}}/'
+    patterns:
+      - "*.yml"
+      - "*.yaml"
+    recurse: yes
+  register: found
+
+############
+# Include YAML files
+# ---------
+- include: "{{ item.path }}"
+  with_items: "{{ found.files }}"
+

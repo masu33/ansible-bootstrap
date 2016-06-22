@@ -1,3 +1,25 @@
+---
+
+############
+# Overview:
+#   TODO
+# ----------
+# Author:
+#   TODO
+# ----------
+# Description:
+#   TODO
+# ----------
+# Usage:
+#   TODO
+# ----------
+# Notes:
+#   TODO
+############
+
+############
+# Add user to docker group
+# ----------
 - name: add user to docker group
   when: "{{ docker_check_package in packages }}"
   become_method: sudo
@@ -8,6 +30,10 @@
     append: yes
     state: present
   ignore_errors: "{{ ansible_check_mode }}"
+
+############
+# Add the dlast command alias
+# ----------
 - name: add alias dlast
   when: "{{ docker_check_package in packages }}"
   become_method: sudo
@@ -19,5 +45,5 @@
     force: no
     mode: 0644
     owner: root
-    src: common_files/profile.d/docker_profile.sh
+    src: files/profile.d/docker_profile.sh
 

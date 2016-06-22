@@ -1,28 +1,16 @@
 #!/usr/bin/python
 
 import json
-import re
 import subprocess
 
-from ansible.module_utils.basic import *
+from ansible.module_utils.basic import AnsibleModule
 
-def _escape_single_quotes(string):
-    return re.sub("'", r"'\''", string)
+def _get_value(user, schema, key):
 
-def _split_key(full_key):
-    key_array = full_key.split('.')
-    schema = '.'.join(key_array[0:-1])
-    single_key = key_array[-1]
-    return (schema, single_key)
-
-def _set_value(user, full_key, value):
-
-    schema, single_key = _split_key(full_key)
     command = " ".join([
         'export `/usr/bin/dbus-launch`',
         ';',
-        '/usr/bin/gsettings set', schema, single_key,
-        "'%s'" % _escape_single_quotes(value),
+        '/usr/bin/gsettings get', schema, key,
         ';',
         'kill $DBUS_SESSION_BUS_PID &> /dev/null'
     ])
@@ -31,29 +19,60 @@ def _set_value(user, full_key, value):
         'su', '-', user , '-c', command
     ]).strip()
 
-def _get_value(user, full_key):
+def _set_value(user, schema, key, value):
 
-    schema, single_key = _split_key(full_key)
+    old_value = _get_value(user, schema, key)
+
+    changed = old_value not in [value, "'" + value + "'"]
+
     command = " ".join([
         'export `/usr/bin/dbus-launch`',
         ';',
-        '/usr/bin/gsettings get', schema, single_key,
+        '/usr/bin/gsettings set', schema, key,
+        "'%s'" % value.replace("'", r"\'"),
         ';',
         'kill $DBUS_SESSION_BUS_PID &> /dev/null'
     ])
 
-    return subprocess.check_output([
+    result = subprocess.check_output([
         'su', '-', user , '-c', command
     ]).strip()
+
+    return changed, old_value
+
+def _reset_value(user, schema, key):
+    
+    old_value = _get_value(user, schema, key)
+        
+    command = " ".join([
+        'export `/usr/bin/dbus-launch`',
+        ';',
+        '/usr/bin/gsettings reset', schema, key,
+        ';',
+        'kill $DBUS_SESSION_BUS_PID &> /dev/null'
+    ])
+
+    result = subprocess.check_output([
+        'su', '-', user , '-c', command
+    ]).strip()
+
+    value = _get_value(user, schema, key)
+
+    return value != old_value, old_value, value
 
 def main():
 
     module = AnsibleModule(
-        argument_spec = {
-            'state': { 'choices': ['present'], 'default': 'present' },
-            'user': { 'required': True },
-            'key': { 'required': True },
-            'value': { 'required': True },
+        argument_spec={
+            'user':   { 'required': True },
+            'schema': { 'required': True },
+            'key':    { 'required': True },
+            'value':  { 'required': True },
+            'state':  { 'choices': [ 'present',
+                                     'reset' ],
+                        'default': 'present'
+                      },
+
         },
         supports_check_mode = True,
     )
@@ -61,20 +80,28 @@ def main():
     params = module.params
     state = module.params['state']
     user = module.params['user']
+    schema = module.params['schema']
     key = module.params['key']
     value = module.params['value']
 
-    old_value = _get_value(user, key)
-    changed = (old_value != value) and (old_value != "'" + value + "'")
+    if module.check_mode:
+        changed = False
+        if state == 'present':
+            old_value = _get_value(user, schema, key)
+        elif state == 'reset':
+            old_value = value = _get_value(user, schema, key)
+    else:
+        if state == 'present':
+            changed, old_value = _set_value(user, schema, key, value)
+        elif state == 'reset' and value == 'reset':
+            changed, old_value, value = _reset_value(user, schema, key)
 
-    if changed and not module.check_mode:
-        _set_value(user, key, value)
-
-    print json.dumps({
+    print(json.dumps({
         'changed': changed,
+        'schema': schema,
         'key': key,
         'value': value,
         'old_value': old_value,
-    })
+    }))
 
 main()

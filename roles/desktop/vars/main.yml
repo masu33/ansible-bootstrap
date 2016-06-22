@@ -98,21 +98,31 @@ gsettings_params:
   workspaces_vertical:
     state: present
     user: "{{ ansible_user_id }}"
-    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.vsize"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key: "vsize"
     value: 2
   workspaces_horizontal:
     state: present
     user: "{{ ansible_user_id }}"
-    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.hsize"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key: "hsize"
     value: 2
   background_image:
     state: present
     user: "{{ ansible_user_id }}"
-    key: "org.gnome.desktop.background.picture-uri"
+    schema: "org.gnome.desktop.background"
+    key: "picture-uri"
     value: "file://{{downloadables.img_background.dest}}"
+  show_desktop_icons:
+    state: present
+    user: "{{ ansible_user_id }}"
+    schema: "org.gnome.desktop.background"
+    key: "show-desktop-icons"
+    value: "true"
   show_login_name:
     state: present
     user: "{{ ansible_user_id }}"
-    key: "com.canonical.indicator.session.show-real-name-on-panel"
+    schema: "com.canonical.indicator.session"
+    key: "show-real-name-on-panel"
     value: "true"
 

@@ -1,4 +1,4 @@
-- include: commons/install.yml
+- include: commons/install/main.yml
 - name: install packages
   become_method: sudo
   become: yes

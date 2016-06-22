@@ -1,2 +1,2 @@
-- include: commons/install.yml
+- include: commons/install/main.yml
 
