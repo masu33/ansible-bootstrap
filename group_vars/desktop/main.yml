@@ -1,2 +1,4 @@
+ansible_connection: local
+ansible_become_method: sudo
 desktopenv: yes
 

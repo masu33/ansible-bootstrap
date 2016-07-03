@@ -1,0 +1,9 @@
+repo_universe1:
+  repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} universe'
+repo_universe2:
+  repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} universe'
+repo_universe3:
+  repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates universe'
+repo_universe4:
+  repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates universe'
+

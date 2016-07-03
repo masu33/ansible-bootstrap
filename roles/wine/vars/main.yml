@@ -1,7 +1,0 @@
-packages:
-  - winbind
-  - wine
-  - wine-gecko*
-  - wine-mono*
-  - playonlinux
-
