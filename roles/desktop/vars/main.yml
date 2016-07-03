@@ -1,118 +1,176 @@
-repos:
-  - "{{ repo_multiverse1 }}"
-  - "{{ repo_multiverse2 }}"
-  - "{{ repo_multiverse3 }}"
-  - "{{ repo_multiverse4 }}"
-  - "{{ repo_canonical }}"
-  - "{{ repo_ubuntu_desktop }}"
-  - "{{ repo_dropbox }}"
-  - "{{ repo_webupd8team }}"
+apt:
+  repos:
+    - "{{ repo_universe1 }}"
+    - "{{ repo_universe2 }}"
+    - "{{ repo_universe3 }}"
+    - "{{ repo_universe4 }}"
+    - "{{ repo_multiverse1 }}"
+    - "{{ repo_multiverse2 }}"
+    - "{{ repo_multiverse3 }}"
+    - "{{ repo_multiverse4 }}"
+    - "{{ repo_canonical }}"
+    - "{{ repo_ubuntu_desktop }}"
+    - "{{ repo_dropbox }}"
+    - "{{ repo_webupd8team }}"
+  packages:
+    - name: totem
+      state: absent
+    - name: totem-common
+      state: absent
+    - name: totem-plugins
+      state: absent
+    - name: rhythmbox
+      state: absent
+    - name: rhythmbox-data
+      state: absent
+    - name: rhythmbox-plugins
+      state: absent
+    - name: rhythmbox-plugin-zeitgeist
+      state: absent
+    - aptitude
+    - curl
+    - wget
+    - iptables
+    - openssh-server
+    - telnet
+    - traceroute
+    - git
+    - gparted
+    - htop
+    - tree
+    - vim
+    - virtualbox
+    - libfreetype6  # fonts
+    - libfreetype6-dev  # fonts
+    - libfontconfig  # fonts
+    - ttf-mscorefonts-installer  # fonts
+    - ttf-ubuntu-font-family  # fonts
+    - fonts-ubuntu-font-family-console  # fonts
+    - caffeine
+    - unity-tweak-tool
+    - pinta
+    - gimp
+    - inkscape
+    - ubuntu-restricted-extras  # codecs
+    - libavcodec-extra  # codecs
+    - ffmpeg  # codec
+    - mplayer
+    - smplayer
+    - youtube-dl
+    - lame  # codec
+    - clementine
+    - virtualbox
+    - docker.io
+    - vagrant
+    - rdesktop
+    - dropbox
+    - unrar
+    - deluged
+    - deluge-gtk
+    - deluge-console
+    - deluge-webui
+    - skype
+    - gtk2-engines-murrine:i386  # Skype visual
+    - gtk2-engines-pixbuf:i386  # Skype visual
+    - firefox
+    - chromium-browser
+    - chromium-codecs-ffmpeg
+    - flashplugin-installer
+    - oracle-java8-installer
+    - ca-certificates
+    - oracle-java8-set-default
+    - openvpn
+    - network-manager-openvpn
+    - network-manager-openvpn-gnome
+    - calibre
+    - pdftk
+    - python3
+    - python3-pip
+    - virtualenv
+    - winbind
+    - wine
+    - wine-gecko*
+    - wine-mono*
+    - playonlinux
+    - atom4
+  python2_packages:
+  python3_packages:
+    - numpy
+    - scipy
+    - scikit-learn
+    - pandas
+    - matplotlib
+    - seaborn
+    - jupyter
+    - pymongo
 
-packages:
-  - libfreetype6  # fonts
-  - libfreetype6-dev  # fonts
-  - libfontconfig  # fonts
-  - ttf-mscorefonts-installer  # fonts
-  - ttf-ubuntu-font-family  # fonts
-  - fonts-ubuntu-font-family-console  # fonts
-  - caffeine
-  - unity-tweak-tool
-  - pinta
-  - gimp
-  - inkscape
-  - ubuntu-restricted-extras  # codecs
-  - libavcodec-extra  # codecs
-  - ffmpeg  # codec
-  - mplayer
-  - smplayer
-  - youtube-dl
-  - lame  # codec
-  - clementine
-  - virtualbox
-  - docker.io
-  - vagrant
-  - rdesktop
-  - dropbox
-  - unrar
-  - deluged
-  - deluge-gtk
-  - deluge-console
-  - deluge-webui
-  - skype
-  - gtk2-engines-murrine:i386  # Skype visual
-  - gtk2-engines-pixbuf:i386  # Skype visual
-  - firefox
-  - chromium-browser
-  - chromium-codecs-ffmpeg
-  - flashplugin-installer
-  - oracle-java8-installer
-  - ca-certificates
-  - oracle-java8-set-default
-  - openvpn
-  - network-manager-openvpn
-  - network-manager-openvpn-gnome
-  - easy-rsa
+users:
+  - name: "masu"
+    groups: "sudo"
+  - name: "willow"
 
-folders:
-  dl: "{{ansible_env.HOME}}/Downloads"
-  dl_firefox: "{{ansible_env.HOME}}/Downloads/firefox"
-  dl_firefox_dta: "{{ansible_env.HOME}}/Downloads/firefox-dta"
-  dl_torrent: "{{ansible_env.HOME}}/Downloads/torrent"
-  dl_torrent_curr: "{{ansible_env.HOME}}/Downloads/torrent/current"
-  dl_torrent_stop: "{{ansible_env.HOME}}/Downloads/torrent/stopped"
-  dl_torrent_watch: "{{ansible_env.HOME}}/Downloads/torrent/watch"
-  dl_torrent_ncore: "{{ansible_env.HOME}}/Downloads/torrent/ncore"
-  dl_torrent_index: "{{ansible_env.HOME}}/Downloads/torrent/index"
-  dropbox: "{{ansible_env.HOME}}/Dropbox"
-  projects: "{{ansible_env.HOME}}/Projects"
+root_user: "root"
 
-nautilus_bookmarks:
-  - name: "DL Firefox"
-    location: "file://{{folders.dl_firefox}}"
-  - name: "DL torrent"
-    location: "file://{{folders.dl_torrent_curr}}"
-  - name: "DL nCore"
-    location: "file://{{folders.dl_torrent_ncore}}"
-  - name: "Dropbox"
-    location: "file://{{folders.dropbox}}"
-  - name: "Projects"
-    location: "file://{{ansible_env.HOME}}/Projects"
-
-downloadables:
-  img_background:
-    dest: "{{ansible_env.HOME}}/background.png"
-    force: yes
+filesystem_resources:
+  - users: [ "masu" ]
+    multiple:
+      - path: "/home/masu/Downloads"
+      - path: "/home/masu/Downloads/firefox"
+      - path: "/home/masu/Downloads/torrent"
+      - path: "/home/masu/Downloads/torrent/current"
+      - path: "/home/masu/Downloads/torrent/stopped"
+      - path: "/home/masu/Downloads/torrent/watch"
+      - path: "/home/masu/Downloads/torrent/ncore"
+        mode: "0755"
+        recurse: yes
+      - path: "/home/masu/Downloads/torrent/index"
+      - path: "/home/masu/Dropbox"
+      - path: "/home/masu/Projects"
     follow: yes
-    mode: 0644
-    owner: "{{ansible_user_id}}"
-    url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background.png"
-  img_avatar:
-    dest: "/var/lib/AccountsService/icons/{{ansible_user_id}}"
     force: yes
+    mode: "0711"
+    state: directory
+  - users: [ "willow" ]
+    path: "/home/willow/ncore"
     follow: yes
-    mode: 0644
-    owner: root
-    url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar.png"
+    force: yes
+    src: "/home/masu/Downloads/torrent/ncore"
+    state: link
 
-gsettings_params:
-  workspaces_vertical:
-    state: present
-    user: "{{ ansible_user_id }}"
-    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.vsize"
-    value: 2
-  workspaces_horizontal:
-    state: present
-    user: "{{ ansible_user_id }}"
-    key: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/.hsize"
-    value: 2
-  background_image:
-    state: present
-    user: "{{ ansible_user_id }}"
-    key: "org.gnome.desktop.background.picture-uri"
-    value: "file://{{downloadables.img_background.dest}}"
-  show_login_name:
-    state: present
-    user: "{{ ansible_user_id }}"
-    key: "com.canonical.indicator.session.show-real-name-on-panel"
-    value: "true"
+online_resources:
+  - users: [ "masu" ]
+    multiple:
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background.png"
+        dest: "/home/masu/.background"
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar.png"
+        dest: "/home/masu/.avatar"
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/login.png"
+        dest: "/home/masu/.login"
+    force: yes
+    mode: "0644"
+    owner: "masu"
 
+visual_settings:
+  - xterminate: no
+  - users: [ "masu" ]
+    bookmarks:
+      - name: "Dropbox"
+        location: "//home/masu/Dropbox"
+      - name: "Projects"
+        location: "//home/masu/Projects"
+      - name: "DL Firefox"
+        location: "//home/masu/Downloads/firefox"
+      - name: "DL torrent"
+        location: "//home/masu/Downloads/torrent"
+      - name: "DL ncore"
+        location: "//home/masu/Downloads/torrent/ncore"
+    bookmarks_check: yes
+    workspaces_h: 2
+    workspaces_v: 2
+    login_background: "/home/masu/.login"
+    background: "//home/masu/.background"
+    avatar: "//home/masu/.avatar"
+    xterminate: no
+  - users: [ "masu", "willow" ]
+    desktop_icons: yes
+    show_name: yes

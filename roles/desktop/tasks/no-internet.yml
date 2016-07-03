@@ -1,0 +1,40 @@
+---
+
+- name: "no-internet group"
+  become: yes
+  group:
+    name: no-internet
+    state: present
+    system: yes
+
+- name: "copy iptables rules"
+  become: yes
+  copy:
+    backup: yes
+    dest: "/etc/network/if-pre-up.d/"
+    follow: yes
+    force: no
+    mode: "0755"
+    owner: "{{ root_user | d('root') }}"
+    src: "no-internet/no-internet_group_rule"
+
+- name: "copy no-internet command"
+  become: yes
+  copy:
+    backup: yes
+    dest: "/usr/bin/no-internet.sh"
+    follow: yes
+    force: no
+    mode: "0755"
+    owner: "{{ root_user | d('root') }}"
+    src: "no-internet/no-internet.sh"
+
+- name: "users to no-internet group"
+  become: yes
+  user:
+    name: "{{ item }}"
+    groups: no-internet
+    append: yes
+    state: present
+  with_items: "{{ add_users }}"
+

@@ -18,7 +18,7 @@
 ############
 
 ############
-# START ansible raw on remote host
+# Set key combination for X reset
 # ----------
-ansible $1 --sudo -m raw -a "yum install -y python2 python-simplejson"
+setxkbmap -option "terminate:ctrl_alt_bksp"
 

@@ -1,0 +1,136 @@
+---
+
+- name: "Disable display of custom backgrounds"
+  when: "{{ username is defined
+            and settings.login_background is defined }}"
+  become: yes
+  gsettings:
+    state: "present"
+    user: "{{ username }}"
+    schema: "com.canonical.unity-greeter"
+    key: "draw-user-backgrounds"
+    value: "{{ (settings.login_background is none) | ternary('true', 'false') }}"
+
+- name: "Set login background"
+  when: "{{ username is defined
+            and settings.login_background is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.login_background is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "com.canonical.unity-greeter"
+    key: "background"
+    value: "{{ settings.login_background }}"
+
+- name: "Set background"
+  when: "{{ username is defined
+            and settings.background is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.background is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "org.gnome.desktop.background"
+    key: "picture-uri"
+    value: "{{ 'file://'+settings.background }}"
+
+- name: "Reset location bookmarks"
+  when: "{{ username is defined
+            and settings.bookmark_reset is defined }}"
+  file:
+    backup: no
+    content: ""
+    dest: "{{ ansible_env.HOME }}/.config/gtk-3.0/bookmarks"
+    follow: yes
+    force: yes
+    mode: "0644"
+    owner: "{{ username }}"
+
+- name: "Set location bookmarks"
+  when: "{{ username is defined
+            and settings.bookmarks is defined }}"
+  become_user: "{{ username }}"
+  lineinfile:
+    backup: yes
+    dest: "{{ ansible_env.HOME }}/.config/gtk-3.0/bookmarks"
+    insertbefore: EOF
+    line: "file://{{ __v.location }} {{ __v.name | d('') }}"
+    state: "{{ __v.state | d('present') }}"
+  with_items: "{{ settings.bookmarks | d([]) }}"
+  loop_control:
+    loop_var: "__v"
+
+- name: "Copy avatar"
+  when: "{{ username is defined
+            and settings.avatar is defined }}"
+  become: yes
+  copy:
+    backup: no
+    dest: "/var/lib/AccountsService/icons/{{username}}"
+    follow: yes
+    force: yes
+    group: "{{ root_user }}"
+    mode: "0420"
+    owner: "{{ root_user }}"
+    src: "{{ settings.avatar }}"
+
+- name: "Set avatar"
+  when: "{{ username is defined
+            and settings.avatar is defined }}"
+  become: yes
+  lineinfile:
+    backup: yes
+    dest: "/var/lib/AccountsService/users/{{username}}"
+    line: "{{ (settings.avatar is none) |
+              ternary('Icon=', 'Icon=/var/lib/AccountsService/icons/'+username) }}"
+    regexp: "^Icon=.*$"
+    state: present
+
+- name: "Set workspaces (horizontal)"
+  when: "{{ username is defined
+            and settings.workspaces_h is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.workspaces_h is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key: "hsize"
+    value: "{{ settings.workspaces_h }}"
+
+- name: "Set workspaces (vertical)"
+  when: "{{ username is defined
+            and settings.workspaces_v is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.workspaces_v is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key: "vsize"
+    value: "{{ settings.workspaces_v }}"
+
+- name: "Show user's name"
+  when: "{{ username is defined
+            and settings.show_name is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.show_name is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "com.canonical.indicator.session"
+    key: "show-real-name-on-panel"
+    value: "{{ settings.show_name }}"
+
+- name: "Show desktop icons"
+  when: "{{ username is defined
+            and settings.desktop_icons is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.desktop_icons is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "org.gnome.desktop.background"
+    key: "show-desktop-icons"
+    value: "{{ settings.desktop_icons }}"
+
+- name: "Set X-terminate keyboard shortcut"
+  when: "{{ settings.xterminate is defined }}"
+  include: xterminate.yml
+  vars:
+    enable: "{{ settings.xterminate }}"

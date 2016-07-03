@@ -1,0 +1,60 @@
+---
+
+- name: "Download resources"
+  when: "{{ online_resources is defined }}"
+  become: yes
+  become_user: "{{ user.name }}"
+  include: download.yml
+  vars:
+    details: "{{ item_per_user }}"
+  with_items: "{{ online_resources | d([]) |
+                  filter_by_user(user.name) |
+                  list }}"
+  loop_control:
+    loop_var: "item_per_user"
+
+- name: "Set up filesystem resources"
+  when: "{{ filesystem_resources is defined }}"
+  become: yes
+  become_user: "{{ user.name }}"
+  include: filesystem.yml
+  vars:
+    details: "{{ item_per_user }}"
+  with_items: "{{ filesystem_resources |
+                  filter_by_user(user.name) |
+                  list }}"
+  loop_control:
+    loop_var: "item_per_user"
+
+- name: "Set visual settings"
+  when: "{{ visual_settings is defined }}"
+  # become_user:  # this is intentionally commented out
+  include: gnome_desktop.yml
+  vars:
+    username: "{{ user.name }}"
+    settings: "{{ item_per_user }}"
+  with_items: "{{ visual_settings |
+                  filter_by_user(user.name) |
+                  list }}"
+  loop_control:
+    loop_var: "item_per_user"
+
+- name: "Set up bashrc.d support (folder)"
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ ansible_env.HOME }}/.bashrc.d"
+    mode: "0755"
+    owner: "{{ ansible_user_id }}"
+    state: directory
+
+- name: "Set up bashrc.d support (inclusion)"
+  become_user: "{{ user.name }}"
+  blockinfile:
+    backup: yes
+    block: "{{ lookup('file', 'bashrc.app') }}"
+    create: yes
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+    follow: yes
+    marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
+    mode: "0644"
+    state: present

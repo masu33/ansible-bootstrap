@@ -1,0 +1,13 @@
+---
+
+- name: "check presence of mscorefonts"
+  when: "{{ mscorefonts_check_package in packages }}"
+  stat:
+    path: "{{ mscorefonts_check_dir }}"
+  register: ttf_dir
+
+- name: "accept ttf license"
+  when: "{{ mscorefonts_check_package in packages and not ttf_dir.stat.exists }}"
+  become: yes
+  shell: 'echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections'
+
