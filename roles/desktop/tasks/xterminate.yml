@@ -23,19 +23,44 @@
     path: "/etc/X11/xorg.conf.d/90-zap.conf"
     state: absent
 
-- name: "XTERMINATE: Enable for a user"
+#- name: "XTERMINATE: Enable for a user (copy script)"
+#  when: "{{ username is defined
+#            and enable }}"
+#  become: yes
+#  become_user: "{{ username }}"
+#  copy:
+#    backup: no
+#    dest: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
+#    follow: yes
+#    force: yes
+#    mode: "0755"
+#    owner: "{{ username }}"
+#    src: "xterminate/xterminate_profile.sh"
+
+- name: "XTERMINATE: Enable for a user (copy desktop app)"
   when: "{{ username is defined
             and enable }}"
   become: yes
   become_user: "{{ username }}"
   copy:
     backup: no
-    dest: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
+    dest: "{{ ansible_env.HOME }}/.config/autostart/"
     follow: yes
     force: yes
     mode: "0644"
-    owner: "{{ root_user | d('root') }}"
-    src: "xterminate/xterminate_profile.sh"
+    owner: "{{ username }}"
+    src: "xterminate/xterminate_profile.desktop"
+
+#- name: "XTERMINATE: Disable for a user"
+#  when: "{{ username is defined
+#            and not enable }}"
+#  become: yes
+#  become_user: "{{ username }}"
+#  file:
+#    follow: yes
+#    force: yes
+#    path: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
+#    state: absent
 
 - name: "XTERMINATE: Disable for a user"
   when: "{{ username is defined
@@ -45,5 +70,5 @@
   file:
     follow: yes
     force: yes
-    path: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
+    path: "{{ ansible_env.HOME }}/.config/autostart/xterminate_profile.desktop"
     state: absent

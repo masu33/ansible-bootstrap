@@ -115,21 +115,27 @@ filesystem_resources:
   - users: [ "masu" ]
     multiple:
       - path: "/home/masu/Downloads"
-      - path: "/home/masu/Downloads/firefox"
+        mode: "0755"
+        recurse: no
       - path: "/home/masu/Downloads/torrent"
+        mode: "0755"
+        recurse: no
+      - path: "/home/masu/Downloads/firefox"
       - path: "/home/masu/Downloads/torrent/current"
       - path: "/home/masu/Downloads/torrent/stopped"
       - path: "/home/masu/Downloads/torrent/watch"
-      - path: "/home/masu/Downloads/torrent/ncore"
-        mode: "0755"
-        recurse: yes
       - path: "/home/masu/Downloads/torrent/index"
       - path: "/home/masu/Dropbox"
       - path: "/home/masu/Projects"
     follow: yes
     force: yes
-    mode: "0711"
+    recurse: yes
+    mode: "0700"
     state: directory
+  - users: [ "masu" ]
+    path: "/home/masu/Downloads/torrent/ncore"
+    mode: "0755"
+    recurse: yes
   - users: [ "willow" ]
     path: "/home/willow/ncore"
     follow: yes
@@ -147,11 +153,12 @@ online_resources:
       - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/login.png"
         dest: "/home/masu/.login"
     force: yes
-    mode: "0644"
+    mode: "0755"
     owner: "masu"
 
 visual_settings:
   - xterminate: no
+    login_background: "/home/masu/.login"
   - users: [ "masu" ]
     bookmarks:
       - name: "Dropbox"
@@ -167,10 +174,10 @@ visual_settings:
     bookmarks_check: yes
     workspaces_h: 2
     workspaces_v: 2
-    login_background: "/home/masu/.login"
     background: "//home/masu/.background"
+    lock_background: "/home/masu/.login"
     avatar: "//home/masu/.avatar"
-    xterminate: no
+    xterminate: yes
   - users: [ "masu", "willow" ]
     desktop_icons: yes
     show_name: yes
