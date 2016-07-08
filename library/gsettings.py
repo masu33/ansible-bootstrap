@@ -39,11 +39,18 @@ class AnsibleGSettingModule(object):
     """
 
     def __init__(self):
+        self.enabled = None
         self.dbus_pid = None
         self.dbus_address = None
+        self.user = None
 
-    def __del__(self):
-        sleep(1)
+    def __destruct(self):
+        if self.enabled == "0":
+            subprocess.check_output('''
+                sudo xhost -SI:localuser:{user}
+                '''.format(user=self.user),
+                shell=True
+            )
         if self.dbus_pid is not None:
             try:
                 os.kill(int(self.dbus_pid), signal.SIGTERM)
@@ -51,16 +58,19 @@ class AnsibleGSettingModule(object):
                 pass
 
     def __init_dbus(self, user):
-        # type: (str) -> Tuple(str, str)
+        # type: (str)
         """
         Initializes the message bus.
         :param user: username
-        :return:
         """
+        self.user = user
         dbus_output = subprocess.check_output('''
             export DISPLAY=:0
-            sudo -H -u {} -s /usr/bin/dbus-launch
-            '''.format(user, user),
+            ENABLED=$(sudo xhost | grep -c "SI:localuser:{user}")
+            echo "ENABLED=$ENABLED"
+            sudo xhost +SI:localuser:{user}
+            sudo -H -u {user} -s /usr/bin/dbus-launch
+            '''.format(user=user),
             shell=True
         )
         for line in dbus_output.split('\n'):
@@ -68,7 +78,8 @@ class AnsibleGSettingModule(object):
                 self.dbus_address = line.split('=', 1)[1]
             elif line.startswith('DBUS_SESSION_BUS_PID='):
                 self.dbus_pid = line.split('=', 1)[1]
-        return self.dbus_address, self.dbus_pid
+            elif line.startswith('ENABLED='):
+                self.enabled = line.split('=', 1)[1]
 
     def __execute(self, user, command):
         # type: (str, str, **Dict[str, str]) -> str
@@ -83,12 +94,22 @@ class AnsibleGSettingModule(object):
             self.__init_dbus(user)
         gset = subprocess.check_output('''
             export DISPLAY=:0
-            export DBUS_SESSION_BUS_ADDRESS={}
-            export DBUS_SESSION_BUS_PID={}
-            sudo -H -u {} -s bash -c \'{}\'
-            '''.format(self.dbus_address, self.dbus_pid, user, command),
+            export DBUS_SESSION_BUS_ADDRESS={dbus_address}
+            export DBUS_SESSION_BUS_PID={dbus_pid}
+            sudo -H -u {user} -s /bin/bash -c \'{command}\'
+            '''.format(dbus_address=self.dbus_address, dbus_pid=self.dbus_pid, user=user, command=command),
             shell=True
         ).strip()
+        with open('/tmp/gsetlog', 'a') as fout:
+            fout.writelines([
+                user,
+                '\n',
+                command,
+                '\n',
+                self.enabled,
+                '\n',
+                '\n'
+            ])
         return gset
 
     def get_param(self, user, schema, key):
@@ -217,6 +238,8 @@ class AnsibleGSettingModule(object):
                     raise NotImplementedError()
 
                 changed = old_value.strip("'") != new_value.strip("'")
+
+        self.__destruct()
 
         print json.dumps({
             'changed': changed,

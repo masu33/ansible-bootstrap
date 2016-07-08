@@ -114,6 +114,9 @@ root_user: "root"
 filesystem_resources:
   - users: [ "masu" ]
     multiple:
+      - path: "/home/masu"
+        mode: "0755"
+        recurse: no
       - path: "/home/masu/Downloads"
         mode: "0755"
         recurse: no
@@ -121,6 +124,8 @@ filesystem_resources:
         mode: "0755"
         recurse: no
       - path: "/home/masu/Downloads/firefox"
+      - path: "/home/masu/Downloads/torrent/ncore"
+        mode: "755"
       - path: "/home/masu/Downloads/torrent/current"
       - path: "/home/masu/Downloads/torrent/stopped"
       - path: "/home/masu/Downloads/torrent/watch"
@@ -132,10 +137,6 @@ filesystem_resources:
     recurse: yes
     mode: "0700"
     state: directory
-  - users: [ "masu" ]
-    path: "/home/masu/Downloads/torrent/ncore"
-    mode: "0755"
-    recurse: yes
   - users: [ "willow" ]
     path: "/home/willow/ncore"
     follow: yes
