@@ -93,7 +93,6 @@ apt:
     - wine-mono*
     - playonlinux
     - atom4
-  python2_packages:
   python3_packages:
     - numpy
     - scipy
@@ -106,29 +105,37 @@ apt:
 
 users:
   - name: "masu"
-    groups: "sudo"
+    groups: "sudo,no-internet,docker"
   - name: "willow"
+    groups: "no-internet"
 
 root_user: "root"
 
 filesystem_resources:
   - users: [ "masu" ]
     multiple:
+      - path: "/home/masu"
+        mode: "0755"
+        recurse: no
       - path: "/home/masu/Downloads"
-      - path: "/home/masu/Downloads/firefox"
+        mode: "0755"
+        recurse: no
       - path: "/home/masu/Downloads/torrent"
+        mode: "0755"
+        recurse: no
+      - path: "/home/masu/Downloads/firefox"
+      - path: "/home/masu/Downloads/torrent/ncore"
+        mode: "755"
       - path: "/home/masu/Downloads/torrent/current"
       - path: "/home/masu/Downloads/torrent/stopped"
       - path: "/home/masu/Downloads/torrent/watch"
-      - path: "/home/masu/Downloads/torrent/ncore"
-        mode: "0755"
-        recurse: yes
       - path: "/home/masu/Downloads/torrent/index"
       - path: "/home/masu/Dropbox"
       - path: "/home/masu/Projects"
     follow: yes
     force: yes
-    mode: "0711"
+    recurse: yes
+    mode: "0700"
     state: directory
   - users: [ "willow" ]
     path: "/home/willow/ncore"
@@ -140,37 +147,52 @@ filesystem_resources:
 online_resources:
   - users: [ "masu" ]
     multiple:
-      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background.png"
-        dest: "/home/masu/.background"
-      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar.png"
-        dest: "/home/masu/.avatar"
-      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/login.png"
-        dest: "/home/masu/.login"
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background"
+        dest: "/home/masu/Pictures/background"
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar"
+        dest: "/home/masu/Pictures/avatar"
+      - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/lock"
+        dest: "/home/masu/Pictures/lockscreen"
     force: yes
     mode: "0644"
     owner: "masu"
+  - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/login"
+    dest: "/usr/share/backgrounds/loginscreen"
+    force: yes
+    mode: "0644"
+    owner: "{{ root_user }}"
 
-visual_settings:
-  - xterminate: no
+desktop_settings:
   - users: [ "masu" ]
+    aliases:
+      - name: "dlast"
+        command: "docker ps -l -q"
+      - name: "python"
+        command: "python3"
+      - name: "pip"
+        command: "pip3"
     bookmarks:
       - name: "Dropbox"
-        location: "//home/masu/Dropbox"
+        location: "/home/masu/Dropbox"
       - name: "Projects"
-        location: "//home/masu/Projects"
+        location: "/home/masu/Projects"
       - name: "DL Firefox"
-        location: "//home/masu/Downloads/firefox"
+        location: "/home/masu/Downloads/firefox"
       - name: "DL torrent"
-        location: "//home/masu/Downloads/torrent"
+        location: "/home/masu/Downloads/torrent"
       - name: "DL ncore"
-        location: "//home/masu/Downloads/torrent/ncore"
+        location: "/home/masu/Downloads/torrent/ncore"
     bookmarks_check: yes
     workspaces_h: 2
     workspaces_v: 2
-    login_background: "/home/masu/.login"
-    background: "//home/masu/.background"
-    avatar: "//home/masu/.avatar"
-    xterminate: no
+    background: "/home/masu/Pictures/background"
+    lock_background: "/home/masu/Pictures/lockscreen"
+    avatar: "/home/masu/Pictures/avatar"
+    xterminate: yes
   - users: [ "masu", "willow" ]
     desktop_icons: yes
     show_name: yes
+  - xterminate: no
+    login_background: "/usr/share/backgrounds/loginscreen"
+
+

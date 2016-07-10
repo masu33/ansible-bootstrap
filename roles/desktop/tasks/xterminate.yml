@@ -23,27 +23,17 @@
     path: "/etc/X11/xorg.conf.d/90-zap.conf"
     state: absent
 
-- name: "XTERMINATE: Enable for a user"
+- name: "XTERMINATE: Set for a user"
   when: "{{ username is defined
             and enable }}"
   become: yes
   become_user: "{{ username }}"
-  copy:
-    backup: no
-    dest: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
+  blockinfile:
+    backup: yes
+    block: "setxkbmap -option \"terminate:ctrl_alt_bksp\""
+    create: yes
+    dest: "{{ ansible_env.HOME }}/.bashrc"
     follow: yes
-    force: yes
-    mode: "0644"
-    owner: "{{ root_user | d('root') }}"
-    src: "xterminate/xterminate_profile.sh"
-
-- name: "XTERMINATE: Disable for a user"
-  when: "{{ username is defined
-            and not enable }}"
-  become: yes
-  become_user: "{{ username }}"
-  file:
-    follow: yes
-    force: yes
-    path: "{{ ansible_env.HOME }}/.bashrc.d/xterminate_profile.sh"
-    state: absent
+    insertafter: EOF
+    marker: "# ANSIBLE MANAGED: xterminate {mark}"
+    state: "{{ enable | ternary('present', 'absent') }}"

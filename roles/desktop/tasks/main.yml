@@ -5,10 +5,17 @@
   vars:
     repos: "{{ apt.repos }}"
     packages: "{{ apt.packages }}"
-    pip2_packages: "{{ apt.python2_packages }}"
-    pip3_packages: "{{ apt.python3_packages }}"
+    pip2_packages: "{{ apt.python2_packages | d([]) }}"
+    pip3_packages: "{{ apt.python3_packages | d([]) }}"
     upgrade: "{{ apt.upgrade | d('yes') }}"
     autoremove: "{{ apt.upgrade | d('yes') }}"
+
+- name: "Set no-internet option"
+  include: no-internet.yml
+  vars:
+    add_users: "{{ users |
+                   map(attribute='name') |
+                   list }}"
 
 - name: "Create users and generate SSH keys"
   become: yes
@@ -53,23 +60,18 @@
                   list }}"
 
 - name: "Set common gnome desktop settings"
+  when: "{{ desktop_settings is defined }}"
   include: gnome_desktop.yml
   become: yes
   vars:
     settings: "{{ item }}"
-  with_items: "{{ visual_settings |
+  with_items: "{{ desktop_settings |
                   selectattr('users', 'undefined') |
                   list }}"
+
 
 - name: "Set up users"
   include: users.yml
   vars:
     user: "{{ item }}"
   with_items: "{{ users }}"
-
-- name: "Set no-internet option"
-  include: no-internet.yml
-  vars:
-    add_users: "{{ users |
-                   map(attribute='name') |
-                   list }}"

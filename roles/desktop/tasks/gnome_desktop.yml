@@ -1,27 +1,5 @@
 ---
 
-- name: "Disable display of custom backgrounds"
-  when: "{{ username is defined
-            and settings.login_background is defined }}"
-  become: yes
-  gsettings:
-    state: "present"
-    user: "{{ username }}"
-    schema: "com.canonical.unity-greeter"
-    key: "draw-user-backgrounds"
-    value: "{{ (settings.login_background is none) | ternary('true', 'false') }}"
-
-- name: "Set login background"
-  when: "{{ username is defined
-            and settings.login_background is defined }}"
-  become: yes
-  gsettings:
-    state: "{{ (settings.login_background is none) | ternary('absent', 'present') }}"
-    user: "{{ username }}"
-    schema: "com.canonical.unity-greeter"
-    key: "background"
-    value: "{{ settings.login_background }}"
-
 - name: "Set background"
   when: "{{ username is defined
             and settings.background is defined }}"
@@ -32,6 +10,50 @@
     schema: "org.gnome.desktop.background"
     key: "picture-uri"
     value: "{{ 'file://'+settings.background }}"
+
+- name: "Set login background: disable display of custom backgrounds"
+  when: "{{ username is undefined
+            and settings.login_background is defined }}"
+  become: yes
+  gsettings:
+    state: "present"
+    user: "lightdm"
+    schema: "com.canonical.unity-greeter"
+    key: "draw-user-backgrounds"
+    value: "{{ (settings.login_background is none) | ternary('true', 'false') }}"
+
+- name: "Set login background"
+  when: "{{ username is undefined
+            and settings.login_background is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.login_background is none) | ternary('absent', 'present') }}"
+    user: "lightdm"
+    schema: "com.canonical.unity-greeter"
+    key: "background"
+    value: "{{ settings.login_background }}"
+
+- name: "Set lockscreen background: disable display of custom backgrounds"
+  when: "{{ username is defined
+            and settings.lock_background is defined }}"
+  become: yes
+  gsettings:
+    state: "present"
+    user: "{{ username }}"
+    schema: "com.canonical.unity-greeter"
+    key: "draw-user-backgrounds"
+    value: "{{ (settings.lock_background is none) | ternary('true', 'false') }}"
+
+- name: "Set lockscreen background"
+  when: "{{ username is defined
+            and settings.lock_background is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.lock_background is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "com.canonical.unity-greeter"
+    key: "background"
+    value: "{{ settings.lock_background }}"
 
 - name: "Reset location bookmarks"
   when: "{{ username is defined

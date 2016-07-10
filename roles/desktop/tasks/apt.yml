@@ -1,9 +1,14 @@
 ---
 
-- name: "TODO replace"
-  include: mscorefonts.yml
-- name: "TODO replace"
-  include: oracle_java.yml
+- name: "APT: Accept the MS TTF EULA if necessary"
+  become: yes
+  msttfeula:
+    packages: "{{ packages }}"
+
+- name: "APT: Accpet the Oracle Java License if necessary"
+  become: yes
+  oraclejavalicense:
+    packages: "{{ packages }}"
 
 - name: "APT: Set repository keys"
   become: yes
@@ -57,31 +62,23 @@
           list }}"
 
 - name: "PIP: Set python2 packages"
-  when: "{{ 'python-pip' in packages
-            and pip2_packages is defined }}"
   become: yes
   pip:
     executable: pip
     name: "{{ item.name | d(item) }}"
     state: "{{ item.state | d('present') }}"
-  with_items: "{{ pip2_packages }}"
+  with_items: "{{ pip2_packages | d([], True) }}"
 
 - name: "PIP: Set python3 packages"
-  when: "{{ 'python3-pip' in packages
-            and pip3_packages is defined }}"
   become: yes
   pip:
     executable: pip3
     name: "{{ item.name | d(item) }}"
     state: "{{ item.state | d('present') }}"
-  with_items: "{{ pip3_packages }}"
+  with_items: "{{ pip3_packages | d([], True) }}"
 
 - name: "APT: Upgrade"
   when: "{{ (upgrade | d('no')) == 'yes' }}"
   become: yes
   apt:
     upgrade: "{{ upgrade | d('no') }}"
-
-- name: "TODO replace"
-  include: docker.yml
-
