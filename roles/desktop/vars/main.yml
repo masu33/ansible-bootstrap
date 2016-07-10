@@ -93,7 +93,6 @@ apt:
     - wine-mono*
     - playonlinux
     - atom4
-  python2_packages:
   python3_packages:
     - numpy
     - scipy
@@ -106,8 +105,9 @@ apt:
 
 users:
   - name: "masu"
-    groups: "sudo"
+    groups: "sudo,no-internet,docker"
   - name: "willow"
+    groups: "no-internet"
 
 root_user: "root"
 
@@ -162,9 +162,15 @@ online_resources:
     mode: "0644"
     owner: "{{ root_user }}"
 
-
-visual_settings:
+desktop_settings:
   - users: [ "masu" ]
+    aliases:
+      - name: "dlast"
+        command: "docker ps -l -q"
+      - name: "python"
+        command: "python3"
+      - name: "pip"
+        command: "pip3"
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"
@@ -188,3 +194,5 @@ visual_settings:
     show_name: yes
   - xterminate: no
     login_background: "/usr/share/backgrounds/loginscreen"
+
+

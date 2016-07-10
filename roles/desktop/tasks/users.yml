@@ -27,13 +27,13 @@
     loop_var: "item_per_user"
 
 - name: "Set visual settings"
-  when: "{{ visual_settings is defined }}"
+  when: "{{ desktop_settings is defined }}"
   # become_user:  # this is intentionally commented out
   include: gnome_desktop.yml
   vars:
     username: "{{ user.name }}"
     settings: "{{ item_per_user }}"
-  with_items: "{{ visual_settings |
+  with_items: "{{ desktop_settings |
                   filter_by_user(user.name) |
                   list }}"
   loop_control:
@@ -58,3 +58,32 @@
     insertafter: EOF
     marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
     state: present
+
+- name: "Set up aliases"
+  become_user: "{{ user.name }}"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest: "{{ansible_env.HOME}}/.bashrc"
+    insertafter: EOF
+    line: "{{ 'alias \"' + item_per_user.name + '\"=\"' + item_per_user.command + '\"' }}"
+    state: "{{ item_per_user.state | d('present') }}"
+  with_flattened: "{{ (
+                        desktop_settings |
+                        selectattr('aliases', 'defined') |
+                        selectattr('users', 'undefined') |
+                        map(attribute='aliases') |
+                        d([]) |
+                        list
+                      ) +
+                      (
+                        desktop_settings |
+                        selectattr('aliases', 'defined') |
+                        filter_by_user( user.name ) |
+                        map(attribute='aliases') |
+                        d([]) |
+                        list
+                      ) }}"
+  loop_control:
+    loop_var: "item_per_user"
