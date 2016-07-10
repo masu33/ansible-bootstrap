@@ -55,6 +55,6 @@
     create: yes
     dest: "{{ ansible_env.HOME }}/.bashrc"
     follow: yes
+    insertafter: EOF
     marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
-    mode: "0644"
     state: present

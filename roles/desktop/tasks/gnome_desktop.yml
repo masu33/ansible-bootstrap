@@ -1,5 +1,16 @@
 ---
 
+- name: "Set background"
+  when: "{{ username is defined
+            and settings.background is defined }}"
+  become: yes
+  gsettings:
+    state: "{{ (settings.background is none) | ternary('absent', 'present') }}"
+    user: "{{ username }}"
+    schema: "org.gnome.desktop.background"
+    key: "picture-uri"
+    value: "{{ 'file://'+settings.background }}"
+
 - name: "Set login background: disable display of custom backgrounds"
   when: "{{ username is undefined
             and settings.login_background is defined }}"
@@ -43,17 +54,6 @@
     schema: "com.canonical.unity-greeter"
     key: "background"
     value: "{{ settings.lock_background }}"
-
-- name: "Set background"
-  when: "{{ username is defined
-            and settings.background is defined }}"
-  become: yes
-  gsettings:
-    state: "{{ (settings.background is none) | ternary('absent', 'present') }}"
-    user: "{{ username }}"
-    schema: "org.gnome.desktop.background"
-    key: "picture-uri"
-    value: "{{ 'file://'+settings.background }}"
 
 - name: "Reset location bookmarks"
   when: "{{ username is defined

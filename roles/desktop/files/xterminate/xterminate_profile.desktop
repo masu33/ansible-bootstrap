@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name="X-terminate"
-GenericName="Keyboard shortcut for X termination"
-Comment="Ctrl+Alt+Bksp"
-Exec="setxkbmap -option "terminate:ctrl_alt_bksp > /tmp/xkbmaplog 2>&1"
-Terminal=false
-Type=Application
-X-GNOME-Autostart-enabled=true

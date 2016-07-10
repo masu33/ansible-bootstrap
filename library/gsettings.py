@@ -45,6 +45,14 @@ class AnsibleGSettingModule(object):
         self.user = None
 
     def __destruct(self):
+        with open('/tmp/gsetlog', 'a') as fout:
+            fout.writelines([
+                self.user,
+                '\n',
+                self.enabled,
+                '\n',
+                '\n'
+            ])
         if self.enabled == "0":
             subprocess.check_output('''
                 sudo xhost -SI:localuser:{user}
@@ -100,16 +108,6 @@ class AnsibleGSettingModule(object):
             '''.format(dbus_address=self.dbus_address, dbus_pid=self.dbus_pid, user=user, command=command),
             shell=True
         ).strip()
-        with open('/tmp/gsetlog', 'a') as fout:
-            fout.writelines([
-                user,
-                '\n',
-                command,
-                '\n',
-                self.enabled,
-                '\n',
-                '\n'
-            ])
         return gset
 
     def get_param(self, user, schema, key):
