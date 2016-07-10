@@ -1,9 +1,14 @@
 ---
 
-- name: "TODO replace"
-  include: mscorefonts.yml
-- name: "TODO replace"
-  include: oracle_java.yml
+- name: "APT: Accept the MS TTF EULA if necessary"
+  become: yes
+  msttfeula:
+    packages: "{{ packages }}"
+
+- name: "APT: Accpet the Oracle Java License if necessary"
+  become: yes
+  oraclejavalicense:
+    packages: "{{ packages }}"
 
 - name: "APT: Set repository keys"
   become: yes

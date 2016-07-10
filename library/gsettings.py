@@ -45,14 +45,6 @@ class AnsibleGSettingModule(object):
         self.user = None
 
     def __destruct(self):
-        with open('/tmp/gsetlog', 'a') as fout:
-            fout.writelines([
-                self.user,
-                '\n',
-                self.enabled,
-                '\n',
-                '\n'
-            ])
         if self.enabled == "0":
             subprocess.check_output('''
                 sudo xhost -SI:localuser:{user}

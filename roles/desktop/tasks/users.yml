@@ -51,7 +51,7 @@
   become_user: "{{ user.name }}"
   blockinfile:
     backup: yes
-    block: "{{ lookup('file', 'bashrc.app') }}"
+    block: "{{ lookup('file', 'bashrc.append.sh') }}"
     create: yes
     dest: "{{ ansible_env.HOME }}/.bashrc"
     follow: yes
