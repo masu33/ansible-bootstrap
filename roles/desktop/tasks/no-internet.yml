@@ -1,13 +1,19 @@
 ---
 
-- name: "no-internet group"
+- name: "NO-INTERNET: ni127 group"
   become: yes
   group:
-    name: no-internet
+    name: ni127
+    state: present
+    system: yes
+- name: "NO-INTERNET: ni192 group"
+  become: yes
+  group:
+    name: ni192
     state: present
     system: yes
 
-- name: "copy iptables rules"
+- name: "NO-INTERNET: copy iptables rules"
   become: yes
   copy:
     backup: yes
@@ -16,24 +22,34 @@
     force: no
     mode: "0755"
     owner: "{{ root_user | d('root') }}"
-    src: "no-internet/no-internet_group_rule"
+    src: "no-internet/ni_group_rule"
 
-- name: "copy no-internet command"
+- name: "NO-INTERNET: copy ni127 command"
   become: yes
   copy:
     backup: yes
-    dest: "/usr/bin/no-internet.sh"
+    dest: "/usr/bin/ni127"
     follow: yes
     force: no
     mode: "0755"
     owner: "{{ root_user | d('root') }}"
-    src: "no-internet/no-internet.sh"
+    src: "no-internet/ni127.sh"
+- name: "NO-INTERNET: copy ni192 command"
+  become: yes
+  copy:
+    backup: yes
+    dest: "/usr/bin/ni192"
+    follow: yes
+    force: no
+    mode: "0755"
+    owner: "{{ root_user | d('root') }}"
+    src: "no-internet/ni192.sh"
 
-- name: "users to no-internet group"
+- name: "NO-INTERNET: users to groups"
   become: yes
   user:
     name: "{{ item }}"
-    groups: no-internet
+    groups: "ni127,ni192"
     append: yes
     state: present
   with_items: "{{ add_users }}"

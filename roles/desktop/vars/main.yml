@@ -106,9 +106,9 @@ apt:
 
 users:
   - name: "masu"
-    groups: "sudo,no-internet,docker"
+    groups: "sudo,ni127,ni192,docker"
   - name: "willow"
-    groups: "no-internet"
+    groups: "ni127,ni192"
 
 root_user: "root"
 
