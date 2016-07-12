@@ -91,7 +91,7 @@
     follow: yes
     force: yes
     group: "{{ root_user }}"
-    mode: "0420"
+    mode: "0644"
     owner: "{{ root_user }}"
     src: "{{ settings.avatar }}"
 

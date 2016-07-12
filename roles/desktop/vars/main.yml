@@ -102,12 +102,13 @@ apt:
     - seaborn
     - jupyter
     - pymongo
+    - tqdm
 
 users:
   - name: "masu"
-    groups: "sudo,no-internet,docker"
+    groups: "sudo,ni127,ni192,docker"
   - name: "willow"
-    groups: "no-internet"
+    groups: "ni127,ni192"
 
 root_user: "root"
 
@@ -171,6 +172,7 @@ desktop_settings:
         command: "python3"
       - name: "pip"
         command: "pip3"
+    bookmarks_reset: yes
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"

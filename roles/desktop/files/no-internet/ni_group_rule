@@ -1,0 +1,13 @@
+#!/bin/bash
+
+############
+# ACCEPT local (network) connections
+# ----------
+iptables -A OUTPUT -m owner --gid-owner ni127 -d 127.0.0.1/8 -j ACCEPT
+iptables -A OUTPUT -m owner --gid-owner ni192 -d 192.0.0.1/16 -j ACCEPT
+
+############
+# REJECT non local connections
+# ----------
+iptables -A OUTPUT -m owner --gid-owner ni127 -j REJECT
+iptables -A OUTPUT -m owner --gid-owner ni192 -j REJECT

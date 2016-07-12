@@ -3,5 +3,5 @@
 ############
 # Switch group to no-internet
 # ----------
-sg no-internet "$1"
+sg ni127 "$1"
 
