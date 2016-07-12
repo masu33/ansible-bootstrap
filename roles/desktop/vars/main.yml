@@ -102,6 +102,7 @@ apt:
     - seaborn
     - jupyter
     - pymongo
+    - tqdm
 
 users:
   - name: "masu"
@@ -171,6 +172,7 @@ desktop_settings:
         command: "python3"
       - name: "pip"
         command: "pip3"
+    bookmarks_reset: yes
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"
