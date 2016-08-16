@@ -1,13 +1,13 @@
 ---
 
-- name: "no-internet group"
+- name: "NO-INTERNET: Set no-internet group"
   become: yes
   group:
     name: no-internet
     state: present
     system: yes
 
-- name: "copy iptables rules"
+- name: "NO-INTERNET: Copy iptables rules"
   become: yes
   copy:
     backup: yes
@@ -18,7 +18,7 @@
     owner: "{{ root_user | d('root') }}"
     src: "no-internet/no-internet_group_rule"
 
-- name: "copy no-internet command"
+- name: "NO-INTERNET: Copy no-internet commands"
   become: yes
   copy:
     backup: yes
@@ -29,7 +29,7 @@
     owner: "{{ root_user | d('root') }}"
     src: "no-internet/no-internet.sh"
 
-- name: "users to no-internet group"
+- name: "NO-INTERNET: Add users to no-internet group"
   become: yes
   user:
     name: "{{ item }}"

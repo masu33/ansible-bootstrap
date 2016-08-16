@@ -1,4 +1,20 @@
 apt:
+  debconfs:
+    - _id: 'Accept Oracle License'
+      name: 'oracle-java8-installer'
+      question: 'shared/accepted-oracle-license-v1-1'
+      vtype: 'select'
+      value: 'true'
+#    - _id: 'Seen Oracle License'
+#      name: 'oracle-java8-installer'
+#      question: 'shared/accepted-oracle-license-v1-1'
+#      vtype: 'seen'
+#      value: 'true'
+    - _id: 'Accept Ms-TTF EULA'
+      name: 'ttf-mscorefonts-installer'
+      question: 'msttcorefonts/accepted-mscorefonts-eula'
+      vtype: 'select'
+      value: 'true'
   repos:
     - "{{ repo_universe1 }}"
     - "{{ repo_universe2 }}"
@@ -39,7 +55,6 @@ apt:
     - htop
     - tree
     - vim
-    - virtualbox
     - libfreetype6  # fonts
     - libfreetype6-dev  # fonts
     - libfontconfig  # fonts
@@ -75,7 +90,7 @@ apt:
     - firefox
     - chromium-browser
     - chromium-codecs-ffmpeg
-    - flashplugin-installer
+    - adobe-flashplugin
     - oracle-java8-installer
     - ca-certificates
     - oracle-java8-set-default
@@ -93,6 +108,16 @@ apt:
     - wine-mono*
     - playonlinux
     - atom4
+    - synergy
+    - rar
+    - zip
+    - unzip
+    - unrar
+    - g++
+    - gcc
+    - make
+    - texlive
+    - texstudio
   python3_packages:
     - numpy
     - scipy
@@ -100,9 +125,15 @@ apt:
     - pandas
     - matplotlib
     - seaborn
+    - ipython
+    - ipywidgets
     - jupyter
+    - jupyter-declarativewidgets
     - pymongo
     - tqdm
+    - pytz
+    - xgboost
+    - cython
 
 users:
   - name: "masu"
@@ -172,7 +203,6 @@ desktop_settings:
         command: "python3"
       - name: "pip"
         command: "pip3"
-    bookmarks_reset: yes
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"

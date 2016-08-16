@@ -1,6 +1,6 @@
 ---
 
-- name: "Set background"
+- name: "GNOME: Set background"
   when: "{{ username is defined
             and settings.background is defined }}"
   become: yes
@@ -11,7 +11,7 @@
     key: "picture-uri"
     value: "{{ 'file://'+settings.background }}"
 
-- name: "Set login background: disable display of custom backgrounds"
+- name: "GNOME: Set login background: disable display of custom backgrounds"
   when: "{{ username is undefined
             and settings.login_background is defined }}"
   become: yes
@@ -22,7 +22,7 @@
     key: "draw-user-backgrounds"
     value: "{{ (settings.login_background is none) | ternary('true', 'false') }}"
 
-- name: "Set login background"
+- name: "GNOME: Set login background"
   when: "{{ username is undefined
             and settings.login_background is defined }}"
   become: yes
@@ -33,7 +33,7 @@
     key: "background"
     value: "{{ settings.login_background }}"
 
-- name: "Set lockscreen background: disable display of custom backgrounds"
+- name: "GNOME: Set lockscreen background: disable display of custom backgrounds"
   when: "{{ username is defined
             and settings.lock_background is defined }}"
   become: yes
@@ -44,7 +44,7 @@
     key: "draw-user-backgrounds"
     value: "{{ (settings.lock_background is none) | ternary('true', 'false') }}"
 
-- name: "Set lockscreen background"
+- name: "GNOME: Set lockscreen background"
   when: "{{ username is defined
             and settings.lock_background is defined }}"
   become: yes
@@ -55,19 +55,7 @@
     key: "background"
     value: "{{ settings.lock_background }}"
 
-- name: "Reset location bookmarks"
-  when: "{{ username is defined
-            and settings.bookmark_reset is defined }}"
-  file:
-    backup: no
-    content: ""
-    dest: "{{ ansible_env.HOME }}/.config/gtk-3.0/bookmarks"
-    follow: yes
-    force: yes
-    mode: "0644"
-    owner: "{{ username }}"
-
-- name: "Set location bookmarks"
+- name: "GNOME: Set location bookmarks"
   when: "{{ username is defined
             and settings.bookmarks is defined }}"
   become_user: "{{ username }}"
@@ -81,7 +69,7 @@
   loop_control:
     loop_var: "__v"
 
-- name: "Copy avatar"
+- name: "GNOME: Copy avatar"
   when: "{{ username is defined
             and settings.avatar is defined }}"
   become: yes
@@ -95,7 +83,7 @@
     owner: "{{ root_user }}"
     src: "{{ settings.avatar }}"
 
-- name: "Set avatar"
+- name: "GNOME: Set avatar"
   when: "{{ username is defined
             and settings.avatar is defined }}"
   become: yes
@@ -107,7 +95,7 @@
     regexp: "^Icon=.*$"
     state: present
 
-- name: "Set workspaces (horizontal)"
+- name: "GNOME: Set workspaces (horizontal)"
   when: "{{ username is defined
             and settings.workspaces_h is defined }}"
   become: yes
@@ -118,7 +106,7 @@
     key: "hsize"
     value: "{{ settings.workspaces_h }}"
 
-- name: "Set workspaces (vertical)"
+- name: "GNOME: Set workspaces (vertical)"
   when: "{{ username is defined
             and settings.workspaces_v is defined }}"
   become: yes
@@ -129,7 +117,7 @@
     key: "vsize"
     value: "{{ settings.workspaces_v }}"
 
-- name: "Show user's name"
+- name: "GNOME: Show user's name"
   when: "{{ username is defined
             and settings.show_name is defined }}"
   become: yes
@@ -140,7 +128,7 @@
     key: "show-real-name-on-panel"
     value: "{{ settings.show_name }}"
 
-- name: "Show desktop icons"
+- name: "GNOME: Show desktop icons"
   when: "{{ username is defined
             and settings.desktop_icons is defined }}"
   become: yes
@@ -151,7 +139,7 @@
     key: "show-desktop-icons"
     value: "{{ settings.desktop_icons }}"
 
-- name: "Set X-terminate keyboard shortcut"
+- name: "GNOME: Set X-terminate keyboard shortcut"
   when: "{{ settings.xterminate is defined }}"
   include: xterminate.yml
   vars:
