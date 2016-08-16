@@ -1,6 +1,6 @@
 ---
 
-- name: "Download resources"
+- name: "USERS: Download resources"
   when: "{{ online_resources is defined }}"
   become: yes
   become_user: "{{ user.name }}"
@@ -13,7 +13,7 @@
   loop_control:
     loop_var: "item_per_user"
 
-- name: "Set up filesystem resources"
+- name: "USERS: Set up filesystem resources"
   when: "{{ filesystem_resources is defined }}"
   become: yes
   become_user: "{{ user.name }}"
@@ -26,10 +26,10 @@
   loop_control:
     loop_var: "item_per_user"
 
-- name: "Set visual settings"
+- name: "USERS: Set visual settings"
   when: "{{ desktop_settings is defined }}"
   # become_user:  # this is intentionally commented out
-  include: gnome_desktop.yml
+  include: gnome.yml
   vars:
     username: "{{ user.name }}"
     settings: "{{ item_per_user }}"
@@ -39,7 +39,7 @@
   loop_control:
     loop_var: "item_per_user"
 
-- name: "Set up bashrc.d support (folder)"
+- name: "USERS: Set up bashrc.d support (folder)"
   become_user: "{{ user.name }}"
   file:
     path: "{{ ansible_env.HOME }}/.bashrc.d"
@@ -47,7 +47,7 @@
     owner: "{{ ansible_user_id }}"
     state: directory
 
-- name: "Set up bashrc.d support (inclusion)"
+- name: "USERS: Set up bashrc.d support (inclusion)"
   become_user: "{{ user.name }}"
   blockinfile:
     backup: yes
@@ -59,7 +59,7 @@
     marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
     state: present
 
-- name: "Set up aliases"
+- name: "USERS: Set up aliases"
   become_user: "{{ user.name }}"
   become: yes
   lineinfile:

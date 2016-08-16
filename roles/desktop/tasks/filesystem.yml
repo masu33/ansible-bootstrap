@@ -1,6 +1,6 @@
 ---
 
-- name: "Applying filesystem settings..."
+- name: "FILESYSTEM: Applying filesystem settings..."
   file:
     follow:  "{{ __fs.follow  | d(omit) }}"
     force:   "{{ __fs.force   | d(omit) }}"

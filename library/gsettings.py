@@ -45,6 +45,9 @@ class AnsibleGSettingModule(object):
         self.user = None
 
     def __destruct(self):
+        """
+        Kill DBUS created and remove xhost privileges if necessary.
+        """
         if self.enabled == "0":
             subprocess.check_output('''
                 sudo xhost -SI:localuser:{user}
@@ -82,7 +85,7 @@ class AnsibleGSettingModule(object):
                 self.enabled = line.split('=', 1)[1]
 
     def __execute(self, user, command):
-        # type: (str, str, **Dict[str, str]) -> str
+        # type: (str, str) -> str
         """
         Executes a given command with the `user` used as username and returns its output.
         :param user: username
@@ -144,8 +147,10 @@ class AnsibleGSettingModule(object):
         self.__execute(user, command)
 
     def main(self, test=None):
+        # type: (dict) -> None
         """
         Executes the given module command.
+        :type test: dictionary object for testing purposes only
         """
 
         # Normal (Ansible) call

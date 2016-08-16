@@ -3,6 +3,7 @@
 - name: "Repositories and packages"
   include: apt.yml
   vars:
+    debconfs: "{{ apt.debconfs }}"
     repos: "{{ apt.repos }}"
     packages: "{{ apt.packages }}"
     pip2_packages: "{{ apt.python2_packages | d([]) }}"
@@ -61,7 +62,7 @@
 
 - name: "Set common gnome desktop settings"
   when: "{{ desktop_settings is defined }}"
-  include: gnome_desktop.yml
+  include: gnome.yml
   become: yes
   vars:
     settings: "{{ item }}"

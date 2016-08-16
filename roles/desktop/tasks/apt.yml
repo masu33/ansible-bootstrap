@@ -1,14 +1,14 @@
 ---
 
-- name: "APT: Accept the MS TTF EULA if necessary"
+- name: "APT: Set debconfs"
+  become_method: sudo
   become: yes
-  msttfeula:
-    packages: "{{ packages }}"
-
-- name: "APT: Accpet the Oracle Java License if necessary"
-  become: yes
-  oraclejavalicense:
-    packages: "{{ packages }}"
+  debconf:
+    name: "{{ item.name }}"
+    question: "{{ item.question }}"
+    vtype: "{{ item.vtype }}"
+    value: "{{ item.value }}"
+  with_items: "{{ debconfs }}"
 
 - name: "APT: Set repository keys"
   become: yes
