@@ -1,6 +1,8 @@
 ---
 
 - hosts: desktop
+  vars:
+    - ansible_connection: local
+    - ansible_become_method: sudo
   roles:
     - desktop
-

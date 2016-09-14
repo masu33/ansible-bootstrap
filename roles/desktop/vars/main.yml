@@ -5,29 +5,53 @@ apt:
       question: 'shared/accepted-oracle-license-v1-1'
       vtype: 'select'
       value: 'true'
-#    - _id: 'Seen Oracle License'
-#      name: 'oracle-java8-installer'
-#      question: 'shared/accepted-oracle-license-v1-1'
-#      vtype: 'seen'
-#      value: 'true'
-    - _id: 'Accept Ms-TTF EULA'
+    - _id: 'Seen Oracle License'
+      name: 'oracle-java8-installer'
+      question: 'shared/accepted-oracle-license-v1-1'
+      vtype: 'seen'
+      value: 'true'
+    - _id: 'Accept MS-TTF EULA'
       name: 'ttf-mscorefonts-installer'
       question: 'msttcorefonts/accepted-mscorefonts-eula'
       vtype: 'select'
       value: 'true'
   repos:
-    - "{{ repo_universe1 }}"
-    - "{{ repo_universe2 }}"
-    - "{{ repo_universe3 }}"
-    - "{{ repo_universe4 }}"
-    - "{{ repo_multiverse1 }}"
-    - "{{ repo_multiverse2 }}"
-    - "{{ repo_multiverse3 }}"
-    - "{{ repo_multiverse4 }}"
-    - "{{ repo_canonical }}"
-    - "{{ repo_ubuntu_desktop }}"
-    - "{{ repo_dropbox }}"
-    - "{{ repo_webupd8team }}"
+    - _id: 'Universe'
+      repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} universe'
+    - _id: 'Universe src'
+      repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} universe'
+    - _id: 'Universe updates'
+      repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates universe'
+    - _id: 'Universe updates src'
+      repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates universe'
+    - _id: 'Multiverse'
+      repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    - _id: 'Multiverse src'
+      repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+    - _id: 'Multiverse updates'
+      repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    - _id: 'Multiverse updates src'
+      repo: 'deb-src http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+    - _id: 'Canonical'
+      repo: 'deb http://archive.canonical.com/ubuntu {{ansible_distribution_release}} partner'
+    - _id: 'Ubuntu desktop'
+      repo: 'deb http://ppa.launchpad.net/ubuntu-desktop/ubuntu-make/ubuntu {{ansible_distribution_release}} main'
+      key: '399B698EEA9EF163B6F9A0F62CC98497A1231595'
+      keyserver: 'keyserver.ubuntu.com'
+    - _id: 'Dropbox'
+      repo: 'deb http://linux.dropbox.com/ubuntu/ {{ansible_distribution_release}} main'
+      key: '5044912E'
+      keyserver: 'pgp.mit.edu'
+    - _id: 'WebUpd8Team'
+      repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu {{ansible_distribution_release}} main'
+      key: '7B2C3B0889BF5709A105D03AC2518248EEA14886'
+      keyserver: 'keyserver.ubuntu.com'
+    - _id: 'git LFS'
+      repo: 'deb https://packagecloud.io/github/git-lfs/{{ansible_distribution | lower}}/ {{ansible_distribution_release}} main'
+      key_url: 'https://packagecloud.io/github/git-lfs/gpgkey'
+    - _id: 'git LFS src'
+      repo: 'deb-src https://packagecloud.io/github/git-lfs/{{ansible_distribution | lower}}/ {{ansible_distribution_release}} main'
+      key_url: 'https://packagecloud.io/github/git-lfs/gpgkey'
   packages:
     - name: totem
       state: absent
@@ -101,6 +125,7 @@ apt:
     - pdftk
     - python3
     - python3-pip
+    - python3-dev
     - virtualenv
     - winbind
     - wine
@@ -118,7 +143,11 @@ apt:
     - make
     - texlive
     - texstudio
+    - vinagre
+    - vino
+    - git-lfs
   python3_packages:
+    - py4j
     - numpy
     - scipy
     - scikit-learn
@@ -166,7 +195,7 @@ filesystem_resources:
       - path: "/home/masu/Projects"
     follow: yes
     force: yes
-    recurse: yes
+    recurse: no
     mode: "0700"
     state: directory
   - users: [ "willow" ]
@@ -226,5 +255,3 @@ desktop_settings:
     show_name: yes
   - xterminate: no
     login_background: "/usr/share/backgrounds/loginscreen"
-
-

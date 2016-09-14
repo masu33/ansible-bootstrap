@@ -1,5 +1,0 @@
-repo_ubuntu_desktop: 
-  repo: 'deb http://ppa.launchpad.net/ubuntu-desktop/ubuntu-make/ubuntu {{ansible_distribution_release}} main'
-  key: '399B698EEA9EF163B6F9A0F62CC98497A1231595'
-  keyserver: 'keyserver.ubuntu.com'
-
