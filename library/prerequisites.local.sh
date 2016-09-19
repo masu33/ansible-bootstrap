@@ -1,22 +1,5 @@
 #!/bin/bash
 
-############
-# Overview:
-#   TODO
-# ----------
-# Author:
-#   TODO
-# ----------
-# Description:
-#   TODO
-# ----------
-# Usage:
-#   TODO
-# ----------
-# Notes:
-#   TODO
-############
-
 #############
 # INSTALL ansible
 # -----------
@@ -38,11 +21,12 @@ sudo pip install paramiko \
                  Jinja2 \
                  httplib2 \
                  six \
-                 ansible
+                 git+git://github.com/ansible/ansible.git@devel
 sudo mkdir /etc/ansible
 
 ############
 # PLAYBOOK start for local desktop machine
 # ----------
+alias python=python2
 ansible-playbook -K desktop.yml -i local_desktop -vvv
 

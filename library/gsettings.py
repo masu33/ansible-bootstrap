@@ -8,7 +8,6 @@ import json
 import subprocess
 import os
 import signal
-from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.errors import AnsibleOptionsError

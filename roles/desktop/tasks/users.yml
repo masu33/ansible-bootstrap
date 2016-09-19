@@ -13,6 +13,23 @@
   loop_control:
     loop_var: "item_per_user"
 
+- name: "USERS: Install frameworks with ubuntu-make"
+  become: yes
+  become_user: "{{ user.name }}"
+  umake:
+    group: "{{ framework.group | d(omit) }}"
+    component: "{{ framework.component | d(omit) }}"
+    path: "{{ framework.path | d(omit) }}"
+    state: "{{ framework.state | d(omit) }}"
+  with_flattened: "{{ desktop_settings |
+                      selectattr('umake_frameworks', 'defined') |
+                      filter_by_user( user.name ) |
+                      map(attribute='umake_frameworks') |
+                      d([]) |
+                      list }}"
+  loop_control:
+    loop_var: "framework"
+
 - name: "USERS: Set up filesystem resources"
   when: "{{ filesystem_resources is defined }}"
   become: yes

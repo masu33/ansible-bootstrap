@@ -10,7 +10,7 @@
     value: "{{ item.value }}"
   with_items: "{{ debconfs }}"
 
-- name: "APT: Set repository keys"
+- name: "APT: Set repository keys with keyserver"
   become: yes
   apt_key:
     keyserver: "{{ item.keyserver | d('keyserver.ubuntu.com') }}"
@@ -19,6 +19,16 @@
   with_items:
     - "{{ repos |
           selectattr('key', 'defined') |
+          list }}"
+
+- name: "APT: Set repository keys with GPG keys"
+  become: yes
+  apt_key:
+    state: "{{ item.state | d('present') }}"
+    url: "{{ item.key_url }}"
+  with_items:
+    - "{{ repos |
+          selectattr('key_url', 'defined') |
           list }}"
 
 - name: "APT: Set repositories"
