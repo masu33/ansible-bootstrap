@@ -146,6 +146,9 @@ apt:
     - vinagre
     - vino
     - git-lfs
+    - libc-bin
+    - lsb
+    - build-essential
   python3_packages:
     - py4j
     - numpy
@@ -163,6 +166,7 @@ apt:
     - pytz
     - xgboost
     - cython
+    - pyinstaller
 
 users:
   - name: "masu"
@@ -229,9 +233,9 @@ desktop_settings:
       - name: "dlast"
         command: "docker ps -l -q"
       - name: "python"
-        command: "python3"
+        command: "python3.5"
       - name: "pip"
-        command: "pip3"
+        command: "pip3.5"
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"
@@ -243,6 +247,11 @@ desktop_settings:
         location: "/home/masu/Downloads/torrent"
       - name: "DL ncore"
         location: "/home/masu/Downloads/torrent/ncore"
+    umake_frameworks:
+      - group: ide
+        component: pycharm
+      - group: ide
+        component: idea
     bookmarks_check: yes
     workspaces_h: 2
     workspaces_v: 2
