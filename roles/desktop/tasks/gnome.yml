@@ -55,13 +55,36 @@
     key: "background"
     value: "{{ settings.lock_background }}"
 
-- name: "GNOME: Set location bookmarks"
+- name: "GNOME: Create bookmark location 1"
   when: "{{ username is defined
             and settings.bookmarks is defined }}"
   become_user: "{{ username }}"
+  file:
+    mode: "0755"
+    owner: "{{ username }}"
+    path: "{{ username | user_home }}/.config"
+    state: directory
+
+- name: "GNOME: Create bookmark location 2"
+  when: "{{ username is defined
+            and settings.bookmarks is defined }}"
+  become: yes
+  become_user: "{{ username }}"
+  file:
+    mode: "0755"
+    owner: "{{ username }}"
+    path: "{{ username | user_home }}/.config/gtk-3.0"
+    state: directory
+
+- name: "GNOME: Set location bookmarks"
+  when: "{{ username is defined
+            and settings.bookmarks is defined }}"
+  become: yes
+  become_user: "{{ username }}"
   lineinfile:
     backup: yes
-    dest: "{{ ansible_env.HOME }}/.config/gtk-3.0/bookmarks"
+    create: yes
+    dest: "{{ username | user_home }}/.config/gtk-3.0/bookmarks"
     insertbefore: EOF
     line: "file://{{ __v.location }} {{ __v.name | d('') }}"
     state: "{{ __v.state | d('present') }}"

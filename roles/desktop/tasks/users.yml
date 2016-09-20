@@ -57,32 +57,35 @@
     loop_var: "item_per_user"
 
 - name: "USERS: Set up bashrc.d support (folder)"
+  become: yes
   become_user: "{{ user.name }}"
   file:
-    path: "{{ ansible_env.HOME }}/.bashrc.d"
+    path: "{{ user.name | user_home }}/.bashrc.d"
     mode: "0755"
-    owner: "{{ ansible_user_id }}"
+    owner: "{{ user.name }}"
     state: directory
 
 - name: "USERS: Set up bashrc.d support (inclusion)"
+  become: yes
   become_user: "{{ user.name }}"
   blockinfile:
     backup: yes
     block: "{{ lookup('file', 'bashrc.append.sh') }}"
     create: yes
-    dest: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "{{ user.name | user_home }}/.bashrc"
     follow: yes
     insertafter: EOF
+    owner: "{{ user.name }}"
     marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
     state: present
 
 - name: "USERS: Set up aliases"
-  become_user: "{{ user.name }}"
   become: yes
+  become_user: "{{ user.name }}"
   lineinfile:
-    backup: yes
+    backup: no
     create: yes
-    dest: "{{ansible_env.HOME}}/.bashrc"
+    dest: "{{ user.name | user_home }}/.bashrc"
     insertafter: EOF
     line: "{{ 'alias \"' + item_per_user.name + '\"=\"' + item_per_user.command + '\"' }}"
     state: "{{ item_per_user.state | d('present') }}"
