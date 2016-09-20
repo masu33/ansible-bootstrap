@@ -16,7 +16,7 @@ sudo apt-get install python-setuptools \
 sudo easy_install greenlet
 sudo easy_install gevent
 sudo easy_install pip
-sudo pip install paramiko \
+sudo pip2 install paramiko \
                  PyYAML \
                  Jinja2 \
                  httplib2 \
