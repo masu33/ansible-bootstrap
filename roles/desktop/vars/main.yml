@@ -149,6 +149,7 @@ apt:
     - libc-bin
     - lsb
     - build-essential
+    - netcat
   python3_packages:
     - py4j
     - numpy

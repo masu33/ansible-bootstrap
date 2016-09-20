@@ -32,7 +32,7 @@
     backup: yes
     block: "setxkbmap -option \"terminate:ctrl_alt_bksp\""
     create: yes
-    dest: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "{{ username | user_home }}/.bashrc"
     follow: yes
     insertafter: EOF
     marker: "# ANSIBLE MANAGED: xterminate {mark}"
