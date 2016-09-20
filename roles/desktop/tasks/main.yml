@@ -26,9 +26,9 @@
     generate_ssh_key: yes
     move_home: yes
     ssh_key_file: .ssh/id_rsa
-    state: present
-#    password:  # TODO
-#    update_password: yes
+    state: "{{ user.state | d('present') }}"
+    password: "{{ user.password | d(omit) }}"
+    update_password: "{{ user.update_password | d(omit) }}"
     comment: "{{ user.comment | d(omit) }}"
     expires: "{{ user.expires | d(omit) }}"
     group:   "{{ user.group   | d(omit) }}"
@@ -69,7 +69,6 @@
   with_items: "{{ desktop_settings |
                   selectattr('users', 'undefined') |
                   list }}"
-
 
 - name: "Set up users"
   include: users.yml
