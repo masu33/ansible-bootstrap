@@ -5,4 +5,4 @@
 # ----------
 alias python=python2
 ./library/prerequisites.sh
-ansible-playbook -K desktop.yml -i local_desktop -vvv
+ansible-playbook -K masu-desktop.yml -i localhost -vvv
