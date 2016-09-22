@@ -8,9 +8,9 @@ def env_create(d):
             d.get('prefix', '') +
             d.get('name', '') +
             '="' +
-            str.replace(d.get('value_prefix', ''), '"', '\"') +
-            str.replace(d.get('value', ''), '"', '\"') +
-            str.replace(d.get('value_postfix', ''), '"', '\"') +
+            d.get('value_prefix', '').replace('"', '\"') +
+            d.get('value', '').replace('"', '\"') +
+            d.get('value_postfix', '').replace('"', '\"') +
             '"' +
             d.get('postfix', '')
         )
