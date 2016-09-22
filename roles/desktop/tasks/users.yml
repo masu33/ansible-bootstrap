@@ -78,31 +78,19 @@
     marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
     state: present
 
-- name: "USERS: Set up aliases"
+- name: "USERS: Set up env"
   become: yes
   become_user: "{{ user.name }}"
   lineinfile:
-    backup: no
     create: yes
     dest: "{{ user.name | user_home }}/.bashrc"
-    insertafter: EOF
-    line: "{{ 'alias \"' + item_per_user.name + '\"=\"' + item_per_user.command + '\"' }}"
-    state: "{{ item_per_user.state | d('present') }}"
-  with_flattened: "{{ (
-                        desktop_settings |
-                        selectattr('aliases', 'defined') |
-                        selectattr('users', 'undefined') |
-                        map(attribute='aliases') |
-                        d([]) |
-                        list
-                      ) +
-                      (
-                        desktop_settings |
-                        selectattr('aliases', 'defined') |
-                        filter_by_user( user.name ) |
-                        map(attribute='aliases') |
-                        d([]) |
-                        list
-                      ) }}"
+    line: "{{ env | env_create }}"
+    state: "{{ env.state | d('present') }}"
+  with_flattened: "{{ desktop_settings |
+                      selectattr('env', 'defined') |
+                      selectattr('users', 'defined') |
+                      map(attribute='env') |
+                      d([]) |
+                      list }}"
   loop_control:
-    loop_var: "item_per_user"
+    loop_var: "env"
