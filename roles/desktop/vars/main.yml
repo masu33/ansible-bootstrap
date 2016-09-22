@@ -230,13 +230,16 @@ online_resources:
 
 desktop_settings:
   - users: [ "masu" ]
-    aliases:
-      - name: "dlast"
-        command: "docker ps -l -q"
-      - name: "python"
-        command: "python3.5"
-      - name: "pip"
-        command: "pip3.5"
+    env:
+      - prefix: "alias "
+        name: "dlast"
+        value: "docker ps -l -q"
+      - prefix: "alias "
+        name: "python"
+        value: "python3.5"
+      - prefix: "alias "
+        name: "pip"
+        value: "pip3.5"
     bookmarks:
       - name: "Dropbox"
         location: "/home/masu/Dropbox"

@@ -75,3 +75,20 @@
   vars:
     user: "{{ item }}"
   with_items: "{{ users }}"
+
+
+- name: "Set up common env"
+  become: yes
+  lineinfile:
+    create: yes
+    dest: "/etc/environment"
+    line: "{{ env | env_create }}"
+    state: "{{ env.state | d('present') }}"
+  with_flattened: "{{ desktop_settings |
+                      selectattr('env', 'defined') |
+                      selectattr('users', 'undefined') |
+                      map(attribute='env') |
+                      d([]) |
+                      list }}"
+  loop_control:
+    loop_var: "env"

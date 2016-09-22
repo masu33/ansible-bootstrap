@@ -1,7 +1,6 @@
 ---
 
 - name: "APT: Set debconfs"
-  become_method: sudo
   become: yes
   debconf:
     name: "{{ item.name }}"
