@@ -4,7 +4,7 @@
   when: "{{ online_resources is defined }}"
   become: yes
   become_user: "{{ user.name }}"
-  include: download.yml
+  include: __download.yml
   vars:
     details: "{{ item_per_user }}"
   with_items: "{{ online_resources | d([]) |
@@ -33,7 +33,7 @@
   when: "{{ filesystem_resources is defined }}"
   become: yes
   become_user: "{{ user.name }}"
-  include: filesystem.yml
+  include: __filesystem.yml
   vars:
     details: "{{ item_per_user }}"
   with_items: "{{ filesystem_resources |

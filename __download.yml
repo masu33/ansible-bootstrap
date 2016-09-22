@@ -20,4 +20,3 @@
                   list }}"
   loop_control:
     loop_var: "__dl"
-

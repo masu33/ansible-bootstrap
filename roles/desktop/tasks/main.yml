@@ -1,7 +1,7 @@
 ---
 
 - name: "Repositories and packages"
-  include: apt.yml
+  include: __apt.yml
   vars:
     debconfs: "{{ apt.debconfs }}"
     repos: "{{ apt.repos }}"
@@ -12,7 +12,7 @@
     autoremove: "{{ apt.upgrade | d('yes') }}"
 
 - name: "Set no-internet option"
-  include: no-internet.yml
+  include: __no-internet.yml
   vars:
     add_users: "{{ users |
                    map(attribute='name') |
@@ -26,16 +26,16 @@
     generate_ssh_key: yes
     move_home: yes
     ssh_key_file: .ssh/id_rsa
-    state: "{{ user.state | d('present') }}"
-    password: "{{ user.password | d(omit) }}"
+    state:           "{{ user.state           | d('present') }}"
+    password:        "{{ user.password        | d(omit) }}"
     update_password: "{{ user.update_password | d(omit) }}"
-    comment: "{{ user.comment | d(omit) }}"
-    expires: "{{ user.expires | d(omit) }}"
-    group:   "{{ user.group   | d(omit) }}"
-    groups:  "{{ user.groups  | d(omit) }}"
-    home:    "{{ user.home    | d(omit) }}"
-    name:    "{{ user.name    | d(omit) }}"
-    system:  "{{ user.system  | d(omit) }}"
+    comment:         "{{ user.comment         | d(omit) }}"
+    expires:         "{{ user.expires         | d(omit) }}"
+    group:           "{{ user.group           | d(omit) }}"
+    groups:          "{{ user.groups          | d(omit) }}"
+    home:            "{{ user.home            | d(omit) }}"
+    name:            "{{ user.name            | d(omit) }}"
+    system:          "{{ user.system          | d(omit) }}"
   with_items: "{{ users }}"
   loop_control:
     loop_var: "user"
@@ -43,7 +43,7 @@
 - name: "Download common resources"
   when: "{{ online_resources is defined }}"
   become: yes
-  include: download.yml
+  include: __download.yml
   vars:
     details: "{{ item }}"
   with_items: "{{ online_resources |
@@ -53,7 +53,7 @@
 - name: "Set up common files and folders"
   when: "{{ filesystem_resources is defined }}"
   become: yes
-  include: filesystem.yml
+  include: __filesystem.yml
   vars:
     details: "{{ item }}"
   with_items: "{{ filesystem_resources |
@@ -75,7 +75,6 @@
   vars:
     user: "{{ item }}"
   with_items: "{{ users }}"
-
 
 - name: "Set up common env"
   become: yes

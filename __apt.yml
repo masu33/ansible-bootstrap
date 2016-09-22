@@ -43,6 +43,7 @@
   become: yes
   apt:
     update_cache: yes
+  ignore_errors: yes
 
 - name: "APT: Removing packages"
   become: yes
