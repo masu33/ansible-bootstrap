@@ -1,0 +1,9 @@
+---
+
+dependencies:
+  - role: _apt
+    packages:
+      - deluged
+      - deluge-gtk
+      - deluge-console
+      - deluge-webui

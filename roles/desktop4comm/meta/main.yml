@@ -1,0 +1,10 @@
+---
+
+dependencies:
+  - role: _apt
+    debconfs:
+    packages:
+      - empathy
+      - skype
+      - gtk2-engines-murrine:i386  # Skype visual
+      - gtk2-engines-pixbuf:i386  # Skype visual

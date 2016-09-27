@@ -1,0 +1,20 @@
+---
+
+dependencies:
+  - role: _apt
+    packages:
+      - pinta
+      - gimp
+      - inkscape
+      - ubuntu-restricted-extras  # codecs
+      - libavcodec-extra  # codecs
+      - ffmpeg  # codec
+      - mplayer
+      - smplayer
+      - youtube-dl
+      - lame  # codec
+      - clementine
+      - virtualbox
+      - dropbox
+      - calibre
+      - pdftk

@@ -1,0 +1,26 @@
+---
+
+- name: "Handle empty list"
+  when: "{{ settings is undefined }}"
+  set_fact:
+    settings: "{{ [] }}"
+
+- name: "Downloading..."
+  become: yes
+  get_url:
+    backup:           "{{ __dl.backup           | d(omit) }}"
+    dest:             "{{ __dl.dest             | d(omit) }}"
+    force:            "{{ __dl.force            | d(omit) }}"
+    force_basic_auth: "{{ __dl.force_basic_auth | d(omit) }}"
+    url:              "{{ __dl.url              | d(omit) }}"
+    url_password:     "{{ __dl.url_password     | d(omit) }}"
+    url_username:     "{{ __dl.url_username     | d(omit) }}"
+    use_proxy:        "{{ __dl.use_proxy        | d(omit) }}"
+    validate_certs:   "{{ __dl.validate_certs   | d(omit) }}"
+    follow:           "{{ __dl.follow           | d(omit) }}"
+    group:            "{{ __dl.group            | d(omit) }}"
+    mode:             "{{ __dl.mode             | d(omit) }}"
+    owner:            "{{ __dl.owner            | d(omit) }}"
+  with_items: "{{ settings | forall | list }}"
+  loop_control:
+    loop_var: "__dl"

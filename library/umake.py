@@ -29,15 +29,15 @@ class AnsibleUMakeModule(object):
     CONFIG_LOCATION = '~/.config/umake'
     DEFAULT_LOCATION = '~/.local/share/umake'
 
-    def __location(self, group, component):
+    def __location(self, category, framework):
         """
         Returns the current location of the framework specified.
-        :param group: ubuntu-make command
-        :param component: ubuntu-make item
+        :param category: ubuntu-make command
+        :param framework: ubuntu-make item
         :return: path where it is currently installed or None
         """
         try:
-            return yaml.load(file(os.path.expanduser(self.CONFIG_LOCATION)))['frameworks'][group][component]['path']
+            return yaml.load(file(os.path.expanduser(self.CONFIG_LOCATION)))['frameworks'][category][framework]['path']
         except (IndexError, KeyError, IOError):
             return None
 
@@ -65,8 +65,8 @@ class AnsibleUMakeModule(object):
             module = AnsibleModule(
                 argument_spec={
                     'executable': {'default': 'umake'},
-                    'group': {'required': True},
-                    'component': {'required': True},
+                    'category': {'required': True},
+                    'framework': {'required': True},
                     'path': {'default': None},
                     'state': {
                         'choices': ['absent', 'present'],
@@ -78,8 +78,8 @@ class AnsibleUMakeModule(object):
 
             # Parameters
             params = module.params
-            group = params.get('group')
-            component = params.get('component')
+            category = params.get('category')
+            framework = params.get('framework')
             path = params.get('path')
             state = params.get('state')
 
@@ -90,8 +90,8 @@ class AnsibleUMakeModule(object):
         else:
             # Parameters
             params = test.get('params', {})
-            group = params.get('group')
-            component = params.get('component')
+            category = params.get('category')
+            framework = params.get('framework')
             path = params.get('path')
             state = params.get('state')
 
@@ -113,17 +113,17 @@ class AnsibleUMakeModule(object):
                     os.path.expanduser(
                         '{}/{}/{}'.format(
                             self.DEFAULT_LOCATION,
-                            group,
-                            component
+                            category,
+                            framework
                         )
                     )
                 )
 
-            old_path = self.__location(group, component)
+            old_path = self.__location(category, framework)
 
-            command = '''yes "no" | umake {group} {component}{switch}{path}'''.format(
-                group=group,
-                component=component,
+            command = '''yes "no" | umake {category} {framework}{switch}{path}'''.format(
+                category=category,
+                framework=framework,
                 switch=switch,
                 path=path,
             )

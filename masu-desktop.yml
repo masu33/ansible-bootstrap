@@ -5,4 +5,175 @@
     - ansible_connection: local
     - ansible_become_method: sudo
   roles:
-    - desktop
+    - role: _users
+      settings:
+        - name: "masu"
+          groups: "sudo"
+          append: yes
+          bashrc.d: yes
+        - name: "willow"
+    - role: _filesystem
+      settings:
+        - forall:
+            - path: "/home/masu"
+              mode: "0755"
+            - path: "/home/masu/Pictures"
+            - path: "/home/masu/Downloads"
+              mode: "0755"
+            - path: "/home/masu/Downloads/firefox"
+            - path: "/home/masu/Downloads/torrent"
+              mode: "0755"
+            - path: "/home/masu/Downloads/torrent/ncore"
+              mode: "0755"
+            - path: "/home/masu/Downloads/torrent/current"
+            - path: "/home/masu/Downloads/torrent/stopped"
+            - path: "/home/masu/Downloads/torrent/watch"
+            - path: "/home/masu/Downloads/torrent/index"
+            - path: "/home/masu/Dropbox"
+            - path: "/home/masu/Projects"
+          follow: no
+          force: yes
+          recurse: no
+          owner: "masu"
+          group: "masu"
+          mode: "0700"
+          state: directory
+        - path: "/home/willow/ncore"
+          follow: no
+          force: yes
+          owner: "willow"
+          group: "willow"
+          src: "/home/masu/Downloads/torrent/ncore"
+          state: link
+    - role: _download
+      settings:
+        - force: yes
+          mode: "0644"
+          owner: "masu"
+          forall:
+            - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background"
+              dest: "/home/masu/Pictures/background"
+            - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/avatar"
+              dest: "/home/masu/Pictures/avatar"
+            - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/lock"
+              dest: "/home/masu/Pictures/lockscreen"
+            - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/login"
+              dest: "/usr/share/backgrounds/loginscreen"
+              owner: "root"
+    - role: _apt
+      repos:
+        - _id: 'ubuntu'
+          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} main universe multiverse'
+        - _id: 'ubuntu updates'
+          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates main universe multiverse'
+        - _id: 'ubuntu backports'
+          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main universe multiverse'
+        - _id: 'ubuntu security'
+          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security main universe multiverse'
+      packages:
+        - state: absent
+          forall:
+          - name: totem
+          - name: totem-common
+          - name: totem-plugins
+          - name: rhythmbox
+          - name: rhythmbox-data
+          - name: rhythmbox-plugins
+          - name: rhythmbox-plugin-zeitgeist
+          - name: transmission
+          - name: transmission-*
+    - role: system
+    - role: netlimit
+      netlimit_users:
+       - "masu"
+       - "willow"
+    - role: server4rdp
+    - role: server4ssh
+    - role: server4torrent
+    - role: server4vm
+      docker_users:
+        - masu
+        - willow
+    - role: _env
+      settings:
+        - forall:
+            - line: "alias dlast=docker\\ ps\\ -l\\ -q"
+            - line: "alias pip=pip3.5"
+          profile: yes
+    - role: server4vnc
+    - role: devenv
+    - role: devenv4java
+      umake:
+        - category: ide
+          framework: idea
+    - role: devenv4python
+      umake:
+        - category: ide
+          framework: pycharm
+      envs:
+        - executable: pip3
+          name:
+            - tqdm
+            - pytz
+            - ipython
+            - ipywidgets
+            - jupyter
+            - jupyter-declarativewidgets
+            - cython
+            - numpy
+            - scipy
+            - scikit-learn
+            - xgboost
+            - pandas
+            - matplotlib
+            - seaborn
+            - pymongo
+            - pyinstaller
+            - py4j
+    - role: _env
+      settings:
+        - user: masu
+          forall:
+            - line: "alias python=python3.5"
+            - line: "alias pip=pip3.5"
+          profile: no
+    - role: desktop
+    - role: desktop4browse
+    - role: desktop4comm
+    - role: desktop4latex
+    - role: desktop4media
+    - role: desktop4office
+    - role: desktop4remote
+    - role: desktop4wine
+    - role: _visual
+      settings:
+        - xzap: yes
+        - user: "masu"
+          xzap: yes
+        - user: "willow"
+          xzap: yes
+        - login_background: "/usr/share/backgrounds/loginscreen"
+        - user: "masu"
+          workspaces_h: 2
+          workspaces_v: 2
+        - user: "willow"
+          workspaces_h: 1
+          workspaces_v: 1
+        - user: "masu"
+          background: "/home/masu/Pictures/background"
+          lock_background: "/home/masu/Pictures/lockscreen"
+          avatar: "/home/masu/Pictures/avatar"
+          desktop_icons: yes
+          show_name: yes
+        - user: "masu"
+          bookmarks:
+            - name: "Dropbox"
+              location: "/home/masu/Dropbox"
+            - name: "Projects"
+              location: "/home/masu/Projects"
+            - name: "DL Firefox"
+              location: "/home/masu/Downloads/firefox"
+            - name: "DL torrent"
+              location: "/home/masu/Downloads/torrent"
+            - name: "DL ncore"
+              location: "/home/masu/Downloads/torrent/ncore"

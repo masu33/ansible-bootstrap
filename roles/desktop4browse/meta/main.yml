@@ -1,0 +1,27 @@
+---
+
+dependencies:
+  - role: _apt
+    debconfs:
+      - _id: 'Accept MS-TTF EULA'
+        name: 'ttf-mscorefonts-installer'
+        question: 'msttcorefonts/accepted-mscorefonts-eula'
+        vtype: 'select'
+        value: 'true'
+    repos:
+      - _id: 'canonical'
+        repo: 'deb http://archive.canonical.com/ubuntu {{ansible_distribution_release}} partner'
+    packages:
+      - libfreetype6  # fonts
+      - libfreetype6-dev  # fonts
+      - libfontconfig  # fonts
+      - ttf-mscorefonts-installer  # fonts
+      - ttf-ubuntu-font-family  # fonts
+      - fonts-ubuntu-font-family-console  # fonts
+      - caffeine
+      - youtube-dl
+      - lame  # codec
+      - firefox
+      - chromium-browser
+      - chromium-codecs-ffmpeg
+      - adobe-flashplugin
