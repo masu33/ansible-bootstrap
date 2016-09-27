@@ -12,7 +12,9 @@ sudo apt-get install python-setuptools \
                      python-apt \
                      libffi-dev \
                      libssl-dev \
-                     aptitude <<< "y"
+                     aptitude \
+                     git \
+                     <<< "y"
 sudo easy_install greenlet
 sudo easy_install gevent
 sudo easy_install pip
@@ -21,5 +23,5 @@ sudo pip2 install paramiko \
                  Jinja2 \
                  httplib2 \
                  six \
-                 git+git://github.com/ansible/ansible.git@devel
+                 git+https://github.com/ansible/ansible.git@devel
 sudo mkdir /etc/ansible

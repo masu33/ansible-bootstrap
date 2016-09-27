@@ -1,0 +1,22 @@
+---
+
+- name: "Handle empty list"
+  when: "{{ settings is undefined }}"
+  set_fact:
+    settings: "{{ [] }}"
+
+- name: "Applying filesystem settings..."
+  become: yes
+  file:
+    follow:  "{{ __fs.follow  | d(omit) }}"
+    force:   "{{ __fs.force   | d(omit) }}"
+    group:   "{{ __fs.group   | d(omit) }}"
+    mode:    "{{ __fs.mode    | d(omit) }}"
+    owner:   "{{ __fs.owner   | d(omit) }}"
+    path:    "{{ __fs.path    | d(omit) }}"
+    recurse: "{{ __fs.recurse | d(omit) }}"
+    src:     "{{ __fs.src     | d(omit) }}"
+    state:   "{{ __fs.state   | d(omit) }}"
+  with_items: "{{ settings | forall | list }}"
+  loop_control:
+    loop_var: "__fs"

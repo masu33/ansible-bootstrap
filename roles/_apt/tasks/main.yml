@@ -1,0 +1,85 @@
+---
+
+- name: "Handle empty list"
+  when: "{{ debconfs is undefined }}"
+  set_fact: debconfs="{{ [] }}"
+
+- name: "Handle empty list"
+  when: "{{ repos is undefined }}"
+  set_fact: repos="{{ [] }}"
+
+- name: "Handle empty list"
+  when: "{{ packages is undefined }}"
+  set_fact: packages="{{ [] }}"
+
+- name: "Set debconfs"
+  when: "{{ debconfs is defined }}"
+  become: yes
+  debconf:
+    name:     "{{ item.name }}"
+    question: "{{ item.question }}"
+    vtype:    "{{ item.vtype }}"
+    value:    "{{ item.value }}"
+  with_items: "{{ debconfs | forall | list }}"
+
+- name: "Set repository keys with keyserver"
+  when: "{{ repos is defined }}"
+  become: yes
+  apt_key:
+    keyserver: "{{ item.keyserver }}"
+    id:        "{{ item.key }}"
+    state:     "{{ item.state | d('present') }}"
+  with_items: "{{ repos | forall |
+                  selectattr('key', 'defined') |
+                  list }}"
+
+- name: "Set repository keys with GPG keys"
+  when: "{{ repos is defined }}"
+  become: yes
+  apt_key:
+    state: "{{ item.state | d('present') }}"
+    url:   "{{ item.key_url }}"
+  with_items: "{{ repos | forall |
+                  selectattr('key_url', 'defined') |
+                  list }}"
+
+- name: "Set repositories"
+  when: "{{ repos is defined }}"
+  become: yes
+  apt_repository:
+    mode: 644
+    repo:  "{{ item.repo }}"
+    state: "{{ item.state | d(omit) }}"
+    update_cache: no
+  with_items: "{{ repos | forall('repo') | list }}"
+
+- name: "Update cache"
+  when: "{{ repos is defined }}"
+  become: yes
+  apt:
+    update_cache: yes
+  ignore_errors: yes
+
+- name: "Packages..."
+  when: "{{ packages is defined }}"
+  become: yes
+  apt:
+    allow_unauthenticated: "{{ item.allow_unauthenticated | d(omit) }}"
+    cache_valid_time:      "{{ item.cache_valid_time      | d(omit) }}"
+    deb:                   "{{ item.deb                   | d(omit) }}"
+    default_release:       "{{ item.default_release       | d(omit) }}"
+    dpkg_options:          "{{ item.dpkg_options          | d(omit) }}"
+    force:                 "{{ item.force                 | d(omit) }}"
+    install_recommends:    "{{ item.install_recommends    | d(omit) }}"
+    name:                  "{{ item.name                  | d(omit) }}"
+    purge:                 "{{ item.purge                 | d(omit) }}"
+    state:                 "{{ item.state                 | d(omit) }}"
+  with_items: "{{ packages | forall('name') | list }}"
+
+- name: "Upgrade and/or autoremove"
+  when: "{{ (upgrade | d(false))
+            or (autoremove | d(false)) }}"
+  become: yes
+  apt:
+    upgrade: "{{ upgrade | d(omit) }}"
+    autoremove: "{{ autoremove | d(omit) }}"

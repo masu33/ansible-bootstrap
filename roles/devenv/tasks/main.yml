@@ -1,0 +1,15 @@
+---
+
+- name: "Handle empty list"
+  when: "{{ umake is undefined }}"
+  set_fact: umake="{{ [] }}"
+
+- name: "Install umake frameworks"
+  umake:
+    category:  "{{ fw.category  | d(omit) }}"
+    framework: "{{ fw.framework | d(omit) }}"
+    state:     "{{ fw.state     | d(omit) }}"
+    path:      "{{ fw.path      | d(omit) }}"
+  with_items: "{{ umake }}"
+  loop_control:
+    loop_var: "fw"

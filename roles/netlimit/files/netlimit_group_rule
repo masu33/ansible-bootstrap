@@ -1,0 +1,17 @@
+#!/bin/bash
+
+############
+# ACCEPT localhost or local network connections
+# ----------
+iptables -A OUTPUT -m owner --gid-owner netlimit127 -d 127.0.0.0/8    -j ACCEPT
+iptables -A OUTPUT -m owner --gid-owner netlimit192 -d 127.0.0.0/8    -j ACCEPT
+iptables -A OUTPUT -m owner --gid-owner netlimit192 -d 192.168.0.0/16 -j ACCEPT
+iptables -A OUTPUT -m owner --gid-owner netlimit10  -d 127.0.0.0/8    -j ACCEPT
+iptables -A OUTPUT -m owner --gid-owner netlimit10  -d 10.0.0.0/24    -j ACCEPT
+
+############
+# REJECT non local connections
+# ----------
+iptables -A OUTPUT -m owner --gid-owner netlimit127 -j REJECT
+iptables -A OUTPUT -m owner --gid-owner netlimit192 -j REJECT
+iptables -A OUTPUT -m owner --gid-owner netlimit10  -j REJECT

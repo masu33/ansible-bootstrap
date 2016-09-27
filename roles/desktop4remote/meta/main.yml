@@ -1,0 +1,11 @@
+---
+
+dependencies:
+  - role: _apt
+    packages:
+      - rdesktop
+      - vinagre
+      - synergy
+      - openvpn
+      - network-manager-openvpn
+      - network-manager-openvpn-gnome
