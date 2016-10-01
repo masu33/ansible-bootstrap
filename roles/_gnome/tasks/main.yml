@@ -1,5 +1,11 @@
 ---
 
+- assert:
+    that:
+      - "(settings is defined)
+         and (settings is sequence)"
+    msg: "settings should be defined and sequence"
+
 - name: "Set background"
   become: yes
   gsettings:
@@ -11,8 +17,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('background', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -26,8 +31,7 @@
     value: "{{ (__config.login_background is none) | ternary('true', 'false') }}"
   with_items: "{{ settings | forall |
                   selectattr('login_background', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -41,8 +45,7 @@
     value: "{{ __config.login_background }}"
   with_items: "{{ settings | forall |
                   selectattr('login_background', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -57,8 +60,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('lock_background', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -73,8 +75,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('lock_background', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -92,8 +93,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('avatar', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -109,8 +109,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('avatar', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -125,8 +124,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('workspaces_h', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -141,8 +139,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('workspaces_v', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -157,8 +154,7 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('show_name', 'defined') |
-                  list
-               }}"
+                  list }}"
   loop_control:
     loop_var: "__config"
 
@@ -173,7 +169,123 @@
   with_items: "{{ settings | forall |
                   selectattr('user', 'defined') |
                   selectattr('show_name', 'defined') |
+                  list }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Create bookmark location 1"
+  become: yes
+  file:
+    mode: "0755"
+    owner: "{{ __config.user }}"
+    group: "{{ __config.user }}"
+    path:  "{{ __config.user | user_home }}/.config"
+    state: directory
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'defined') |
+                  selectattr('bookmark', 'defined') |
                   list
                }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Create bookmark location 2"
+  become: yes
+  file:
+    mode: "0755"
+    owner: "{{ __config.user }}"
+    group: "{{ __config.user }}"
+    path:  "{{ __config.user | user_home }}/.config/gtk-3.0"
+    state: directory
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'defined') |
+                  selectattr('bookmark', 'defined') |
+                  list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set location bookmarks"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    owner: "{{ __config.user }}"
+    group: "{{ __config.group | d(__config.user) }}"
+    dest:  "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    insertbefore: EOF
+    line: "file://{{ __config.location }} {{ __config.name | d('') }}"
+    state: "{{ __config.state | d('present') }}"
+  with_items: "{{ settings |
+                  selectattr('bookmark', 'defined') |
+                  forall(default_key='location') |
+                  list }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set xorg.conf.d present"
+  when: "{{ settings | forall |
+            selectattr('xzap', 'defined') |
+            selectattr('xzap', 'equalto', True) |
+            selectattr('user', 'undefined') |
+            list != [] }}"
+  become: yes
+  file:
+    follow: yes
+    force: yes
+    path: "/etc/X11/xorg.conf.d/"
+    owner: "{{ root_user | d('root') }}"
+    group: "{{ root_user | d('root') }}"
+    state: directory
+
+- name: "Hotkey for restarting X (global) - Enable"
+  become: yes
+  copy:
+    backup: no
+    dest: "/etc/X11/xorg.conf.d/"
+    follow: yes
+    force: yes
+    mode: "0644"
+    owner: "{{ root_user | d('root') }}"
+    src: "90-zap.conf"
+  with_items: "{{ settings | forall |
+                  selectattr('xzap', 'defined') |
+                  selectattr('xzap', 'equalto', True) |
+                  selectattr('user', 'undefined') |
+                  list |
+                  last }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Hotkey for restarting X (global) - Disable"
+  become: yes
+  file:
+    follow: yes
+    force: yes
+    path: "/etc/X11/xorg.conf.d/90-zap.conf"
+    state: absent
+  with_items: "{{ settings | forall |
+                  selectattr('xzap', 'defined') |
+                  selectattr('xzap', 'equalto', False) |
+                  selectattr('user', 'undefined') |
+                  list }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Hotkey for restarting X (user)"
+  become: yes
+  blockinfile:
+    backup: yes
+    block: "setxkbmap -option \"terminate:ctrl_alt_bksp\""
+    create: yes
+    dest: "{{ __config.user | user_home }}/.bashrc"
+    follow: yes
+    insertafter: EOF
+    marker: "# ANSIBLE MANAGED: xzap {mark}"
+    state: "{{ __config.xzap | ternary('present', 'absent') }}"
+  with_items: "{{ settings | forall |
+                  selectattr('xzap', 'defined') |
+                  selectattr('user', 'defined') |
+                  list }}"
   loop_control:
     loop_var: "__config"

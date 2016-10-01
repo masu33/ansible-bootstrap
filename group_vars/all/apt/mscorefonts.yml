@@ -1,0 +1,8 @@
+---
+
+mscorefonts_debconfs:
+  - _id: 'Accept MS-TTF EULA'
+    name: 'ttf-mscorefonts-installer'
+    question: 'msttcorefonts/accepted-mscorefonts-eula'
+    vtype: 'select'
+    value: 'true'

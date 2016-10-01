@@ -1,14 +1,17 @@
 ---
 
-- name: "Handle empty list"
-  when: "{{ docker_users is undefined }}"
-  set_fact: docker_users="{{ [] }}"
+- assert:
+    that:
+      - "(docker_users is undefined)
+         or (docker_users is sequence)"
+    msg: "docker_users should be undefined or sequence"
+
 - name: "Add users to docker group"
   become: yes
   user:
     name: "{{ username }}"
     groups: docker
     append: yes
-  with_items: "{{ docker_users }}"
+  with_items: "{{ docker_users | d([]) }}"
   loop_control:
     loop_var: "username"

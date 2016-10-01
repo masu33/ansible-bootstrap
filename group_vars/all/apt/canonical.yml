@@ -1,0 +1,5 @@
+---
+
+canonical_repos:
+  - _id: 'canonical'
+    repo: 'deb http://archive.canonical.com/ubuntu {{ansible_distribution_release}} partner'

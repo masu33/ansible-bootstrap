@@ -1,8 +1,10 @@
 ---
 
-- name: "Handle empty list"
-  when: "{{ envs is undefined }}"
-  set_fact: envs="{{ [] }}"
+- assert:
+    that:
+      - "(envs is undefined)
+         or (envs is sequence)"
+    msg: "envs should be undefined or sequence"
 
 - name: "Set environments"
   pip:
@@ -19,6 +21,6 @@
     virtualenv_command:       "{{ __env.virtualenv_command       | d(omit) }}"
     virtualenv_python:        "{{ __env.virtualenv_python        | d(omit) }}"
     virtualenv_site_packages: "{{ __env.virtualenv_site_packages | d(omit) }}"
-  with_items: "{{ envs | forall('name') | list }}"
+  with_items: "{{ envs | d([]) | forall(default_key='name') | list }}"
   loop_control:
     loop_var: "__env"

@@ -1,9 +1,10 @@
 ---
 
-- name: "Handle empty list"
-  when: "{{ settings is undefined }}"
-  set_fact:
-    settings: "{{ [] }}"
+- assert:
+    that:
+      - "(settings is defined)
+         and (settings is sequence)"
+    msg: "settings should be defined and sequence"
 
 - name: "Downloading..."
   become: yes

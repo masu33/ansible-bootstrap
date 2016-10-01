@@ -1,57 +1,88 @@
 ---
 
-- name: "Handle empty list"
-  when: "{{ debconfs is undefined }}"
-  set_fact: debconfs="{{ [] }}"
+- assert:
+    that:
+      - "(debconfs is defined)
+         or (repos is defined)
+         or (packages is defined)
+         or (autoremove | d(false))
+         or (upgrade | d(false))"
+    msg:
+      - "debconfs, repos or packages should be defined otherwise autoremove or upgrade should be true"
 
-- name: "Handle empty list"
-  when: "{{ repos is undefined }}"
-  set_fact: repos="{{ [] }}"
+- assert:
+    that:
+      - "(debconfs is undefined)
+         or (debconfs is sequence)"
+    msg:
+      - "debconfs should be undefined or sequence"
 
-- name: "Handle empty list"
-  when: "{{ packages is undefined }}"
-  set_fact: packages="{{ [] }}"
+- assert:
+    that:
+      - "(repos is undefined)
+         or (repos is sequence)"
+    msg:
+      - "packages should be undefined or sequence"
+
+- assert:
+    that:
+      - "(packages is undefined)
+         or (packages is sequence)"
+    msg:
+      - "packages should be undefined or sequence"
+
+- assert:
+    that:
+      - "(upgrade is undefined)
+         or (upgrade is sameas false)
+         or (upgrade is sameas true)"
+    msg:
+      - "upgrade should be undefined or boolean"
+
+- assert:
+    that:
+      - "(autoremove is undefined)
+         or (autoremove is sameas false)
+         or (autoremove is sameas true)"
+    msg:
+      - "autoremove should be undefined or boolean"
 
 - name: "Set debconfs"
-  when: "{{ debconfs is defined }}"
   become: yes
   debconf:
     name:     "{{ item.name }}"
     question: "{{ item.question }}"
     vtype:    "{{ item.vtype }}"
     value:    "{{ item.value }}"
-  with_items: "{{ debconfs | forall | list }}"
+  with_items: "{{ debconfs | d([]) | forall | list }}"
 
 - name: "Set repository keys with keyserver"
-  when: "{{ repos is defined }}"
   become: yes
   apt_key:
     keyserver: "{{ item.keyserver }}"
     id:        "{{ item.key }}"
     state:     "{{ item.state | d('present') }}"
-  with_items: "{{ repos | forall |
+  with_items: "{{ repos | d([]) | forall |
                   selectattr('key', 'defined') |
                   list }}"
 
 - name: "Set repository keys with GPG keys"
-  when: "{{ repos is defined }}"
   become: yes
   apt_key:
     state: "{{ item.state | d('present') }}"
     url:   "{{ item.key_url }}"
-  with_items: "{{ repos | forall |
+  with_items: "{{ repos | d([]) | forall |
                   selectattr('key_url', 'defined') |
                   list }}"
 
 - name: "Set repositories"
-  when: "{{ repos is defined }}"
   become: yes
   apt_repository:
     mode: 644
     repo:  "{{ item.repo }}"
     state: "{{ item.state | d(omit) }}"
     update_cache: no
-  with_items: "{{ repos | forall('repo') | list }}"
+  with_items: "{{ repos | d([]) | forall(default_key='repo') | list }}"
 
 - name: "Update cache"
   when: "{{ repos is defined }}"
@@ -61,7 +92,6 @@
   ignore_errors: yes
 
 - name: "Packages..."
-  when: "{{ packages is defined }}"
   become: yes
   apt:
     allow_unauthenticated: "{{ item.allow_unauthenticated | d(omit) }}"
@@ -74,7 +104,7 @@
     name:                  "{{ item.name                  | d(omit) }}"
     purge:                 "{{ item.purge                 | d(omit) }}"
     state:                 "{{ item.state                 | d(omit) }}"
-  with_items: "{{ packages | forall('name') | list }}"
+  with_items: "{{ packages | d([]) | forall(default_key='name') | list }}"
 
 - name: "Upgrade and/or autoremove"
   when: "{{ (upgrade | d(false))

@@ -1,17 +1,25 @@
 ---
 
+- assert:
+    that:
+      - "(netlimit_users is undefined)
+         or (netlimit_users is sequence)"
+    msg: "netlimit_users should be undefined or a sequence"
+
 - name: "Create netlimit127 group"
   become: yes
   group:
     name: netlimit127
     state: present
     system: yes
+
 - name: "Create netlimit192 group"
   become: yes
   group:
     name: netlimit192
     state: present
     system: yes
+
 - name: "Create netlimit10 group"
   become: yes
   group:

@@ -1,9 +1,6 @@
 ---
 
 - hosts: localhost
-  vars:
-    - ansible_connection: local
-    - ansible_become_method: sudo
   roles:
     - role: _users
       settings:
@@ -73,34 +70,33 @@
       packages:
         - state: absent
           forall:
-          - name: totem
-          - name: totem-common
-          - name: totem-plugins
-          - name: rhythmbox
-          - name: rhythmbox-data
-          - name: rhythmbox-plugins
-          - name: rhythmbox-plugin-zeitgeist
-          - name: transmission
-          - name: transmission-*
+            - totem
+            - totem-common
+            - totem-plugins
+            - rhythmbox
+            - rhythmbox-data
+            - rhythmbox-plugins
+            - rhythmbox-plugin-zeitgeist
+            - transmission
+            - transmission-*
     - role: system
     - role: netlimit
       netlimit_users:
-       - "masu"
-       - "willow"
+        - "masu"
+        - "willow"
     - role: server4rdp
     - role: server4ssh
     - role: server4torrent
     - role: server4vm
       docker_users:
-        - masu
-        - willow
-    - role: _env
+        - "masu"
+        - "willow"
+    - role: _vars
       settings:
         - forall:
             - line: "alias dlast=docker\\ ps\\ -l\\ -q"
             - line: "alias pip=pip3.5"
-          profile: yes
-    - role: server4vnc
+          type: all
     - role: devenv
     - role: devenv4java
       umake:
@@ -130,13 +126,15 @@
             - pymongo
             - pyinstaller
             - py4j
-    - role: _env
+    - role: _vars
       settings:
-        - user: masu
+        - user: "masu"
+          type: all
           forall:
             - line: "alias python=python3.5"
-            - line: "alias pip=pip3.5"
-          profile: no
+              regexp: "^alias python=.*$"
+            - line: "alias pip=python3.5"
+              regexp: "^alias pip=.*$"
     - role: desktop
     - role: desktop4browse
     - role: desktop4comm
@@ -145,7 +143,7 @@
     - role: desktop4office
     - role: desktop4remote
     - role: desktop4wine
-    - role: _visual
+    - role: _gnome
       settings:
         - xzap: yes
         - user: "masu"
@@ -166,14 +164,40 @@
           desktop_icons: yes
           show_name: yes
         - user: "masu"
-          bookmarks:
-            - name: "Dropbox"
-              location: "/home/masu/Dropbox"
-            - name: "Projects"
-              location: "/home/masu/Projects"
-            - name: "DL Firefox"
-              location: "/home/masu/Downloads/firefox"
-            - name: "DL torrent"
-              location: "/home/masu/Downloads/torrent"
-            - name: "DL ncore"
-              location: "/home/masu/Downloads/torrent/ncore"
+          forall:
+            bookmark:
+              - name: "Dropbox"
+                location: "/home/masu/Dropbox"
+              - name: "Projects"
+                location: "/home/masu/Projects"
+              - name: "DL Firefox"
+                location: "/home/masu/Downloads/firefox"
+              - name: "DL torrent"
+                location: "/home/masu/Downloads/torrent"
+              - name: "DL ncore"
+                location: "/home/masu/Downloads/torrent/ncore"
+    - role: _vars
+      settings:
+        - user: "masu"
+          state: present
+          type: all
+          forall:
+            - line: "{{ 'export PS1=\"'
+                        + '\\[\\e[0;1;32m\\]' + '\\u'
+                        + '\\[\\e[0;2;91m\\]' + '@'
+                        + '\\[\\e[0;1;36m\\]' + '\\h'
+                        + '\\[\\e[0;2;91m\\]'+ ':'
+                        + '\\[\\e[0;1;34m\\]' + '\\W'
+                        + '\\[\\e[0;2;91m\\]' + '\\$'
+                        + '\\[\\e[0m\\]'
+                        + ' \"' }}"
+              regexp: "^export PS1=.*$"
+            - line: "{{ 'export PS2=\"'
+                        + '\\[\\e[0;2;91m\\]' + '\\$'
+                        + '\\[\\e[0m\\]' + '>'
+                        + '\\[\\e[0m\\]'
+                        + ' '
+                        + '\"' }}"
+              regexp: "^export PS2=.*$"
+            - line: "alias clear=echo\\ -e\\ '\\e[2J\\n\\n'"
+              regexp: "^alias clear=.*$"

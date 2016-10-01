@@ -1,0 +1,7 @@
+---
+
+dependencies:
+  - role: _apt
+    debconfs: "{{ mscorefonts_debconfs }}"
+    packages:
+      - ttf-mscorefonts-installer  # fonts
