@@ -10,3 +10,4 @@ dependencies:
     packages:
       - unity-tweak-tool
       - dropbox
+  - role: _oraclejdk8

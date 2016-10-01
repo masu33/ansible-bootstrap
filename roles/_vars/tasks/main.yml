@@ -1,0 +1,90 @@
+---
+
+- assert:
+    that:
+      - "(settings is defined)
+         and (settings is sequence)"
+    msg: "settings should be defined and sequence"
+
+- assert:
+    that:
+      - "(item.type is defined)
+         and (item.type in ['all', 'env', 'profile'])"
+  with_items: "{{ settings }}"
+
+- name: "Global vars: profile.d"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest:   "/etc/profile.d/ansible-managed"
+    state:  "{{ __var.state   | d('present') }}"
+    owner:  "{{ __var.user                    | d(root_user) | d('root') }}"
+    group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
+    line:   "{{ __var.line    | d(omit) }}"
+    regexp: "{{ __var.regexp  | d(omit) }}"
+    mode: "0644"
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'undefined') |
+                  rejectattr('type', 'equalto', 'env') |
+                  list }}"
+  loop_control:
+    loop_var: "__var"
+
+- name: "Global vars: environment"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest:   "/etc/environment"
+    state:  "{{ __var.state   | d('present') }}"
+    owner:  "{{ __var.user                    | d(root_user) | d('root') }}"
+    group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
+    line:   "{{ __var.line    | d(omit) }}"
+    regexp: "{{ __var.regexp  | d(omit) }}"
+    mode: "0644"
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'undefined') |
+                  rejectattr('type', 'equalto', 'profile') |
+                  list }}"
+  loop_control:
+    loop_var: "__var"
+
+- name: "User envs: .bashrc"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest:   "{{ __var.user | user_home }}/.bashrc"
+    state:  "{{ __var.state   | d('present') }}"
+    owner:  "{{ __var.user                    | d(root_user) | d('root') }}"
+    group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
+    line:   "{{ __var.line    | d(omit) }}"
+    regexp: "{{ __var.regexp  | d(omit) }}"
+    mode: "0755"
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'defined') |
+                  rejectattr('type', 'equalto', 'env') |
+                  list }}"
+  loop_control:
+    loop_var: "__var"
+
+
+- name: "User envs: .bash_profile"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest:   "{{ __var.user | user_home }}/.bash_profile"
+    state:  "{{ __var.state   | d('present') }}"
+    owner:  "{{ __var.user                    | d(root_user) | d('root') }}"
+    group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
+    line:   "{{ __var.line    | d(omit) }}"
+    regexp: "{{ __var.regexp  | d(omit) }}"
+    mode: "0755"
+  with_items: "{{ settings | forall |
+                  selectattr('user', 'defined') |
+                  rejectattr('type', 'equalto', 'profile') |
+                  list }}"
+  loop_control:
+    loop_var: "__var"

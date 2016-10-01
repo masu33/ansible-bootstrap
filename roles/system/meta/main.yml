@@ -2,22 +2,6 @@
 
 dependencies:
   - role: _apt
-    debconfs:
-      - _id: 'Accept Oracle License'
-        name: 'oracle-java8-installer'
-        question: 'shared/accepted-oracle-license-v1-1'
-        vtype: 'select'
-        value: 'true'
-      - _id: 'Seen Oracle License'
-        name: 'oracle-java8-installer'
-        question: 'shared/accepted-oracle-license-v1-1'
-        vtype: 'seen'
-        value: 'true'
-    repos:
-      - _id: 'WebUpd8Team'
-        repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu {{ansible_distribution_release}} main'
-        key: '7B2C3B0889BF5709A105D03AC2518248EEA14886'
-        keyserver: 'keyserver.ubuntu.com'
     packages:
       - aptitude
       - curl
@@ -30,10 +14,9 @@ dependencies:
       - htop
       - tree
       - vim
-      - oracle-java8-installer
-      - ca-certificates
-      - oracle-java8-set-default
       - rar
       - zip
       - unzip
       - unrar
+  - role: _oraclejdk8
+    default: yes
