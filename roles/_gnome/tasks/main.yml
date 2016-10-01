@@ -207,18 +207,17 @@
 
 - name: "Set location bookmarks"
   become: yes
-  lineinfile:
-    backup: yes
-    create: yes
+  copy:
+    backup: no
+    content: "{{ __config.bookmarks | gtk_bookmarks }}"
     owner: "{{ __config.user }}"
     group: "{{ __config.group | d(__config.user) }}"
     dest:  "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
-    insertbefore: EOF
-    line: "file://{{ __config.location }} {{ __config.name | d('') }}"
-    state: "{{ __config.state | d('present') }}"
-  with_items: "{{ settings |
-                  selectattr('bookmark', 'defined') |
-                  forall(default_key='location') |
+    follow: yes
+    force: yes
+    mode: "0700"
+  with_items: "{{ settings | forall |
+                  selectattr('bookmarks', 'defined') |
                   list }}"
   loop_control:
     loop_var: "__config"
@@ -239,6 +238,11 @@
     state: directory
 
 - name: "Hotkey for restarting X (global) - Enable"
+  when: "{{ settings | forall |
+            selectattr('xzap', 'defined') |
+            selectattr('xzap', 'equalto', True) |
+            selectattr('user', 'undefined') |
+            list != [] }}"
   become: yes
   copy:
     backup: no
@@ -248,14 +252,6 @@
     mode: "0644"
     owner: "{{ root_user | d('root') }}"
     src: "90-zap.conf"
-  with_items: "{{ settings | forall |
-                  selectattr('xzap', 'defined') |
-                  selectattr('xzap', 'equalto', True) |
-                  selectattr('user', 'undefined') |
-                  list |
-                  last }}"
-  loop_control:
-    loop_var: "__config"
 
 - name: "Hotkey for restarting X (global) - Disable"
   become: yes

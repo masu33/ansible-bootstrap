@@ -164,18 +164,17 @@
           desktop_icons: yes
           show_name: yes
         - user: "masu"
-          forall:
-            bookmark:
-              - name: "Dropbox"
-                location: "/home/masu/Dropbox"
-              - name: "Projects"
-                location: "/home/masu/Projects"
-              - name: "DL Firefox"
-                location: "/home/masu/Downloads/firefox"
-              - name: "DL torrent"
-                location: "/home/masu/Downloads/torrent"
-              - name: "DL ncore"
-                location: "/home/masu/Downloads/torrent/ncore"
+          bookmarks:
+            - name: "Dropbox"
+              location: "/home/masu/Dropbox"
+            - name: "Projects"
+              location: "/home/masu/Projects"
+            - name: "DL Firefox"
+              location: "/home/masu/Downloads/firefox"
+            - name: "DL torrent"
+              location: "/home/masu/Downloads/torrent"
+            - name: "DL ncore"
+              location: "/home/masu/Downloads/torrent/ncore"
     - role: _vars
       settings:
         - user: "masu"
