@@ -2,91 +2,96 @@
 
 - assert:
     that:
-      - "(netlimit_users is undefined)
-         or (netlimit_users is sequence)"
+      - "( netlimit_users is undefined
+        or netlimit_users is sequence
+         )"
     msg: "netlimit_users should be undefined or a sequence"
 
 - name: "Create netlimit127 group"
   become: yes
   group:
-    name: netlimit127
-    state: present
+    name:   netlimit127
+    state:  present
     system: yes
 
 - name: "Create netlimit192 group"
   become: yes
   group:
-    name: netlimit192
-    state: present
+    name:   netlimit192
+    state:  present
     system: yes
 
 - name: "Create netlimit10 group"
   become: yes
   group:
-    name: netlimit10
-    state: present
+    name:   netlimit10
+    state:  present
     system: yes
 
 - name: "Copy iptables rules"
   become: yes
   copy:
     backup: yes
-    dest: "/etc/network/if-pre-up.d/"
+    dest:   "/etc/network/if-pre-up.d/"
     follow: yes
-    force: no
-    mode: "0755"
-    owner: "{{ root_user | d('root') }}"
-    src: "netlimit_group_rule"
+    force:  no
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "netlimit_group_rule"
 
 - name: "Copy netlimit127 command"
   become: yes
   copy:
     backup: yes
-    dest: "/usr/bin/netlimit127"
+    dest:   "/usr/bin/netlimit127"
     follow: yes
-    force: no
-    mode: "0755"
-    owner: "{{ root_user | d('root') }}"
-    src: "netlimit127.sh"
+    force:  no
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "netlimit127.sh"
+
 - name: "Copy netlimit192 command"
   become: yes
   copy:
     backup: yes
-    dest: "/usr/bin/netlimit192"
+    dest:   "/usr/bin/netlimit192"
     follow: yes
-    force: no
-    mode: "0755"
-    owner: "{{ root_user | d('root') }}"
-    src: "netlimit192.sh"
+    force:  no
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "netlimit192.sh"
+
 - name: "Copy netlimit10 command"
   become: yes
   copy:
     backup: yes
-    dest: "/usr/bin/netlimit10"
+    dest:   "/usr/bin/netlimit10"
     follow: yes
-    force: no
-    mode: "0755"
-    owner: "{{ root_user | d('root') }}"
-    src: "netlimit10.sh"
+    force:  no
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "netlimit10.sh"
 
 - name: "Copy netlimit command"
   become: yes
   copy:
     backup: yes
-    dest: "/usr/bin/netlimit"
+    dest:   "/usr/bin/netlimit"
     follow: yes
-    force: no
-    mode: "0755"
-    owner: "{{ root_user | d('root') }}"
-    src: "netlimit127.sh"
+    force:  no
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "netlimit127.sh"
 
 - name: "Add users to netlimit group"
   become: yes
   user:
-    name: "{{ item }}"
+    name:   "{{ item }}"
     groups: "netlimit127,netlimit192,netlimit10"
     append: yes
-    state: present
-  with_items:
-    - "root"
-    - "{{ netlimit_users | d([]) }}"
+    state:  present
+  with_items: "{{ (netlimit_users | d([]))
+                + ['root']
+               }}"
+  loop_control:
+    loop_var: "netlimit_user"

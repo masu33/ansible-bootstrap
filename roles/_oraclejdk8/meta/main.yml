@@ -2,9 +2,12 @@
 
 dependencies:
   - role: _apt
-    debconfs: "{{ oraclejdk_debconfs }}"
-    repos: "{{ oraclejdk_repos }}"
+    debconfs: "{{ debconfs_oraclejdk }}"
+    repos: "{{ repos_oraclejdk }}"
     packages:
       - oracle-java8-installer
       - ca-certificates
-      - "{{ default | d(false) | ternary('oracle-java8-set-default', 'oracle-java8-installer') }}"
+      - "{{ default
+          | d(false)
+          | ternary('oracle-java8-set-default', 'oracle-java8-installer')
+         }}"

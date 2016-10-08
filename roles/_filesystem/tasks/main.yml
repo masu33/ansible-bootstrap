@@ -2,8 +2,9 @@
 
 - assert:
     that:
-      - "(settings is defined)
-         and (settings is sequence)"
+      - "( settings is defined
+       and settings is sequence
+         )"
     msg: "settings should be defined and sequence"
 
 - name: "Applying filesystem settings..."
@@ -18,6 +19,9 @@
     recurse: "{{ __fs.recurse | d(omit) }}"
     src:     "{{ __fs.src     | d(omit) }}"
     state:   "{{ __fs.state   | d(omit) }}"
-  with_items: "{{ settings | forall | list }}"
+  with_items: "{{ settings
+                | forall
+                | list
+               }}"
   loop_control:
     loop_var: "__fs"

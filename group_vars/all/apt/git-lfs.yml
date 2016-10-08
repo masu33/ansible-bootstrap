@@ -1,0 +1,6 @@
+---
+
+repos_git_lfs:
+  - _id: 'git LFS'
+    repo: 'deb https://packagecloud.io/github/git-lfs/{{ansible_distribution | lower}}/ {{ansible_distribution_release}} main'
+    key_url: 'https://packagecloud.io/github/git-lfs/gpgkey'

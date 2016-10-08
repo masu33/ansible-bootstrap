@@ -2,14 +2,16 @@
 
 - assert:
     that:
-      - "(settings is defined)
-         and (settings is sequence)"
+      - "( settings is defined
+       and settings is sequence
+         )"
     msg: "settings should be defined and sequence"
 
 - assert:
     that:
-      - "(item.type is defined)
-         and (item.type in ['all', 'env', 'profile'])"
+      - "( item.type is defined
+       and item.type in ['all', 'env', 'profile']
+         )"
   with_items: "{{ settings }}"
 
 - name: "Global vars: profile.d"
@@ -23,11 +25,13 @@
     group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
     line:   "{{ __var.line    | d(omit) }}"
     regexp: "{{ __var.regexp  | d(omit) }}"
-    mode: "0644"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'undefined') |
-                  rejectattr('type', 'equalto', 'env') |
-                  list }}"
+    mode:   "0644"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'undefined')
+                | rejectattr('type', 'equalto', 'env')
+                | list
+               }}"
   loop_control:
     loop_var: "__var"
 
@@ -42,11 +46,13 @@
     group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
     line:   "{{ __var.line    | d(omit) }}"
     regexp: "{{ __var.regexp  | d(omit) }}"
-    mode: "0644"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'undefined') |
-                  rejectattr('type', 'equalto', 'profile') |
-                  list }}"
+    mode:   "0644"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'undefined')
+                | rejectattr('type', 'equalto', 'profile')
+                | list
+               }}"
   loop_control:
     loop_var: "__var"
 
@@ -61,14 +67,15 @@
     group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
     line:   "{{ __var.line    | d(omit) }}"
     regexp: "{{ __var.regexp  | d(omit) }}"
-    mode: "0755"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  rejectattr('type', 'equalto', 'env') |
-                  list }}"
+    mode:  "0755"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | rejectattr('type', 'equalto', 'env')
+                | list
+               }}"
   loop_control:
     loop_var: "__var"
-
 
 - name: "User envs: .bash_profile"
   become: yes
@@ -81,10 +88,12 @@
     group:  "{{ __var.group   | d(__var.user) | d(root_user) | d('root') }}"
     line:   "{{ __var.line    | d(omit) }}"
     regexp: "{{ __var.regexp  | d(omit) }}"
-    mode: "0755"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  rejectattr('type', 'equalto', 'profile') |
-                  list }}"
+    mode:   "0755"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | rejectattr('type', 'equalto', 'profile')
+                | list
+               }}"
   loop_control:
     loop_var: "__var"

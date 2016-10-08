@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # coding=utf-8
 """
-Jinja filter definition for getting a user's home folder.
+Jinja filter definition for checking user details in /etc/passwd.
 """
 
-from ansible import errors
-from subprocess import check_output
+from ansible.errors import AnsibleFilterError
 
 __author__ = "Sandor Kazi"
 __copyright__ = "Copyright 2016, ansible-desktop-bootstrap project"
@@ -15,20 +14,27 @@ __maintainer__ = "Sandor Kazi"
 __email__ = None
 __status__ = "Development"
 
+__passwd = '/etc/passwd'
 
-def user_home(user):
+
+def user_attribute(user, num):
     """
-    Home folder lookup.
-    :param user: the user to get the home folder for
-    :return: the home folder of the given user
+    User attribute lookup.
+    :param user: the user to get the attribute for
+    :param num: the attribute index to return
+    :return: the attribute of the
     """
-    result = check_output(
-        'grep "^{}:" /etc/passwd | cut -f6 -d:'.format(user),
-        shell=True,
-    ).strip('\n')
-    if result == "":
-        raise errors.AnsibleFilterError('No such user')
-    return result
+    try:
+        with open(__passwd) as fin:
+            for line in filter(lambda x: x.startswith('{}:'.format(user)), fin):
+                try:
+                    return line.split(':', num+1)[num]
+                except IndexError:
+                    raise AnsibleFilterError('Wrong index supplied: {}'.format(num))
+            else:
+                raise AnsibleFilterError('No such user {}'.format(user))
+    except IOError:
+        raise AnsibleFilterError('Environment problem: could not run read {}'.format(__passwd))
 
 
 class FilterModule(object):
@@ -36,5 +42,5 @@ class FilterModule(object):
     @staticmethod
     def filters():
         return {
-            'user_home': user_home,
+            'user_home': lambda x: user_attribute(x, 5),
         }

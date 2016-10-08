@@ -17,17 +17,26 @@ __email__ = None
 __status__ = "Development"
 
 
-def __product(iterable, default_key):
+def __remap(item, default_key=None):
+    if isinstance(item, dict):
+        return item
+    elif default_key is None:
+        raise AnsibleFilterError('default_key should be set if the input can have non-keyed items')
+    else:
+        return {default_key: item}
+
+
+def __product(iterable, default_key=None):
     if isinstance(iterable, dict):
         remapped = map(lambda x: [(x[0], i) for i in x[1]] if isinstance(x[1], list) else [x], iterable.iteritems())
         return map(dict, product(*remapped))
     elif isinstance(iterable, list):
-        return map(lambda x: x if isinstance(x, dict) else {default_key: x}, iterable)
+        return map(lambda x: __remap(x, default_key=default_key), iterable)
     else:
         raise AnsibleFilterError('grouping key should contain list or dict')
 
 
-def forall(l, group_key='forall', default_key='name'):
+def forall(l, group_key='forall', default_key=None):
     """
     The following is executed for each item of the list `l`. If the inputs group attribute is a dictionary (supposedly
     key - value-list pairs) it returns all possible combinations of the specialized grouping updating the original

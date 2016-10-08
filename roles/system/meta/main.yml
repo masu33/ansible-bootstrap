@@ -18,5 +18,3 @@ dependencies:
       - zip
       - unzip
       - unrar
-  - role: _oraclejdk8
-    default: yes

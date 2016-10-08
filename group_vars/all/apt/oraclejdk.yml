@@ -1,6 +1,6 @@
 ---
 
-oraclejdk_debconfs:
+debconfs_oraclejdk:
   - _id: 'Accept Oracle License'
     name: 'oracle-java8-installer'
     question: 'shared/accepted-oracle-license-v1-1'
@@ -11,7 +11,7 @@ oraclejdk_debconfs:
     question: 'shared/accepted-oracle-license-v1-1'
     vtype: 'seen'
     value: 'true'
-oraclejdk_repos:
+repos_oraclejdk:
   - _id: 'WebUpd8Team'
     repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu {{ansible_distribution_release}} main'
     key: '7B2C3B0889BF5709A105D03AC2518248EEA14886'

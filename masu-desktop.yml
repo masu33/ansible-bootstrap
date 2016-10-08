@@ -58,15 +58,11 @@
               dest: "/usr/share/backgrounds/loginscreen"
               owner: "root"
     - role: _apt
-      repos:
-        - _id: 'ubuntu'
-          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} main universe multiverse'
-        - _id: 'ubuntu updates'
-          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates main universe multiverse'
-        - _id: 'ubuntu backports'
-          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main universe multiverse'
-        - _id: 'ubuntu security'
-          repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security main universe multiverse'
+      repos: "{{ repos_ubuntu
+               + repos_ubuntu_backports
+               + repos_ubuntu_security
+               + repos_ubuntu_updates
+              }}"
       packages:
         - state: absent
           forall:
@@ -146,10 +142,6 @@
     - role: _gnome
       settings:
         - xzap: yes
-        - user: "masu"
-          xzap: yes
-        - user: "willow"
-          xzap: yes
         - login_background: "/usr/share/backgrounds/loginscreen"
         - user: "masu"
           workspaces_h: 2
@@ -175,25 +167,33 @@
               location: "/home/masu/Downloads/torrent"
             - name: "DL ncore"
               location: "/home/masu/Downloads/torrent/ncore"
+#        - hide_login: yes
+#          forall:
+#            user:
+#              - "ansible_user"
+    - role: _apt
+      upgrade: yes
+      autoremove: yes
     - role: _vars
       settings:
         - user: "masu"
           state: present
           type: all
+          backup: no
           forall:
             - line: "{{ 'export PS1=\"'
-                        + '\\[\\e[0;1;32m\\]' + '\\u'
-                        + '\\[\\e[0;2;91m\\]' + '@'
+                        + '\\[\\e[0;1;36m\\]' + '\\u'
+                        + '\\[\\e[0;1;33m\\]' + '@'
                         + '\\[\\e[0;1;36m\\]' + '\\h'
-                        + '\\[\\e[0;2;91m\\]'+ ':'
-                        + '\\[\\e[0;1;34m\\]' + '\\W'
-                        + '\\[\\e[0;2;91m\\]' + '\\$'
+                        + '\\[\\e[0;1;33m\\]'+ ':'
+                        + '\\[\\e[0;1;36m\\]' + '\\W'
+                        + '\\[\\e[0;1;33m\\]' + '\\$'
                         + '\\[\\e[0m\\]'
                         + ' \"' }}"
               regexp: "^export PS1=.*$"
             - line: "{{ 'export PS2=\"'
-                        + '\\[\\e[0;2;91m\\]' + '\\$'
-                        + '\\[\\e[0m\\]' + '>'
+                        + '\\[\\e[0;1;33m\\]' + '\\$'
+                        + '\\[\\e[0;1;33m\\]' + '>'
                         + '\\[\\e[0m\\]'
                         + ' '
                         + '\"' }}"

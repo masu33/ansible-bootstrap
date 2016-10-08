@@ -2,7 +2,7 @@
 
 dependencies:
   - role: _apt
-    repos: "{{ canonical_repos }}"
+    repos: "{{ repos_canonical }}"
     packages:
       - libfreetype6  # fonts
       - libfreetype6-dev  # fonts
@@ -17,3 +17,4 @@ dependencies:
       - chromium-codecs-ffmpeg
       - adobe-flashplugin
   - role: _mscorefonts
+  - role: _oraclejdk8

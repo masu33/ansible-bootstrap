@@ -2,17 +2,15 @@
 
 dependencies:
   - role: _apt
-    repos:
-      - _id: 'git LFS'
-        repo: 'deb https://packagecloud.io/github/git-lfs/{{ansible_distribution | lower}}/ {{ansible_distribution_release}} main'
-        key_url: 'https://packagecloud.io/github/git-lfs/gpgkey'
-      - _id: 'ubuntu-make'
-        repo: 'deb http://ppa.launchpad.net/ubuntu-desktop/ubuntu-make/ubuntu {{ansible_distribution_release}} main'
-        key: '399B698EEA9EF163B6F9A0F62CC98497A1231595'
-        keyserver: 'keyserver.ubuntu.com'
+    repos: "{{ repos_git_lfs
+             + repos_umake
+             }}"
     packages:
       - git
-      - git-lfs
+      - "{{ git_lfs
+          | d(false)
+          | ternary('git-lfs', 'git')
+         }}"
       - ubuntu-make
       - g++
       - gcc

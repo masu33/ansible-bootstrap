@@ -1,0 +1,17 @@
+---
+
+repos_ubuntu:
+  - _id: 'ubuntu'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} main universe multiverse'
+
+repos_ubuntu_updates:
+  - _id: 'ubuntu updates'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates main universe multiverse'
+
+repos_ubuntu_backports:
+  - _id: 'ubuntu backports'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main universe multiverse'
+
+repos_ubuntu_security:
+  - _id: 'ubuntu security'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security main universe multiverse'

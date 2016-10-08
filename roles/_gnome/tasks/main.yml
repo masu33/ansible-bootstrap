@@ -2,80 +2,101 @@
 
 - assert:
     that:
-      - "(settings is defined)
-         and (settings is sequence)"
+      - "( settings is defined
+       and settings is sequence
+         )"
     msg: "settings should be defined and sequence"
+
+- assert:
+    that: "{{ settings
+            | forall
+            | selectattr('user', 'defined')
+            | map(attribute='user')
+            | map('user_exists')
+            | list
+           }}"
+    msg: "user argument should be undefined or an existing user"
 
 - name: "Set background"
   become: yes
   gsettings:
-    state: "{{ (__config.background is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.background is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "org.gnome.desktop.background"
-    key: "picture-uri"
-    value: "{{ 'file://'+__config.background }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('background', 'defined') |
-                  list }}"
+    key:    "picture-uri"
+    value:  "file://{{__config.background}}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('background', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set login background: disable display of custom backgrounds"
   become: yes
   gsettings:
-    state: "present"
-    user: "lightdm"
+    state:  present
+    user:   "lightdm"
     schema: "com.canonical.unity-greeter"
-    key: "draw-user-backgrounds"
-    value: "{{ (__config.login_background is none) | ternary('true', 'false') }}"
-  with_items: "{{ settings | forall |
-                  selectattr('login_background', 'defined') |
-                  list }}"
+    key:    "draw-user-backgrounds"
+    value:  "{{ __config.login_background is none | ternary('true', 'false') }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('login_background', 'defined')
+                | list
+                }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set login background"
   become: yes
   gsettings:
-    state: "{{ (__config.login_background is none) | ternary('absent', 'present') }}"
-    user: "lightdm"
+    state:  "{{ __config.login_background is none | ternary('absent', 'present') }}"
+    user:   "lightdm"
     schema: "com.canonical.unity-greeter"
-    key: "background"
-    value: "{{ __config.login_background }}"
-  with_items: "{{ settings | forall |
-                  selectattr('login_background', 'defined') |
-                  list }}"
+    key:    "background"
+    value:  "{{ __config.login_background }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('login_background', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set lockscreen background: disable display of custom backgrounds"
   become: yes
   gsettings:
-    state: "present"
-    user: "{{ __config.user }}"
+    state:  present
+    user:   "{{ __config.user }}"
     schema: "com.canonical.unity-greeter"
-    key: "draw-user-backgrounds"
-    value: "{{ (__config.lock_background is none) | ternary('true', 'false') }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('lock_background', 'defined') |
-                  list }}"
+    key:    "draw-user-backgrounds"
+    value:  "{{ __config.lock_background is none | ternary('true', 'false') }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set lockscreen background"
   become: yes
   gsettings:
-    state: "{{ (__config.lock_background is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.lock_background is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "com.canonical.unity-greeter"
-    key: "background"
-    value: "{{ __config.lock_background }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('lock_background', 'defined') |
-                  list }}"
+    key:    "background"
+    value:  "{{ __config.lock_background }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
@@ -83,17 +104,19 @@
   become: yes
   copy:
     backup: no
-    dest: "/var/lib/AccountsService/icons/{{__config.user}}"
+    dest:   "/var/lib/AccountsService/icons/{{__config.user}}"
     follow: yes
-    force: yes
-    group: "{{ root_user | d('root') }}"
-    mode: "0644"
-    owner: "{{ root_user | d('root') }}"
-    src: "{{ __config.avatar }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('avatar', 'defined') |
-                  list }}"
+    force:  yes
+    group:  "{{ root_user | d('root') }}"
+    mode:   "0644"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "{{ __config.avatar }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('avatar', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
@@ -101,90 +124,141 @@
   become: yes
   lineinfile:
     backup: yes
-    dest: "/var/lib/AccountsService/users/{{__config.user}}"
-    line: "{{ (__config.avatar is none) |
-              ternary('Icon=', 'Icon=/var/lib/AccountsService/icons/'+__config.user) }}"
+    dest:   "/var/lib/AccountsService/users/{{__config.user}}"
+    line:   "{{ __config.avatar is none
+              | ternary('Icon=', 'Icon=/var/lib/AccountsService/icons/'+__config.user)
+             }}"
     regexp: "^Icon=.*$"
-    state: present
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('avatar', 'defined') |
-                  list }}"
+    state:  present
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('avatar', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set workspaces (horizontal)"
   become: yes
   gsettings:
-    state: "{{ (__config.workspaces_h is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.workspaces_h is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
-    key: "hsize"
-    value: "{{ __config.workspaces_h }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('workspaces_h', 'defined') |
-                  list }}"
+    key:    "hsize"
+    value:  "{{ __config.workspaces_h }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_h', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set workspaces (vertical)"
   become: yes
   gsettings:
-    state: "{{ (__config.workspaces_v is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.workspaces_v is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
-    key: "vsize"
-    value: "{{ __config.workspaces_v }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('workspaces_v', 'defined') |
-                  list }}"
+    key:    "vsize"
+    value:  "{{ __config.workspaces_v }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_v', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
-- name: "Show user's name"
+- name: "Show/Hide user's name on panel"
   become: yes
   gsettings:
-    state: "{{ (__config.show_name is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.show_name is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "com.canonical.indicator.session"
-    key: "show-real-name-on-panel"
-    value: "{{ __config.show_name }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('show_name', 'defined') |
-                  list }}"
+    key:    "show-real-name-on-panel"
+    value:  "{{ __config.show_name }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('show_name', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
-- name: "Show desktop icons"
+- name: "Show/Hide user's name at login - 1"
+  become: yes
+  lineinfile:
+    create:      yes
+    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
+    insertafter: EOF
+    owner:       "{{ root_user | d('root') }}"
+    group:       "{{ root_user | d('root') }}"
+    mode:        "0644"
+    line:        "[User]"
+    state:       present
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('hide_login', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Show/Hide user's name at login - 2"
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      no
+    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
+    insertafter: "[User]"
+    line:        "SystemAccount={{ __config.hide_login | ternary('true', 'false') }}"
+    regexp:      "^SystemAccount=.*$"
+    state:       present
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('hide_login', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Show/Hide desktop icons"
   become: yes
   gsettings:
-    state: "{{ (__config.desktop_icons is none) | ternary('absent', 'present') }}"
-    user: "{{ __config.user }}"
+    state:  "{{ __config.desktop_icons is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
     schema: "org.gnome.desktop.background"
-    key: "show-desktop-icons"
-    value: "{{ __config.desktop_icons }}"
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('show_name', 'defined') |
-                  list }}"
+    key:    "show-desktop-icons"
+    value:  "{{ __config.desktop_icons }}"
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('show_name', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Create bookmark location 1"
   become: yes
   file:
-    mode: "0755"
+    mode:  "0755"
     owner: "{{ __config.user }}"
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config"
     state: directory
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('bookmark', 'defined') |
-                  list
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('bookmark', 'defined')
+                | list
                }}"
   loop_control:
     loop_var: "__config"
@@ -197,10 +271,11 @@
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config/gtk-3.0"
     state: directory
-  with_items: "{{ settings | forall |
-                  selectattr('user', 'defined') |
-                  selectattr('bookmark', 'defined') |
-                  list
+  with_items: "{{ settings
+                | forall
+                | selectattr('user', 'defined')
+                | selectattr('bookmark', 'defined')
+                | list
                }}"
   loop_control:
     loop_var: "__config"
@@ -208,80 +283,70 @@
 - name: "Set location bookmarks"
   become: yes
   copy:
-    backup: no
+    backup:  no
     content: "{{ __config.bookmarks | gtk_bookmarks }}"
-    owner: "{{ __config.user }}"
-    group: "{{ __config.group | d(__config.user) }}"
-    dest:  "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
-    follow: yes
-    force: yes
-    mode: "0700"
-  with_items: "{{ settings | forall |
-                  selectattr('bookmarks', 'defined') |
-                  list }}"
+    owner:   "{{ __config.user }}"
+    group:   "{{ __config.group | d(__config.user) }}"
+    dest:    "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    follow:  yes
+    force:   yes
+    mode:    "0700"
+  with_items: "{{ settings
+                | forall
+                | selectattr('bookmarks', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
 
 - name: "Set xorg.conf.d present"
-  when: "{{ settings | forall |
-            selectattr('xzap', 'defined') |
-            selectattr('xzap', 'equalto', True) |
-            selectattr('user', 'undefined') |
-            list != [] }}"
+  when: "{{ settings
+          | forall
+          | selectattr('xzap', 'defined')
+          | selectattr('xzap', 'equalto', True)
+          | selectattr('user', 'undefined')
+          | list
+         }}"
   become: yes
   file:
     follow: yes
-    force: yes
-    path: "/etc/X11/xorg.conf.d/"
-    owner: "{{ root_user | d('root') }}"
-    group: "{{ root_user | d('root') }}"
-    state: directory
+    force:  yes
+    path:   "/etc/X11/xorg.conf.d/"
+    owner:  "{{ root_user | d('root') }}"
+    group:  "{{ root_user | d('root') }}"
+    state:  directory
 
 - name: "Hotkey for restarting X (global) - Enable"
-  when: "{{ settings | forall |
-            selectattr('xzap', 'defined') |
-            selectattr('xzap', 'equalto', True) |
-            selectattr('user', 'undefined') |
-            list != [] }}"
+  when: "{{ settings
+          | forall
+          | selectattr('xzap', 'defined')
+          | selectattr('xzap', 'equalto', True)
+          | selectattr('user', 'undefined')
+          | list
+         }}"
   become: yes
   copy:
     backup: no
-    dest: "/etc/X11/xorg.conf.d/"
+    dest:   "/etc/X11/xorg.conf.d/"
     follow: yes
-    force: yes
-    mode: "0644"
-    owner: "{{ root_user | d('root') }}"
-    src: "90-zap.conf"
+    force:  yes
+    mode:   "0755"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "90-zap.conf"
 
 - name: "Hotkey for restarting X (global) - Disable"
   become: yes
   file:
     follow: yes
-    force: yes
-    path: "/etc/X11/xorg.conf.d/90-zap.conf"
-    state: absent
-  with_items: "{{ settings | forall |
-                  selectattr('xzap', 'defined') |
-                  selectattr('xzap', 'equalto', False) |
-                  selectattr('user', 'undefined') |
-                  list }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Hotkey for restarting X (user)"
-  become: yes
-  blockinfile:
-    backup: yes
-    block: "setxkbmap -option \"terminate:ctrl_alt_bksp\""
-    create: yes
-    dest: "{{ __config.user | user_home }}/.bashrc"
-    follow: yes
-    insertafter: EOF
-    marker: "# ANSIBLE MANAGED: xzap {mark}"
-    state: "{{ __config.xzap | ternary('present', 'absent') }}"
-  with_items: "{{ settings | forall |
-                  selectattr('xzap', 'defined') |
-                  selectattr('user', 'defined') |
-                  list }}"
+    force:  yes
+    path:   "/etc/X11/xorg.conf.d/90-zap.conf"
+    state:  absent
+  with_items: "{{ settings
+                | forall
+                | selectattr('xzap', 'defined')
+                | selectattr('xzap', 'equalto', False)
+                | selectattr('user', 'undefined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"

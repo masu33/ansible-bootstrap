@@ -2,14 +2,14 @@
 
 - assert:
     that:
-      - "(settings is defined)
-         and (settings is sequence)"
+      - "( settings is defined
+       and settings is sequence
+         )"
     msg: "settings should be defined and sequence"
 
-- name: "Handle empty list"
-  when: "{{ settings is undefined }}"
+- name: "Remap forall arguments"
   set_fact:
-    settings: "{{ [] }}"
+    settings: "{{ settings | forall(default_key='name') }}"
 
 - name: "Setting up users..."
   become: yes
@@ -29,44 +29,46 @@
     home:             "{{ __user.home             | d(omit) }}"
     name:             "{{ __user.name             | d(omit) }}"
     system:           "{{ __user.system           | d(omit) }}"
-  with_items: "{{ settings | forall(default_key='name') | list }}"
+  with_items: "{{ settings
+                | list
+               }}"
   loop_control:
     loop_var: "__user"
 
 - name: "Set up bashrc.d support (folder)"
   become: yes
-  become_user: "{{ __user.name }}"
   file:
-    path: "{{ __user.name | user_home }}/append-.bashrc.sh"
-    mode: "0755"
+    path:  "{{ __user.name | user_home }}/append-.bashrc.sh"
+    mode:  "0755"
     owner: "{{ __user.name }}"
     group: "{{ __user.group | d(__user.name) | d(omit) }}"
     state: directory
-  with_items: "{{ settings | forall |
-                  selectattr('name', 'defined') |
-                  selectattr('bashrcd', 'defined') |
-                  selectattr('bashrcd', 'true') |
-                  list }}"
+  with_items: "{{ settings
+                | selectattr('name', 'defined')
+                | selectattr('bashrcd', 'defined')
+                | selectattr('bashrcd', 'true')
+                | list
+               }}"
   loop_control:
     loop_var: "__user"
 
 - name: "Set up bashrc.d support (inclusion)"
   become: yes
-  become_user: "{{ __user.name }}"
   blockinfile:
-    backup: yes
-    block: "{{ lookup('file', 'append-.bashrc.sh') }}"
-    create: yes
-    dest: "{{ __user.name | user_home }}/.bashrc"
-    follow: yes
+    backup:      yes
+    block:       "{{ lookup('file', 'append-.bashrc.sh') }}"
+    create:      yes
+    dest:        "{{ __user.name | user_home }}/.bashrc"
+    follow:      yes
     insertafter: EOF
-    owner: "{{ __user.name }}"
-    group: "{{ __user.group | d(__user.name) | d(omit) }}"
-    marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
-    state: present
-  with_items: "{{ settings | forall |
-                  selectattr('name', 'defined') |
-                  selectattr('bashrcd', 'defined') |
-                  list }}"
+    owner:       "{{ __user.name }}"
+    group:       "{{ __user.group | d(__user.name) | d(omit) }}"
+    marker:      "# ANSIBLE MANAGED: .bashrc.d {mark}"
+    state:       present
+  with_items: "{{ settings
+                | selectattr('name', 'defined')
+                | selectattr('bashrcd', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__user"

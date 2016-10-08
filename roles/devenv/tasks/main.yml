@@ -2,8 +2,9 @@
 
 - assert:
     that:
-      - "(umake is undefined)
-         or (umake is sequence)"
+      - "( umake is undefined
+        or umake is sequence
+         )"
     msg: "umake should be undefined or sequence"
 
 - name: "Install umake frameworks"
@@ -12,6 +13,10 @@
     framework: "{{ fw.framework | d(omit) }}"
     state:     "{{ fw.state     | d(omit) }}"
     path:      "{{ fw.path      | d(omit) }}"
-  with_items: "{{ umake | d([]) | forall | list }}"
+  with_items: "{{ umake
+                | d([])
+                | forall
+                | list
+               }}"
   loop_control:
     loop_var: "fw"

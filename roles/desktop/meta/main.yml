@@ -2,11 +2,7 @@
 
 dependencies:
   - role: _apt
-    repos:
-      - _id: 'Dropbox'
-        repo: 'deb http://linux.dropbox.com/ubuntu/ {{ansible_distribution_release}} main'
-        key: '5044912E'
-        keyserver: 'pgp.mit.edu'
+    repos: "{{ repos_dropbox }}"
     packages:
       - unity-tweak-tool
       - dropbox

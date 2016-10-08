@@ -2,8 +2,9 @@
 
 - assert:
     that:
-      - "(settings is defined)
-         and (settings is sequence)"
+      - "( settings is defined
+       and settings is sequence
+         )"
     msg: "settings should be defined and sequence"
 
 - name: "Downloading..."
@@ -22,6 +23,9 @@
     group:            "{{ __dl.group            | d(omit) }}"
     mode:             "{{ __dl.mode             | d(omit) }}"
     owner:            "{{ __dl.owner            | d(omit) }}"
-  with_items: "{{ settings | forall | list }}"
+  with_items: "{{ settings
+                | forall
+                | list
+               }}"
   loop_control:
     loop_var: "__dl"
