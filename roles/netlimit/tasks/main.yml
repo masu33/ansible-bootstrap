@@ -86,7 +86,7 @@
 - name: "Add users to netlimit group"
   become: yes
   user:
-    name:   "{{ item }}"
+    name:   "{{ __netlimit_user }}"
     groups: "netlimit127,netlimit192,netlimit10"
     append: yes
     state:  present
@@ -94,4 +94,4 @@
                 + ['root']
                }}"
   loop_control:
-    loop_var: "netlimit_user"
+    loop_var: "__netlimit_user"
