@@ -8,14 +8,69 @@
     msg: "settings should be defined and sequence"
 
 - assert:
-    that: "{{ settings
-            | forall
-            | selectattr('user', 'defined')
-            | map(attribute='user')
-            | map('user_exists')
-            | list
-           }}"
-    msg: "user argument should be undefined or an existing user"
+    that:
+      - "{{ settings
+          | forall(default_key=default_forall_key)
+          | selectattr('user', 'defined')
+          | rejectattr('user', 'user_exists')
+          | list
+          == []
+         }}"
+    msg: "the user key should be undefined or an existing user"
+
+- assert:
+    that:
+      - "{{ settings
+          | forall(default_key=default_forall_key)
+          | selectattr('user', 'undefined')
+          | map('list')
+          | sum(start=[])
+          | reject('in', optional_keys_wo_user)
+          | list
+          == []
+         }}"
+    msg: "{{ 'invalid keys found: '
+           + ', '.join( settings
+                      | forall(default_key=default_forall_key)
+                      | selectattr('user', 'undefined')
+                      | map('list')
+                      | sum(start=[])
+                      | reject('in', optional_keys_wo_user)
+                      | list
+                      )
+           + '; '
+           + 'possible keys without user: '
+           + ', '.join(optional_keys_wo_user | d([]))
+          }}"
+
+- assert:
+    that:
+      - "{{ settings
+          | forall(default_key=default_forall_key)
+          | selectattr('user', 'defined')
+          | map('list')
+          | sum(start=[])
+          | reject('equalto', 'user')
+          | reject('equalto', 'ignore_errors')
+          | reject('in', optional_keys_w_user)
+          | list
+          == []
+         }}"
+    msg: "{{ 'invalid keys found: '
+           + ', '.join( settings
+                      | forall(default_key=default_forall_key)
+                      | selectattr('user', 'defined')
+                      | map('list')
+                      | sum(start=[])
+                      | reject('equalto', 'user')
+                      | reject('equalto', 'ignore_errors')
+                      | reject('in', optional_keys_w_user)
+                      | list
+                      )
+           + '; '
+           + 'possible keys with user: '
+           + ', '.join(optional_keys_w_user | d([]))
+          }}"
 
 - name: "Set background"
   become: yes
@@ -25,8 +80,9 @@
     schema: "org.gnome.desktop.background"
     key:    "picture-uri"
     value:  "file://{{__config.background}}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('background', 'defined')
                 | list
@@ -42,8 +98,9 @@
     schema: "com.canonical.unity-greeter"
     key:    "draw-user-backgrounds"
     value:  "{{ __config.login_background is none | ternary('true', 'false') }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('login_background', 'defined')
                 | list
                 }}"
@@ -58,8 +115,9 @@
     schema: "com.canonical.unity-greeter"
     key:    "background"
     value:  "{{ __config.login_background }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('login_background', 'defined')
                 | list
                }}"
@@ -74,8 +132,9 @@
     schema: "com.canonical.unity-greeter"
     key:    "draw-user-backgrounds"
     value:  "{{ __config.lock_background is none | ternary('true', 'false') }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('lock_background', 'defined')
                 | list
@@ -91,8 +150,9 @@
     schema: "com.canonical.unity-greeter"
     key:    "background"
     value:  "{{ __config.lock_background }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('lock_background', 'defined')
                 | list
@@ -111,8 +171,9 @@
     mode:   "0644"
     owner:  "{{ root_user | d('root') }}"
     src:    "{{ __config.avatar }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('avatar', 'defined')
                 | list
@@ -130,8 +191,9 @@
              }}"
     regexp: "^Icon=.*$"
     state:  present
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('avatar', 'defined')
                 | list
@@ -147,8 +209,9 @@
     schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
     key:    "hsize"
     value:  "{{ __config.workspaces_h }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('workspaces_h', 'defined')
                 | list
@@ -164,8 +227,9 @@
     schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
     key:    "vsize"
     value:  "{{ __config.workspaces_v }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('workspaces_v', 'defined')
                 | list
@@ -181,8 +245,9 @@
     schema: "com.canonical.indicator.session"
     key:    "show-real-name-on-panel"
     value:  "{{ __config.show_name }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('show_name', 'defined')
                 | list
@@ -201,8 +266,9 @@
     mode:        "0644"
     line:        "[User]"
     state:       present
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('hide_login', 'defined')
                 | list
@@ -220,8 +286,9 @@
     line:        "SystemAccount={{ __config.hide_login | ternary('true', 'false') }}"
     regexp:      "^SystemAccount=.*$"
     state:       present
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('hide_login', 'defined')
                 | list
@@ -232,15 +299,16 @@
 - name: "Show/Hide desktop icons"
   become: yes
   gsettings:
-    state:  "{{ __config.desktop_icons is none | ternary('absent', 'present') }}"
+    state:  "{{ __config.show_icons is none | ternary('absent', 'present') }}"
     user:   "{{ __config.user }}"
     schema: "org.gnome.desktop.background"
     key:    "show-desktop-icons"
-    value:  "{{ __config.desktop_icons }}"
+    value:  "{{ __config.show_icons }}"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
-                | selectattr('show_name', 'defined')
+                | selectattr('show_icons', 'defined')
                 | list
                }}"
   loop_control:
@@ -254,10 +322,11 @@
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config"
     state: directory
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
-                | selectattr('bookmark', 'defined')
+                | selectattr('bookmarks', 'defined')
                 | list
                }}"
   loop_control:
@@ -271,10 +340,11 @@
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config/gtk-3.0"
     state: directory
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
-                | selectattr('bookmark', 'defined')
+                | selectattr('bookmarks', 'defined')
                 | list
                }}"
   loop_control:
@@ -291,8 +361,10 @@
     follow:  yes
     force:   yes
     mode:    "0700"
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
                 | selectattr('bookmarks', 'defined')
                 | list
                }}"
@@ -301,10 +373,10 @@
 
 - name: "Set xorg.conf.d present"
   when: "{{ settings
-          | forall
+          | forall(default_key=default_forall_key)
+          | selectattr('user', 'undefined')
           | selectattr('xzap', 'defined')
           | selectattr('xzap', 'equalto', True)
-          | selectattr('user', 'undefined')
           | list
          }}"
   become: yes
@@ -318,10 +390,10 @@
 
 - name: "Hotkey for restarting X (global) - Enable"
   when: "{{ settings
-          | forall
+          | forall(default_key=default_forall_key)
+          | selectattr('user', 'undefined')
           | selectattr('xzap', 'defined')
           | selectattr('xzap', 'equalto', True)
-          | selectattr('user', 'undefined')
           | list
          }}"
   become: yes
@@ -341,12 +413,12 @@
     force:  yes
     path:   "/etc/X11/xorg.conf.d/90-zap.conf"
     state:  absent
+  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'undefined')
                 | selectattr('xzap', 'defined')
                 | selectattr('xzap', 'equalto', False)
-                | selectattr('user', 'undefined')
-                | list
-               }}"
+                | list }}"
   loop_control:
     loop_var: "__config"

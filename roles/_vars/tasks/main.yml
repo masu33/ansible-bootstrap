@@ -27,7 +27,7 @@
     regexp: "{{ __var.regexp  | d(omit) }}"
     mode:   "0644"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'undefined')
                 | rejectattr('type', 'equalto', 'env')
                 | list
@@ -48,7 +48,7 @@
     regexp: "{{ __var.regexp  | d(omit) }}"
     mode:   "0644"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'undefined')
                 | rejectattr('type', 'equalto', 'profile')
                 | list
@@ -69,7 +69,7 @@
     regexp: "{{ __var.regexp  | d(omit) }}"
     mode:  "0755"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | rejectattr('type', 'equalto', 'env')
                 | list
@@ -90,7 +90,7 @@
     regexp: "{{ __var.regexp  | d(omit) }}"
     mode:   "0755"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | rejectattr('type', 'equalto', 'profile')
                 | list
