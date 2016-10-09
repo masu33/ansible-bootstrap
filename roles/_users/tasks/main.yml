@@ -7,10 +7,6 @@
          )"
     msg: "settings should be defined and sequence"
 
-- name: "Remap forall arguments"
-  set_fact:
-    settings: "{{ settings | forall(default_key='name') }}"
-
 - name: "Setting up users..."
   become: yes
   user:
@@ -30,6 +26,7 @@
     name:             "{{ __user.name             | d(omit) }}"
     system:           "{{ __user.system           | d(omit) }}"
   with_items: "{{ settings
+                | forall(default_key=default_forall_key)
                 | list
                }}"
   loop_control:
@@ -44,6 +41,7 @@
     group: "{{ __user.group | d(__user.name) | d(omit) }}"
     state: directory
   with_items: "{{ settings
+                | forall(default_key=default_forall_key)
                 | selectattr('name', 'defined')
                 | selectattr('bashrcd', 'defined')
                 | selectattr('bashrcd', 'true')
@@ -66,6 +64,7 @@
     marker:      "# ANSIBLE MANAGED: .bashrc.d {mark}"
     state:       present
   with_items: "{{ settings
+                | forall(default_key=default_forall_key)
                 | selectattr('name', 'defined')
                 | selectattr('bashrcd', 'defined')
                 | list

@@ -1,0 +1,20 @@
+---
+
+default_forall_key: "user"
+
+optional_keys_wo_user:
+  - "ignore_errors"
+  - "login_background"
+  - "xzap"
+
+optional_keys_w_user:
+  - "ignore_errors"
+  - "avatar"
+  - "background"
+  - "bookmarks"
+  - "hide_login"
+  - "lock_background"
+  - "show_icons"
+  - "show_name"
+  - "workspaces_h"
+  - "workspaces_v"

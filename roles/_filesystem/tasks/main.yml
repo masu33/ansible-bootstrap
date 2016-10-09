@@ -20,7 +20,7 @@
     src:     "{{ __fs.src     | d(omit) }}"
     state:   "{{ __fs.state   | d(omit) }}"
   with_items: "{{ settings
-                | forall
+                | forall(default_key=default_forall_key)
                 | list
                }}"
   loop_control:

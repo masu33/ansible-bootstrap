@@ -9,6 +9,10 @@
           append: yes
           bashrc.d: yes
         - name: "willow"
+        - name: "ansible_user"
+          groups: "sudo"
+          append: yes
+          bashrc.d: yes
     - role: _filesystem
       settings:
         - forall:
@@ -153,8 +157,8 @@
           background: "/home/masu/Pictures/background"
           lock_background: "/home/masu/Pictures/lockscreen"
           avatar: "/home/masu/Pictures/avatar"
-          desktop_icons: yes
           show_name: yes
+          show_icons: yes
         - user: "masu"
           bookmarks:
             - name: "Dropbox"
@@ -167,10 +171,10 @@
               location: "/home/masu/Downloads/torrent"
             - name: "DL ncore"
               location: "/home/masu/Downloads/torrent/ncore"
-#        - hide_login: yes
-#          forall:
-#            user:
-#              - "ansible_user"
+        - hide_login: yes
+          forall:
+            user:
+              - "ansible_user"
     - role: _apt
       upgrade: yes
       autoremove: yes

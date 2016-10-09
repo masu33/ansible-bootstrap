@@ -9,7 +9,7 @@
         or ( upgrade    | d(false) )
          )"
     msg:
-      - "debconfs, repos or packages should be defined otherwise autoremove or upgrade should be true"
+      - "debconfs, repos or packages should be defined or any of autoremove or upgrade should be true"
 
 - assert:
     that:
@@ -56,53 +56,61 @@
 - name: "Set debconfs"
   become: yes
   debconf:
-    name:     "{{ item.name     }}"
-    question: "{{ item.question }}"
-    vtype:    "{{ item.vtype    }}"
-    value:    "{{ item.value    }}"
+    name:     "{{ __debconf.name     }}"
+    question: "{{ __debconf.question }}"
+    vtype:    "{{ __debconf.vtype    }}"
+    value:    "{{ __debconf.value    }}"
   with_items: "{{ debconfs
                 | d([])
-                | forall
+                | forall(default_key=default_forall_key_4_debconfs)
                 | list
                }}"
+  loop_control:
+    loop_var: "__debconf"
 
 - name: "Set repository keys with keyserver"
   become: yes
   apt_key:
-    state:     "{{ item.state | d('present') }}"
-    keyserver: "{{ item.keyserver            }}"
-    id:        "{{ item.key                  }}"
+    state:     "{{ __repo.state | d('present') }}"
+    keyserver: "{{ __repo.keyserver            }}"
+    id:        "{{ __repo.key                  }}"
   with_items: "{{ repos
                 | d([])
-                | forall(default_key='repo')
+                | forall(default_key=default_forall_key_4_repos)
                 | selectattr('key', 'defined')
                 | list
                }}"
+  loop_control:
+    loop_var: "__repo"
 
 - name: "Set repository keys with GPG keys"
   become: yes
   apt_key:
-    state: "{{ item.state   | d('present') }}"
-    url:   "{{ item.key_url                }}"
+    state: "{{ __repo.state   | d('present') }}"
+    url:   "{{ __repo.key_url                }}"
   with_items: "{{ repos
                 | d([])
-                | forall(default_key='repo')
+                | forall(default_key=default_forall_key_4_repos)
                 | selectattr('key_url', 'defined')
                 | list
                }}"
+  loop_control:
+    loop_var: "__repo"
 
 - name: "Set repositories"
   become: yes
   apt_repository:
     mode: 644
-    repo:  "{{ item.repo            }}"
-    state: "{{ item.state | d(omit) }}"
+    repo:  "{{ __repo.repo            }}"
+    state: "{{ __repo.state | d(omit) }}"
     update_cache: no
   with_items: "{{ repos
                 | d([])
-                | forall(default_key='repo')
+                | forall(default_key=default_forall_key_4_repos)
                 | list
                }}"
+  loop_control:
+    loop_var: "__repo"
 
 - name: "Update cache"
   when: "{{ repos is defined }}"
@@ -114,21 +122,23 @@
 - name: "Packages..."
   become: yes
   apt:
-    allow_unauthenticated: "{{ item.allow_unauthenticated | d(omit) }}"
-    cache_valid_time:      "{{ item.cache_valid_time      | d(omit) }}"
-    deb:                   "{{ item.deb                   | d(omit) }}"
-    default_release:       "{{ item.default_release       | d(omit) }}"
-    dpkg_options:          "{{ item.dpkg_options          | d(omit) }}"
-    force:                 "{{ item.force                 | d(omit) }}"
-    install_recommends:    "{{ item.install_recommends    | d(omit) }}"
-    name:                  "{{ item.name                  | d(omit) }}"
-    purge:                 "{{ item.purge                 | d(omit) }}"
-    state:                 "{{ item.state                 | d(omit) }}"
+    allow_unauthenticated: "{{ __package.allow_unauthenticated | d(omit) }}"
+    cache_valid_time:      "{{ __package.cache_valid_time      | d(omit) }}"
+    deb:                   "{{ __package.deb                   | d(omit) }}"
+    default_release:       "{{ __package.default_release       | d(omit) }}"
+    dpkg_options:          "{{ __package.dpkg_options          | d(omit) }}"
+    force:                 "{{ __package.force                 | d(omit) }}"
+    install_recommends:    "{{ __package.install_recommends    | d(omit) }}"
+    name:                  "{{ __package.name                  | d(omit) }}"
+    purge:                 "{{ __package.purge                 | d(omit) }}"
+    state:                 "{{ __package.state                 | d(omit) }}"
   with_items: "{{ packages
                 | d([])
-                | forall(default_key='name')
+                | forall(default_key=default_forall_key_4_packages)
                 | list
                }}"
+  loop_control:
+    loop_var: "__package"
 
 - name: "Upgrade and/or autoremove"
   when: "( (upgrade    | d(false))

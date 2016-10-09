@@ -15,7 +15,7 @@
     path:      "{{ fw.path      | d(omit) }}"
   with_items: "{{ umake
                 | d([])
-                | forall
+                | forall(default_key=None)
                 | list
                }}"
   loop_control:
