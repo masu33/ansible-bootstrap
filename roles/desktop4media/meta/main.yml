@@ -2,19 +2,26 @@
 
 dependencies:
   - role: _apt
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
     packages:
+      - inkscape
       - pinta
       - gimp
-      - inkscape
-      - ubuntu-restricted-extras  # codecs
       - libavcodec-extra  # codecs
       - ffmpeg  # codec
-      - mplayer
-      - smplayer
       - youtube-dl
       - lame  # codec
       - clementine
-      - virtualbox
-      - dropbox
+      - mplayer
+      - smplayer
       - calibre
       - pdftk
+      - ubuntu-restricted-extras  # codecs
+      - virtualbox
+  - role: _dropbox

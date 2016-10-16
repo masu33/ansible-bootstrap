@@ -26,6 +26,7 @@
               mode: "0755"
             - path: "/home/masu/Downloads/torrent/ncore"
               mode: "0755"
+              recursive: yes
             - path: "/home/masu/Downloads/torrent/current"
             - path: "/home/masu/Downloads/torrent/stopped"
             - path: "/home/masu/Downloads/torrent/watch"
@@ -62,10 +63,10 @@
               dest: "/usr/share/backgrounds/loginscreen"
               owner: "root"
     - role: _apt
-      repos: "{{ repos_ubuntu
-               + repos_ubuntu_backports
-               + repos_ubuntu_security
-               + repos_ubuntu_updates
+      repos: "{{ repos_ubuntu_all
+               + repos_ubuntu_backports_all
+               + repos_ubuntu_security_all
+               + repos_ubuntu_updates_all
               }}"
       packages:
         - state: absent
@@ -98,6 +99,9 @@
             - line: "alias pip=pip3.5"
           type: all
     - role: devenv
+      umake:
+        - category: scala
+          framework: scala-lang
     - role: devenv4java
       umake:
         - category: ide
@@ -126,6 +130,7 @@
             - pymongo
             - pyinstaller
             - py4j
+            - thefuck
     - role: _vars
       settings:
         - user: "masu"
@@ -145,7 +150,8 @@
     - role: desktop4wine
     - role: _gnome
       settings:
-        - xzap: yes
+        - user: "masu"
+          xzap: yes
         - login_background: "/usr/share/backgrounds/loginscreen"
         - user: "masu"
           workspaces_h: 2
@@ -159,6 +165,7 @@
           avatar: "/home/masu/Pictures/avatar"
           show_name: yes
           show_icons: yes
+          onclick_minimize: yes
         - user: "masu"
           bookmarks:
             - name: "Dropbox"

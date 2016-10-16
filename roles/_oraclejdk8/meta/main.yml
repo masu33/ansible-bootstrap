@@ -7,7 +7,3 @@ dependencies:
     packages:
       - oracle-java8-installer
       - ca-certificates
-      - "{{ default
-          | d(false)
-          | ternary('oracle-java8-set-default', 'oracle-java8-installer')
-         }}"

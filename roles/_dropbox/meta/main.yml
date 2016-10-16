@@ -1,0 +1,7 @@
+---
+
+dependencies:
+  - role: _apt
+    repos: "{{ repos_dropbox }}"
+    packages:
+      - dropbox

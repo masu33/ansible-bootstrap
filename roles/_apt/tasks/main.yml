@@ -2,9 +2,9 @@
 
 - assert:
     that:
-      - "( debconfs is defined
-        or repos    is defined
-        or packages is defined
+      - "( ( debconfs is defined )
+        or ( repos    is defined )
+        or ( packages is defined )
         or ( autoremove | d(false) )
         or ( upgrade    | d(false) )
          )"
@@ -13,42 +13,42 @@
 
 - assert:
     that:
-      - "( debconfs is undefined
-        or debconfs is sequence
+      - "( ( debconfs is undefined )
+        or ( debconfs is sequence )
          )"
     msg:
       - "debconfs should be undefined or sequence"
 
 - assert:
     that:
-      - "( repos is undefined
-        or repos is sequence
+      - "( ( repos is undefined )
+        or ( repos is sequence )
          )"
     msg:
       - "packages should be undefined or sequence"
 
 - assert:
     that:
-      - "( packages is undefined
-        or packages is sequence
+      - "( ( packages is undefined )
+        or ( packages is sequence )
          )"
     msg:
       - "packages should be undefined or sequence"
 
 - assert:
     that:
-      - "( upgrade is undefined
-        or upgrade is sameas false
-        or upgrade is sameas true
+      - "( ( upgrade is undefined )
+        or ( upgrade is equalto false )
+        or ( upgrade is equalto true )
          )"
     msg:
       - "upgrade should be undefined or boolean"
 
 - assert:
     that:
-      - "( autoremove is undefined
-        or autoremove is sameas false
-        or autoremove is sameas true
+      - "( ( autoremove is undefined )
+        or ( autoremove is equalto false )
+        or ( autoremove is equalto true )
          )"
     msg:
       - "autoremove should be undefined or boolean"
@@ -100,7 +100,7 @@
 - name: "Set repositories"
   become: yes
   apt_repository:
-    mode: 644
+    mode:  "0664"
     repo:  "{{ __repo.repo            }}"
     state: "{{ __repo.state | d(omit) }}"
     update_cache: no
@@ -111,13 +111,13 @@
                }}"
   loop_control:
     loop_var: "__repo"
+  register: "repos_state"
 
 - name: "Update cache"
-  when: "{{ repos is defined }}"
+  when: "{{ repos_state | changed }}"
   become: yes
   apt:
     update_cache: yes
-  ignore_errors: yes
 
 - name: "Packages..."
   become: yes
@@ -141,8 +141,8 @@
     loop_var: "__package"
 
 - name: "Upgrade and/or autoremove"
-  when: "( (upgrade    | d(false))
-        or (autoremove | d(false))
+  when: "( ( upgrade    | d(false) )
+        or ( autoremove | d(false) )
          )"
   become: yes
   apt:
