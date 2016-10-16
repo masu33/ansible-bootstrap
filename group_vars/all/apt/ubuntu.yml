@@ -1,17 +1,69 @@
 ---
 
-repos_ubuntu:
-  - _id: 'ubuntu'
-    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} main universe multiverse'
+repos_ubuntu_main:
+  - _id: 'ubuntu main'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} main'
+repos_ubuntu_universe:
+  - _id: 'ubuntu universe'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} universe'
+repos_ubuntu_multiverse:
+  - _id: 'ubuntu multiverse'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} multiverse'
+repos_ubuntu_all: "{{ repos_ubuntu_main
+                    + repos_ubuntu_universe
+                    + repos_ubuntu_multiverse
+                   }}"
+repos_ubuntu_restricted:
+  - _id: 'ubuntu restricted'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}} restricted'
 
-repos_ubuntu_updates:
-  - _id: 'ubuntu updates'
-    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates main universe multiverse'
+repos_ubuntu_updates_main:
+  - _id: 'ubuntu updates main'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates main'
+repos_ubuntu_updates_universe:
+  - _id: 'ubuntu updates universe'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates universe'
+repos_ubuntu_updates_multiverse:
+  - _id: 'ubuntu updates multiverse'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates multiverse'
+repos_ubuntu_updates_all: "{{ repos_ubuntu_updates_main
+                            + repos_ubuntu_updates_universe
+                            + repos_ubuntu_updates_multiverse
+                           }}"
+repos_ubuntu_updates_restricted:
+  - _id: 'ubuntu updates restricted'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-updates restricted'
 
-repos_ubuntu_backports:
-  - _id: 'ubuntu backports'
-    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main universe multiverse'
+repos_ubuntu_backports_main:
+  - _id: 'ubuntu backports main'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports main'
+repos_ubuntu_backports_universe:
+  - _id: 'ubuntu backports universe'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports universe'
+repos_ubuntu_backports_multiverse:
+  - _id: 'ubuntu backports multiverse'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports multiverse'
+repos_ubuntu_backports_all: "{{ repos_ubuntu_backports_main
+                              + repos_ubuntu_backports_universe
+                              + repos_ubuntu_backports_multiverse
+                             }}"
+repos_ubuntu_backports_restricted:
+  - _id: 'ubuntu backports restricted'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-backports restricted'
 
-repos_ubuntu_security:
-  - _id: 'ubuntu security'
-    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security main universe multiverse'
+repos_ubuntu_security_main:
+  - _id: 'ubuntu security main'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security main'
+repos_ubuntu_security_universe:
+  - _id: 'ubuntu security universe'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security universe'
+repos_ubuntu_security_multiverse:
+  - _id: 'ubuntu security multiverse'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security multiverse'
+repos_ubuntu_security_all: "{{ repos_ubuntu_security_main
+                             + repos_ubuntu_security_universe
+                             + repos_ubuntu_security_multiverse
+                            }}"
+repos_ubuntu_security_restricted:
+  - _id: 'ubuntu security restricted'
+    repo: 'deb http://archive.ubuntu.com/ubuntu {{ansible_distribution_release}}-security restricted'

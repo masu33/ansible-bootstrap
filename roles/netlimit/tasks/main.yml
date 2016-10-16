@@ -2,8 +2,8 @@
 
 - assert:
     that:
-      - "( netlimit_users is undefined
-        or netlimit_users is sequence
+      - "( ( netlimit_users is undefined )
+        or ( netlimit_users is sequence )
          )"
     msg: "netlimit_users should be undefined or a sequence"
 

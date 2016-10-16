@@ -1,7 +1,15 @@
 ---
 
 dependencies:
+  - role: devenv
   - role: _apt
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
     packages:
       - python3
       - python3-pip

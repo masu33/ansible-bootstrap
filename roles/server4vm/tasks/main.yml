@@ -2,8 +2,8 @@
 
 - assert:
     that:
-      - "( docker_users is undefined
-        or docker_users is sequence
+      - "( ( docker_users is undefined )
+        or ( docker_users is sequence )
          )"
     msg: "docker_users should be undefined or sequence"
 

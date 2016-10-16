@@ -2,8 +2,8 @@
 
 - assert:
     that:
-      - "( settings is defined
-       and settings is sequence
+      - "( ( settings is defined )
+       and ( settings is sequence )
          )"
     msg: "settings should be defined and sequence"
 
@@ -51,7 +51,6 @@
           | map('list')
           | sum(start=[])
           | reject('equalto', 'user')
-          | reject('equalto', 'ignore_errors')
           | reject('in', optional_keys_w_user)
           | list
           == []
@@ -63,7 +62,6 @@
                       | map('list')
                       | sum(start=[])
                       | reject('equalto', 'user')
-                      | reject('equalto', 'ignore_errors')
                       | reject('in', optional_keys_w_user)
                       | list
                       )
@@ -72,23 +70,13 @@
            + ', '.join(optional_keys_w_user | d([]))
           }}"
 
-- name: "Set background"
-  become: yes
-  gsettings:
-    state:  "{{ __config.background is none | ternary('absent', 'present') }}"
-    user:   "{{ __config.user }}"
-    schema: "org.gnome.desktop.background"
-    key:    "picture-uri"
-    value:  "file://{{__config.background}}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('background', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
+############
+# Without user specified
+############
+
+############
+# login_background
+# ----------
 
 - name: "Set login background: disable display of custom backgrounds"
   become: yes
@@ -98,9 +86,9 @@
     schema: "com.canonical.unity-greeter"
     key:    "draw-user-backgrounds"
     value:  "{{ __config.login_background is none | ternary('true', 'false') }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
+                | selectattr('user', 'undefined')
                 | selectattr('login_background', 'defined')
                 | list
                 }}"
@@ -115,50 +103,26 @@
     schema: "com.canonical.unity-greeter"
     key:    "background"
     value:  "{{ __config.login_background }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
+                | selectattr('user', 'undefined')
                 | selectattr('login_background', 'defined')
                 | list
                }}"
   loop_control:
     loop_var: "__config"
 
-- name: "Set lockscreen background: disable display of custom backgrounds"
-  become: yes
-  gsettings:
-    state:  present
-    user:   "{{ __config.user }}"
-    schema: "com.canonical.unity-greeter"
-    key:    "draw-user-backgrounds"
-    value:  "{{ __config.lock_background is none | ternary('true', 'false') }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('lock_background', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
+# ----------
+# login_background
+############
 
-- name: "Set lockscreen background"
-  become: yes
-  gsettings:
-    state:  "{{ __config.lock_background is none | ternary('absent', 'present') }}"
-    user:   "{{ __config.user }}"
-    schema: "com.canonical.unity-greeter"
-    key:    "background"
-    value:  "{{ __config.lock_background }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('lock_background', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
+############
+# With user specified
+############
+
+############
+# avatar
+# ----------
 
 - name: "Copy avatar"
   become: yes
@@ -171,7 +135,6 @@
     mode:   "0644"
     owner:  "{{ root_user | d('root') }}"
     src:    "{{ __config.avatar }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
@@ -191,7 +154,6 @@
              }}"
     regexp: "^Icon=.*$"
     state:  present
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
@@ -201,118 +163,38 @@
   loop_control:
     loop_var: "__config"
 
-- name: "Set workspaces (horizontal)"
+# ----------
+# avatar
+############
+
+############
+# background
+# ----------
+
+- name: "Set background"
   become: yes
   gsettings:
-    state:  "{{ __config.workspaces_h is none | ternary('absent', 'present') }}"
-    user:   "{{ __config.user }}"
-    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
-    key:    "hsize"
-    value:  "{{ __config.workspaces_h }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('workspaces_h', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Set workspaces (vertical)"
-  become: yes
-  gsettings:
-    state:  "{{ __config.workspaces_v is none | ternary('absent', 'present') }}"
-    user:   "{{ __config.user }}"
-    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
-    key:    "vsize"
-    value:  "{{ __config.workspaces_v }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('workspaces_v', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Show/Hide user's name on panel"
-  become: yes
-  gsettings:
-    state:  "{{ __config.show_name is none | ternary('absent', 'present') }}"
-    user:   "{{ __config.user }}"
-    schema: "com.canonical.indicator.session"
-    key:    "show-real-name-on-panel"
-    value:  "{{ __config.show_name }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('show_name', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Show/Hide user's name at login - 1"
-  become: yes
-  lineinfile:
-    create:      yes
-    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
-    insertafter: EOF
-    owner:       "{{ root_user | d('root') }}"
-    group:       "{{ root_user | d('root') }}"
-    mode:        "0644"
-    line:        "[User]"
-    state:       present
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('hide_login', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Show/Hide user's name at login - 2"
-  become: yes
-  lineinfile:
-    backup:      no
-    create:      no
-    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
-    insertafter: "[User]"
-    line:        "SystemAccount={{ __config.hide_login | ternary('true', 'false') }}"
-    regexp:      "^SystemAccount=.*$"
-    state:       present
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('hide_login', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Show/Hide desktop icons"
-  become: yes
-  gsettings:
-    state:  "{{ __config.show_icons is none | ternary('absent', 'present') }}"
+    state:  "{{ __config.background is none | ternary('absent', 'present') }}"
     user:   "{{ __config.user }}"
     schema: "org.gnome.desktop.background"
-    key:    "show-desktop-icons"
-    value:  "{{ __config.show_icons }}"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
+    key:    "picture-uri"
+    value:  "file://{{ __config.background | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
-                | selectattr('show_icons', 'defined')
+                | selectattr('background', 'defined')
                 | list
                }}"
   loop_control:
     loop_var: "__config"
+
+# ----------
+# background
+############
+
+############
+# bookmarks
+# ----------
 
 - name: "Create bookmark location 1"
   become: yes
@@ -322,7 +204,6 @@
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config"
     state: directory
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
@@ -340,7 +221,6 @@
     group: "{{ __config.user }}"
     path:  "{{ __config.user | user_home }}/.config/gtk-3.0"
     state: directory
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
@@ -361,7 +241,6 @@
     follow:  yes
     force:   yes
     mode:    "0700"
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
@@ -371,54 +250,262 @@
   loop_control:
     loop_var: "__config"
 
-- name: "Set xorg.conf.d present"
-  when: "{{ settings
-          | forall(default_key=default_forall_key)
-          | selectattr('user', 'undefined')
-          | selectattr('xzap', 'defined')
-          | selectattr('xzap', 'equalto', True)
-          | list
-         }}"
-  become: yes
-  file:
-    follow: yes
-    force:  yes
-    path:   "/etc/X11/xorg.conf.d/"
-    owner:  "{{ root_user | d('root') }}"
-    group:  "{{ root_user | d('root') }}"
-    state:  directory
+# ----------
+# bookmarks
+############
 
-- name: "Hotkey for restarting X (global) - Enable"
-  when: "{{ settings
-          | forall(default_key=default_forall_key)
-          | selectattr('user', 'undefined')
-          | selectattr('xzap', 'defined')
-          | selectattr('xzap', 'equalto', True)
-          | list
-         }}"
-  become: yes
-  copy:
-    backup: no
-    dest:   "/etc/X11/xorg.conf.d/"
-    follow: yes
-    force:  yes
-    mode:   "0755"
-    owner:  "{{ root_user | d('root') }}"
-    src:    "90-zap.conf"
+############
+# hide_login
+# ----------
 
-- name: "Hotkey for restarting X (global) - Disable"
+- name: "Show/Hide user's name at login - 1"
   become: yes
-  file:
-    follow: yes
-    force:  yes
-    path:   "/etc/X11/xorg.conf.d/90-zap.conf"
-    state:  absent
-  ignore_errors: "{{ __config.ignore_errors | d(omit) }}"
+  lineinfile:
+    create:      yes
+    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
+    insertafter: EOF
+    owner:       "{{ root_user | d('root') }}"
+    group:       "{{ root_user | d('root') }}"
+    mode:        "0644"
+    line:        "[User]"
+    state:       present
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
-                | selectattr('user', 'undefined')
-                | selectattr('xzap', 'defined')
-                | selectattr('xzap', 'equalto', False)
-                | list }}"
+                | selectattr('user', 'defined')
+                | selectattr('hide_login', 'defined')
+                | list
+               }}"
   loop_control:
     loop_var: "__config"
+
+- name: "Show/Hide user's name at login - 2"
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      no
+    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
+    insertafter: "[User]"
+    line:        "SystemAccount={{ __config.hide_login | ternary('true', 'false') }}"
+    regexp:      "^SystemAccount=.*$"
+    state:       present
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('hide_login', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# hide_login
+############
+
+############
+# launcher_position
+# ----------
+
+- name: "Set launcher position"
+  become: yes
+  gsettings:
+    state:  "{{ __config.launcher_position is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.Unity.Launcher"
+    key:    "launcher-position"
+    value:  "{{ __config.launcher_position }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('launcher_position', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# launcher_position
+############
+
+############
+# lock_background
+# ----------
+
+- name: "Set lockscreen background: disable display of custom backgrounds"
+  become: yes
+  gsettings:
+    state:  present
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.unity-greeter"
+    key:    "draw-user-backgrounds"
+    value:  "{{ __config.lock_background is none | ternary('true', 'false') }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set lockscreen background"
+  become: yes
+  gsettings:
+    state:  "{{ __config.lock_background is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.unity-greeter"
+    key:    "background"
+    value:  "{{ __config.lock_background }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# lock_background
+############
+
+############
+# onclick_minize
+# ----------
+
+- name: "Set on-click minimization"
+  become: yes
+  gsettings:
+    state:  "{{ __config.onclick_minimize is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.unityshell:/org/compiz/profiles/unity/plugins/unityshell/"
+    key:    "launcher-minimize-window"
+    value:  "{{ __config.onclick_minimize | bool }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('onclick_minimize', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# onclick_minize
+############
+
+############
+# show_icons
+# ----------
+
+- name: "Show/Hide desktop icons"
+  become: yes
+  gsettings:
+    state:  "{{ __config.show_icons is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.gnome.desktop.background"
+    key:    "show-desktop-icons"
+    value:  "{{ __config.show_icons }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('show_icons', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# show_icons
+############
+
+############
+# show_name
+# ----------
+
+- name: "Show/Hide user's name on panel"
+  become: yes
+  gsettings:
+    state:  "{{ __config.show_name is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.indicator.session"
+    key:    "show-real-name-on-panel"
+    value:  "{{ __config.show_name }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('show_name', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# show_name
+############
+
+############
+# workspaces_(h|v)
+# ----------
+
+- name: "Set workspaces (horizontal)"
+  become: yes
+  gsettings:
+    state:  "{{ __config.workspaces_h is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key:    "hsize"
+    value:  "{{ __config.workspaces_h }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_h', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set workspaces (vertical)"
+  become: yes
+  gsettings:
+    state:  "{{ __config.workspaces_v is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key:    "vsize"
+    value:  "{{ __config.workspaces_v }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_v', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# workspaces_(h|v)
+############
+
+############
+# xzap
+# ----------
+
+- name: "Set xkb-option to restart X"
+  become: yes
+  gsettings:
+    state:  "{{ __config.xzap | ternary('present', 'absent') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.gnome.desktop.input-sources"
+    key:    "xkb-options"
+    value:  "terminate:ctrl_alt_bksp"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('xzap', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# xzap
+############

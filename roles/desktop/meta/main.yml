@@ -2,8 +2,15 @@
 
 dependencies:
   - role: _apt
-    repos: "{{ repos_dropbox }}"
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
     packages:
       - unity-tweak-tool
-      - dropbox
+      - shutter
+  - role: _dropbox
   - role: _oraclejdk8

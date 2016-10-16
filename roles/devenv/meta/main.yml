@@ -2,15 +2,15 @@
 
 dependencies:
   - role: _apt
-    repos: "{{ repos_git_lfs
-             + repos_umake
-             }}"
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
     packages:
       - git
-      - "{{ git_lfs
-          | d(false)
-          | ternary('git-lfs', 'git')
-         }}"
       - ubuntu-make
       - g++
       - gcc
@@ -18,3 +18,7 @@ dependencies:
       - libc-bin
       - lsb
       - build-essential
+  - role: _apt
+    repos: "{{ repos_umake }}"
+    packages:
+      - ubuntu-make

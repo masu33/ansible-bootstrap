@@ -2,12 +2,13 @@
 
 - assert:
     that:
-      - "( envs is undefined
-        or envs is sequence
+      - "( ( envs is undefined )
+        or ( envs is sequence )
          )"
     msg: "envs should be undefined or sequence"
 
 - name: "Set environments"
+  become: yes
   pip:
     chdir:                    "{{ __env.chdir                    | d(omit) }}"
     editable:                 "{{ __env.editable                 | d(omit) }}"

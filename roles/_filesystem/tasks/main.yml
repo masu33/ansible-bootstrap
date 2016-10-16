@@ -2,8 +2,8 @@
 
 - assert:
     that:
-      - "( settings is defined
-       and settings is sequence
+      - "( ( settings is defined )
+       and ( settings is sequence )
          )"
     msg: "settings should be defined and sequence"
 

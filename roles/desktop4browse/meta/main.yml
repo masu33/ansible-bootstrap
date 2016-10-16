@@ -2,7 +2,13 @@
 
 dependencies:
   - role: _apt
-    repos: "{{ repos_canonical }}"
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
     packages:
       - libfreetype6  # fonts
       - libfreetype6-dev  # fonts
@@ -15,6 +21,9 @@ dependencies:
       - firefox
       - chromium-browser
       - chromium-codecs-ffmpeg
+  - role: _apt
+    repos: "{{ repos_canonical }}"
+    packages:
       - adobe-flashplugin
   - role: _mscorefonts
   - role: _oraclejdk8
