@@ -3,4 +3,4 @@
 dependencies:
   - role: devenv
   - role: _oraclejdk8
-    default: no
+    set_default: yes

@@ -13,6 +13,9 @@ dependencies:
       - rdesktop
       - vinagre
       - synergy
-      - openvpn
-      - network-manager-openvpn
-      - network-manager-openvpn-gnome
+      - name: openvpn
+        state: latest
+      - name: network-manager-openvpn
+        state: latest
+      - name: network-manager-openvpn-gnome
+        state: latest

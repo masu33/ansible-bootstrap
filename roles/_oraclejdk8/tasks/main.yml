@@ -15,4 +15,4 @@
   vars:
     packages:
 #      - oracle-java8-set-default  # BUG: -
-       - "{{ default | d(false) | in([true, 'yes']) | ternary('oracle-java8-set-default', 'oracle-java8-installer') }}"  # BUG: +
+       - "{{ set_default | d(false) | in([true, 'yes']) | ternary('oracle-java8-set-default', 'oracle-java8-installer') }}"  # BUG: +

@@ -3,7 +3,8 @@
 #############
 # INSTALL ansible
 # -----------
-sudo apt-get install python-setuptools \
+sudo apt-get install python-pip \
+                     python-setuptools \
                      build-essential \
                      autoconf \
                      libtool \

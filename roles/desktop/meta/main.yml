@@ -14,3 +14,4 @@ dependencies:
       - shutter
   - role: _dropbox
   - role: _oraclejdk8
+    set_default: yes
