@@ -11,7 +11,9 @@ dependencies:
              + repos_ubuntu_updates_multiverse
             }}"
     packages:
-      - python3
-      - python3-pip
-      - python3-dev
-      - virtualenv
+      - state: latest
+        forall:
+          - python3
+          - python3-pip
+          - python3-dev
+          - virtualenv

@@ -11,7 +11,6 @@ dependencies:
             }}"
     packages:
       - git
-      - ubuntu-make
       - g++
       - gcc
       - make
@@ -21,4 +20,5 @@ dependencies:
   - role: _apt
     repos: "{{ repos_umake }}"
     packages:
-      - ubuntu-make
+      - name: ubuntu-make
+        state: latest

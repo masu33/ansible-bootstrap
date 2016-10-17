@@ -10,4 +10,5 @@ dependencies:
              + repos_ubuntu_updates_multiverse
             }}"
     packages:
-      - iptables
+      - name: iptables
+        state: latest

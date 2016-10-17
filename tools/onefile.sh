@@ -5,7 +5,6 @@
 # ----------
 
 GITHUBNAME="ansible-ubuntu-bootstrap"
-GITHUBID="614b61e8f756f0b5b4de42a0dba164e811ddd7f4"
 
 INSTALLIT="???"
 while [ "${INSTALLIT}" != "y" -a "${INSTALLIT}" != "n" ]; do
@@ -13,13 +12,14 @@ while [ "${INSTALLIT}" != "y" -a "${INSTALLIT}" != "n" ]; do
     echo    ""
 done
 
-wget "https://github.com/masu33/${GITHUBNAME}/archive/${GITHUBID}.zip"
-unzip "${GITHUBID}.zip"
+sudo apt-get install git <<< "y"
+
+git clone "https://github.com/masu33/${GITHUBNAME}.git"
 
 if [ "${INSTALLIT}" == "n" ]; then
     exit 0
 else
-    cd "${GITHUBNAME}-${GITHUBID}"
+    cd "${GITHUBNAME}"
     ./tools/prerequisites.sh
     ./tools/ansible_start.sh
     cd -

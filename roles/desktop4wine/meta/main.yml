@@ -11,7 +11,8 @@ dependencies:
             }}"
     packages:
       - winbind
-      - wine
+      - name: wine
+        state: latest
       - wine-gecko*
       - wine-mono*
       - playonlinux

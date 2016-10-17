@@ -19,6 +19,7 @@
             - path: "/home/masu"
               mode: "0755"
             - path: "/home/masu/Pictures"
+              mode: "0755"
             - path: "/home/masu/Downloads"
               mode: "0755"
             - path: "/home/masu/Downloads/firefox"
@@ -50,7 +51,7 @@
     - role: _download
       settings:
         - force: yes
-          mode: "0644"
+          mode: "0755"
           owner: "masu"
           forall:
             - url: "https://dl.dropboxusercontent.com/u/71173308/Profile/background"
