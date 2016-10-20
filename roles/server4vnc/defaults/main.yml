@@ -1,0 +1,15 @@
+---
+
+vncserver_key_args:
+  - "name"
+  - "depth"
+  - "name"
+  - "depth"
+  - "geometry"
+  - "httpport"
+  - "basehttpport"
+  - "pixelformat"
+
+vncserver_flag_args:
+  - "alwaysshared"
+  - "nevershared"

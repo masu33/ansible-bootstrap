@@ -148,6 +148,7 @@
   become: yes
   lineinfile:
     backup: yes
+    create: yes
     dest:   "/var/lib/AccountsService/users/{{__config.user}}"
     line:   "{{ __config.avatar is none
               | ternary('Icon=', 'Icon=/var/lib/AccountsService/icons/'+__config.user)
@@ -196,7 +197,7 @@
 # bookmarks
 # ----------
 
-- name: "Create bookmark location 1"
+- name: "Create bookmark location - 1"
   become: yes
   file:
     mode:  "0755"
@@ -213,7 +214,7 @@
   loop_control:
     loop_var: "__config"
 
-- name: "Create bookmark location 2"
+- name: "Create bookmark location - 2"
   become: yes
   file:
     mode: "0755"
@@ -258,27 +259,7 @@
 # hide_login
 # ----------
 
-- name: "Show/Hide user's name at login - 1"
-  become: yes
-  lineinfile:
-    create:      yes
-    dest:        "/var/lib/AccountsService/users/{{__config.user}}"
-    insertafter: EOF
-    owner:       "{{ root_user | d('root') }}"
-    group:       "{{ root_user | d('root') }}"
-    mode:        "0644"
-    line:        "[User]"
-    state:       present
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('hide_login', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Show/Hide user's name at login - 2"
+- name: "Show/Hide user's name at login"
   become: yes
   lineinfile:
     backup:      no

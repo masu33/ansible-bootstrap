@@ -53,50 +53,35 @@ class AnsibleUMakeModule(object):
         ).strip()
         return output
 
-    def main(self, test=None):
+    def main(self):
         """
         Executes the given module command.
-        :type test: dictionary object for testing purposes only
         """
 
-        # Normal (Ansible) call
-        if test is None:
-            # Module specs
-            module = AnsibleModule(
-                argument_spec={
-                    'executable': {'default': 'umake'},
-                    'category': {'required': True},
-                    'framework': {'required': True},
-                    'path': {'default': None},
-                    'state': {
-                        'choices': ['absent', 'present'],
-                        'default': 'present',
-                    },
+        # Module specs
+        module = AnsibleModule(
+            argument_spec={
+                'executable': {'default': 'umake'},
+                'category': {'required': True},
+                'framework': {'required': True},
+                'path': {'default': None},
+                'state': {
+                    'choices': ['absent', 'present'],
+                    'default': 'present',
                 },
-                supports_check_mode=True,
-            )
+            },
+            supports_check_mode=True,
+        )
 
-            # Parameters
-            params = module.params
-            category = params.get('category')
-            framework = params.get('framework')
-            path = params.get('path')
-            state = params.get('state')
+        # Parameters
+        params = module.params
+        category = params.get('category')
+        framework = params.get('framework')
+        path = params.get('path')
+        state = params.get('state')
 
-            # Check mode
-            check_mode = module.check_mode
-
-        # Test call
-        else:
-            # Parameters
-            params = test.get('params', {})
-            category = params.get('category')
-            framework = params.get('framework')
-            path = params.get('path')
-            state = params.get('state')
-
-            # Check mode
-            check_mode = test.get('check_mode')
+        # Check mode
+        check_mode = module.check_mode
 
         # Handling option errors
         if state == 'absent' and path is not None:
@@ -148,7 +133,6 @@ class AnsibleUMakeModule(object):
             'old_path': old_path,
             'new_path': path,
         })
-
 
 if __name__ == '__main__':
     AnsibleUMakeModule().main()

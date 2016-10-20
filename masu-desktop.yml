@@ -1,6 +1,9 @@
 ---
 
 - hosts: localhost
+  vars_prompt:
+    - name: "masu_vnc_pass"
+      prompt: "VNC server password for user masu"
   roles:
     - role: _users
       settings:
@@ -93,6 +96,10 @@
       docker_users:
         - "masu"
         - "willow"
+    - role: server4vnc
+      settings:
+        - user: "masu"
+          password: "{{ masu_vnc_pass }}"
     - role: _vars
       settings:
         - forall:
@@ -103,14 +110,10 @@
       umake:
         - category: scala
           framework: scala-lang
-    - role: devenv4java
-      umake:
         - category: ide
           framework: idea
+    - role: devenv4java
     - role: devenv4python
-      umake:
-        - category: ide
-          framework: pycharm
       envs:
         - executable: pip3
           name:
