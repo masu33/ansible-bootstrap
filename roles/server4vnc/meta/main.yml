@@ -10,19 +10,6 @@ dependencies:
              + repos_ubuntu_updates_multiverse
             }}"
     packages:
-      - aptitude
-      - curl
-      - wget
-      - iptables
-      - telnet
-      - traceroute
-      - netcat
-      - gparted
-      - htop
-      - tree
-      - vim
-      - rar
-      - zip
-      - unzip
-      - unrar
+      - gnome-core
+      - vnc4server
       - systemd
