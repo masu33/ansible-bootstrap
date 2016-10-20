@@ -5,8 +5,7 @@ unset SESSION_MANAGER
 
 unset DBUS_SESSION_BUS_ADDRESS
 
- # exec /etc/X11/xinit/xinitrc
-gnome-panel &
+exec /etc/X11/xinit/xinitrc
 gnome-settings-daemon &
 metacity &
 nautilus -n &
@@ -18,4 +17,5 @@ gnome-terminal &
 
 xsetroot -solid grey
 vncconfig -iconic &
-gnome-session --session=gnome-classic &
+gnome-session --session=gnome-fallback &
+gnome-panel &

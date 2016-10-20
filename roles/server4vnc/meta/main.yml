@@ -11,5 +11,6 @@ dependencies:
             }}"
     packages:
       - gnome-core
+      - gnome-panel
       - vnc4server
       - systemd
