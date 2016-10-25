@@ -10,7 +10,6 @@ dependencies:
              + repos_ubuntu_updates_multiverse
             }}"
     packages:
-      - gnome-core
       - gnome-panel
       - vnc4server
       - systemd

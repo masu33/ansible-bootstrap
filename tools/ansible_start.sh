@@ -3,4 +3,5 @@
 ############
 # PLAYBOOK start for local desktop machine
 # ----------
-ansible-playbook -K masu-desktop.yml -i localhost
+ansible-playbook -K masu-desktop.yml -i localhost $@
+
