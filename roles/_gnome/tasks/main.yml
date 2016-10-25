@@ -233,15 +233,19 @@
 
 - name: "Set location bookmarks"
   become: yes
-  copy:
-    backup:  no
-    content: "{{ __config.bookmarks | gtk_bookmarks }}"
-    owner:   "{{ __config.user }}"
-    group:   "{{ __config.group | d(__config.user) }}"
-    dest:    "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
-    follow:  yes
-    force:   yes
-    mode:    "0700"
+  template:
+    src:    bookmarks.j2
+    owner:  "{{ __config.user }}"
+    group:  "{{ __config.group | d(__config.user) }}"
+    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    follow: yes
+    force:  yes
+    mode:   "0700"
+  vars:
+    bookmarks: "{{ __config.bookmarks
+                 | forall
+                 | list }}"
+    current: "{{ lookup('file', (__config.user  | user_home) + '/.config/gtk-3.0/bookmarks') }}"
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')

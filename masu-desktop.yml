@@ -4,7 +4,10 @@
   vars_prompt:
     - name: "masu_vnc_pass"
       prompt: "VNC server password for user masu"
+      private: yes
+      confirm: yes
   roles:
+    # Prepare
     - role: _users
       settings:
         - name: "masu"
@@ -74,16 +77,56 @@
               }}"
       packages:
         - state: absent
+          purge: yes
           forall:
-            - totem
-            - totem-common
-            - totem-plugins
             - rhythmbox
             - rhythmbox-data
             - rhythmbox-plugins
             - rhythmbox-plugin-zeitgeist
             - transmission
             - transmission-*
+    - role: _env
+      settings:
+        - user: "masu"
+          backup: no
+          forall:
+            file:
+              - ".bashrc"
+              - ".bash_profile"
+            line:
+              - "{{ 'export PS1=\"'
+                  + '\\[\\e[0;1;36m\\]' + '\\u'
+                  + '\\[\\e[0;1;33m\\]' + '@'
+                  + '\\[\\e[0;1;36m\\]' + '\\h'
+                  + '\\[\\e[0;1;33m\\]'+ ':'
+                  + '\\[\\e[0;1;36m\\]' + '\\W'
+                  + '\\[\\e[0;1;33m\\]' + '\\$'
+                  + '\\[\\e[0m\\]'
+                  + ' \"'
+                 }}"
+              - "{{ 'export PS2=\"'
+                  + '\\[\\e[0;1;36m\\]' + '\\u'
+                  + '\\[\\e[0;1;33m\\]' + '>'
+                  + '\\[\\e[0m\\]'
+                  + ' '
+                  + '\"'
+                 }}"
+              - "{{ 'export PS3=\"'
+                  + '#'
+                  + '?'
+                  + ' '
+                  + '\"'
+                 }}"
+              - "{{ 'export PS4=\"'
+                  + '\\${0}'
+                  + '\\${LINENO}'
+                  + ':'
+                  + '>'
+                  + '\"'
+                 }}"
+              - "alias clear=echo\\ -e\\ \"\\e[2J\\n\\n\""
+
+    # Roles
     - role: system
     - role: netlimit
       netlimit_users:
@@ -95,17 +138,20 @@
     - role: server4vm
       docker_users:
         - "masu"
-        - "willow"
+    - role: _env
+      settings:
+        - user: "masu"
+          forall:
+            file:
+              - ".bashrc"
+              - ".bash_profile"
+            line:
+              - "alias dlast=docker\\ ps\\ -l\\ -q"
     - role: server4vnc
       settings:
         - user: "masu"
           password: "{{ masu_vnc_pass }}"
-    - role: _vars
-      settings:
-        - forall:
-            - line: "alias dlast=docker\\ ps\\ -l\\ -q"
-            - line: "alias pip=pip3.5"
-          type: all
+          geometry: "1280x1024"
     - role: devenv
       umake:
         - category: scala
@@ -135,15 +181,17 @@
             - pyinstaller
             - py4j
             - thefuck
-    - role: _vars
+    - role: _env
       settings:
         - user: "masu"
-          type: all
           forall:
-            - line: "alias python=python3.5"
-              regexp: "^alias python=.*$"
-            - line: "alias pip=python3.5"
-              regexp: "^alias pip=.*$"
+            file:
+              - ".bashrc"
+              - ".bash_profile"
+            line:
+              - "alias pip=pip3"
+              - "alias python=python3"
+              - "alias ipython=ipython3"
     - role: desktop
     - role: desktop4browse
     - role: desktop4comm
@@ -186,32 +234,9 @@
           forall:
             user:
               - "ansible_user"
+
+    # Upgrade
     - role: _apt
-      upgrade: yes
+      purge: yes
+      upgrade: full
       autoremove: yes
-    - role: _vars
-      settings:
-        - user: "masu"
-          state: present
-          type: all
-          backup: no
-          forall:
-            - line: "{{ 'export PS1=\"'
-                        + '\\[\\e[0;1;36m\\]' + '\\u'
-                        + '\\[\\e[0;1;33m\\]' + '@'
-                        + '\\[\\e[0;1;36m\\]' + '\\h'
-                        + '\\[\\e[0;1;33m\\]'+ ':'
-                        + '\\[\\e[0;1;36m\\]' + '\\W'
-                        + '\\[\\e[0;1;33m\\]' + '\\$'
-                        + '\\[\\e[0m\\]'
-                        + ' \"' }}"
-              regexp: "^export PS1=.*$"
-            - line: "{{ 'export PS2=\"'
-                        + '\\[\\e[0;1;33m\\]' + '\\$'
-                        + '\\[\\e[0;1;33m\\]' + '>'
-                        + '\\[\\e[0m\\]'
-                        + ' '
-                        + '\"' }}"
-              regexp: "^export PS2=.*$"
-            - line: "alias clear=echo\\ -e\\ '\\e[2J\\n\\n'"
-              regexp: "^alias clear=.*$"

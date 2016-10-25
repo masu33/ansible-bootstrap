@@ -2,17 +2,6 @@
 
 - assert:
     that:
-      - "( ( debconfs is defined )
-        or ( repos    is defined )
-        or ( packages is defined )
-        or ( autoremove | d(false) )
-        or ( upgrade    | d(false) )
-         )"
-    msg:
-      - "debconfs, repos or packages should be defined or any of autoremove or upgrade should be true"
-
-- assert:
-    that:
       - "( ( debconfs is undefined )
         or ( debconfs is sequence )
          )"
@@ -34,24 +23,6 @@
          )"
     msg:
       - "packages should be undefined or sequence"
-
-- assert:
-    that:
-      - "( ( upgrade is undefined )
-        or ( upgrade is equalto false )
-        or ( upgrade is equalto true )
-         )"
-    msg:
-      - "upgrade should be undefined or boolean"
-
-- assert:
-    that:
-      - "( ( autoremove is undefined )
-        or ( autoremove is equalto false )
-        or ( autoremove is equalto true )
-         )"
-    msg:
-      - "autoremove should be undefined or boolean"
 
 - name: "Set debconfs"
   become: yes
@@ -140,11 +111,13 @@
   loop_control:
     loop_var: "__package"
 
-- name: "Upgrade and/or autoremove"
-  when: "( ( upgrade    | d(false) )
-        or ( autoremove | d(false) )
+- name: "Others"
+  when: "( ( autoremove | d(false) )
+        or ( purge      | d(false) )
+        or ( upgrade    | d(false) )
          )"
   become: yes
   apt:
-    upgrade:    "{{ upgrade    | d(omit) }}"
     autoremove: "{{ autoremove | d(omit) }}"
+    purge:      "{{ purge      | d(omit) }}"
+    upgrade:    "{{ upgrade    | d(omit) }}"

@@ -3,8 +3,6 @@
 vncserver_key_args:
   - "name"
   - "depth"
-  - "name"
-  - "depth"
   - "geometry"
   - "httpport"
   - "basehttpport"
@@ -13,3 +11,10 @@ vncserver_key_args:
 vncserver_flag_args:
   - "alwaysshared"
   - "nevershared"
+
+vncserver_defaults:
+  depth: "16"
+  geometry: "1024x768"
+  basehttpport: "5900"
+  alwaysshared: "no"
+  nevershared: "yes"

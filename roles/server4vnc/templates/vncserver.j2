@@ -9,28 +9,47 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-prog=$"VNC server"
+servicename="vncserver"
 
 unset VNCSERVERARGS
 VNCSERVERS=""
 
 VNCSERVERS="{% for setting in settings %}{{loop.index}}:{{setting.user}} {% endfor %}"
-{% for setting in settings %}
-{% if setting | list | reject('equalto', 'user') | reject('equalto', 'password') != [] %}
-VNCSERVERARGS[{{loop.index}}]="{# #}
-{% for key in vncserver_key_args %}
-{% if key in setting %} -{{ key }} "{{ setting[key] | replace('"', '\\"') }}"{% endif %}
-{% endfor %}
-{% for key in vncserver_flag_args %}
-{% if key in setting and setting[key] %} -{{ key }}{% endif %}
-{% endfor %}"
-{% endif %}
-{% endfor %}
+{%
+for setting in settings
+    %}{%
+    if setting | list | reject('equalto', 'user') | reject('equalto', 'password') != []
+        %}VNCSERVERARGS[{{loop.index}}]="{%
+        for key in vncserver_key_args
+        %}{%
+            if key in setting
+                %} -{{ key }} {{ setting[key] | replace('"', '\\"') }}{%
+            elif key in vncserver_defaults
+                %} -{{ key }} {{ vncserver_defaults[key] | replace('"', '\\"') }}{%
+            endif
+        %}{%
+        endfor
+        %}{%
+        for key in vncserver_flag_args
+        %}{%
+            if key in setting and setting[key]
+                %} -{{ key }}{%
+            elif key in vncserver_defaults and vncserver_defaults[key]
+                %} -{{ key }}{%
+            endif
+        %}{%
+        endfor
+        %}"{%
+    endif
+    %}{%
+endfor
+%}
+
 
 start() {
     . /lib/lsb/init-functions
     REQ_USER=$2
-    echo -n $"Starting $prog: "
+    echo -n $"Starting ${servicename}: "
     ulimit -S -c 0 >/dev/null 2>&1
     RETVAL=0
     for display in ${VNCSERVERS}; do
@@ -40,27 +59,28 @@ start() {
             unset BASH_ENV ENV
             DISP="${display%%:*}"
             export VNCUSERARGS="${VNCSERVERARGS[${DISP}]}"
-            su ${USER} -c "cd ~${USER} && [ -f .vnc/passwd ] && vncserver :${DISP} ${VNCUSERARGS}"
+            sudo -u ${USER} -s /bin/bash -c "cd ~; [ -f .vnc/passwd ] && vncserver :${DISP} ${VNCUSERARGS}"
         fi
     done
+    echo -e "\n"
+    echo "VNCServers started"
 }
 
 stop() {
     . /lib/lsb/init-functions
     REQ_USER=$2
-    echo -n $"Shutting down $prog: "
-    for display in ${VNCSERVERS}
-    do
-    export USER="${display##*:}"
-    if test -z "${REQ_USER}" -o "${REQ_USER}" == ${USER} ; then
-    echo -n "${display} "
-    unset BASH_ENV ENV
-    export USER="${display##*:}"
-    su ${USER} -c "vncserver -kill :${display%%:*}" >/dev/null 2>&1
-    fi
+    echo -n $"Shutting down ${servicename}: "
+    for display in ${VNCSERVERS}; do
+        export USER="${display##*:}"
+        if test -z "${REQ_USER}" -o "${REQ_USER}" == ${USER} ; then
+            echo -n "${display} "
+            unset BASH_ENV ENV
+            export USER="${display##*:}"
+            sudo -u ${USER} -s /bin/bash -c "vncserver -kill :${display%%:*}" >/dev/null 2>&1
+        fi
     done
     echo -e "\n"
-    echo "VNCServer Stopped"
+    echo "VNCServers stopped"
 }
 
 case "$1" in
@@ -75,15 +95,10 @@ case "$1" in
         sleep 3
         start $@
     ;;
-    condrestart)
-        if [ -f /var/lock/subsys/vncserver ]; then
-            restart $@
-        fi
-    ;;
     status)
-        status Xvnc
+        status ${servicename}
     ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+        echo $"Usage: $0 {start|stop|restart|status}"
         exit 1
 esac
