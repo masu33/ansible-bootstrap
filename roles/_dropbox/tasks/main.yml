@@ -1,14 +1,14 @@
 ---
 
 - name: "Install dropbox"
+  become: yes
   apt:
     name: dropbox
     state: present
   register: dropbox_service
 
-- name: "Restart nautilus"
-  become: yes
-  service:
-    name: nautilus
-    state: restarted
+- name: "Stop nautilus"
   when: dropbox_service.changed
+  become: yes
+  shell: "nautilus -q"
+  changed_when: no

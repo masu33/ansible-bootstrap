@@ -63,7 +63,8 @@
           }}"
 
 - name: "Create folder"
-  become_method: "0700"
+  become: yes
+  become_user: "{{ __login.user }}"
   file:
     path:  "{{ __login.folder | d((__login.user | user_home) + '/.vnc') }}"
     mode: "0700"
