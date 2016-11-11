@@ -197,86 +197,112 @@
 # bookmarks
 # ----------
 
-- name: "Create bookmark location - 1"
+- name: "Get bookmarks state - before"
   become: yes
-  file:
-    mode:   "0755"
-    owner:  "{{ __config.user }}"
-    group:  "{{ __config.user }}"
-    path:   "{{ __config.user | user_home }}/.config"
+  stat:
+    checksum: "sha1"
     follow: yes
-    force:  yes
-    state:  directory
+    get_checksum: yes
+    get_md5: yes
+    mime: no
+    path: "{{ __home }}/.config/gtk-3.0/bookmarks"
+  register: bookmarks_state_before
+
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('bookmarks', 'defined')
+                | map(attribute='user')
+                | map('user_home')
                 | list
+                | sort
+                | unique
                }}"
   loop_control:
-    loop_var: "__config"
+    loop_var: "__home"
 
-- name: "Create bookmark location - 2"
+- name: "Set location bookmarks - remove"
   become: yes
-  file:
-    mode:   "0755"
-    owner:  "{{ __config.user }}"
-    group:  "{{ __config.user }}"
-    path:   "{{ __config.user | user_home }}/.config/gtk-3.0"
-    follow: yes
-    force:  yes
-    state:  directory
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('bookmarks', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Create bookmark location - 3"
-  become: yes
-  file:
-    mode: "0700"
-    owner:  "{{ __config.user }}"
-    group:  "{{ __config.user }}"
-    path:   "{{ __config.user | user_home }}/.config/gtk-3.0"
-    follow: yes
-    force:  yes
-    state:  file
-  with_items: "{{ settings
-                | forall(default_key=default_forall_key)
-                | selectattr('user', 'defined')
-                | selectattr('bookmarks', 'defined')
-                | list
-               }}"
-  loop_control:
-    loop_var: "__config"
-
-- name: "Set location bookmarks"
-  become: yes
-  template:
-    src:    bookmarks.j2
+  lineinfile:
+    backup: no
+    create: yes
+    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
     owner:  "{{ __config.user }}"
     group:  "{{ __config.group | d(__config.user) }}"
-    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
     follow: yes
     force:  yes
     mode:   "0700"
-  vars:
-    bookmarks: "{{ __config.bookmarks
-                 | forall
-                 | list }}"
-    current: "{{ lookup('file', (__config.user  | user_home) + '/.config/gtk-3.0/bookmarks') }}"
+    regexp: "^{{ __config.location }}( .*)?$"
+    state:  "absent"
+  changed_when: no
   with_items: "{{ settings
                 | forall(default_key=default_forall_key)
                 | selectattr('user', 'defined')
                 | selectattr('bookmarks', 'defined')
+                | forall(group_key='bookmarks', default_key='location')
                 | list
                }}"
   loop_control:
     loop_var: "__config"
+
+- name: "Set location bookmarks - add-to-end"
+  become: yes
+  when: "{{ __config.state is undefined
+         or __config.state is equalto 'present' }}"
+  lineinfile:
+    insertafter: EOF
+    backup: no
+    create: yes
+    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    owner:  "{{ __config.user }}"
+    group:  "{{ __config.group | d(__config.user) }}"
+    follow: yes
+    force:  yes
+    mode:   "0700"
+    line:   "{{ __config.location
+             }}{%
+              if 'name' in __config
+             %} {{ __config.name }}{%
+              endif
+             %}"
+  changed_when: no
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | forall(group_key='bookmarks', default_key='location')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Get bookmarks state - after"
+  become: yes
+  stat:
+    checksum: "sha1"
+    follow: yes
+    get_checksum: yes
+    get_md5: yes
+    mime: no
+    path: "{{ __home }}/.config/gtk-3.0/bookmarks"
+  register: bookmarks_state_after
+  changed_when: "{{ ( bookmarks_state_before.results
+                    | selectattr('__home', 'equalto', __home)
+                    | first
+                    ).stat.md5 != bookmarks_state_after.stat.md5
+                 }}"
+  with_items: "{{ settings
+                | forall(default_key=default_forall_key)
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | map(attribute='user')
+                | map('user_home')
+                | list
+                | sort
+                | unique
+               }}"
+  loop_control:
+    loop_var: "__home"
 
 # ----------
 # bookmarks

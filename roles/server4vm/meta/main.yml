@@ -11,4 +11,5 @@ dependencies:
             }}"
     packages:
       - docker.io
+      - docker-compose
       - virtualbox

@@ -234,6 +234,19 @@
           forall:
             user:
               - "ansible_user"
+    - role: _env
+      settings:
+        - user: "masu"
+          forall:
+            file:
+              - ".bashrc"
+              - ".bash_profile"
+            line:
+              - "{{ 'alias firefox-bme='
+                  + 'ssh\\ -D\\ 8080\\ -f\\ -C\\ -c\\ blowfish-cbc\\ -q\\ masu@ede.tmit.bme.hu\\ sleep\\ 10'
+                  + '\\;\\ '
+                  + 'firefox\\ -P\\ bme'
+                 }}"
 
     # Upgrade
     - role: _apt
