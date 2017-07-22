@@ -1,7 +1,0 @@
----
-
-dependencies:
-  - role: _apt
-    repos: "{{ repos_shellextension }}"
-    packages:
-      - name: chrome-gnome-shell

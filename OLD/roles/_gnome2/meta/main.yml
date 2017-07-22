@@ -1,7 +1,0 @@
----
-
-dependencies:
-  - role: _apt
-    packages:
-      - name: accountsservice
-        state: latest

@@ -1,9 +1,0 @@
----
-
-dependencies:
-  - role: _apt
-    debconfs: "{{ debconfs_oraclejdk }}"
-    repos: "{{ repos_oraclejdk }}"
-    packages:
-      - name: oracle-java8-installer
-      - name: ca-certificates

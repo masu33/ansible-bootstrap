@@ -307,6 +307,7 @@
         - oracle-java8-unlimited-jce-policy
 
         # Desktop
+        - accountsservice
         - chrome-gnome-shell
         - gnome-shell-extensions
         - gnome-tweak-tool
