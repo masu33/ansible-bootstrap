@@ -1,0 +1,14 @@
+---
+
+- assert:
+    that:
+      - paths is sequence
+
+- # name:
+  become: yes
+  include: path.yml
+  with_items: "{{ paths }}"
+  loop_control:
+    loop_var: path
+
+...

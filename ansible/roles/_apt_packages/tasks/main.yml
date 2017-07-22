@@ -1,0 +1,28 @@
+---
+
+- assert:
+    that:
+      - packages is sequence
+
+- # name:
+  become: yes
+  include: debconf.yml
+  with_items: "{{ packages
+                | default_key('name')
+                | mass_table_join(debconf_list, 'name', collection=true)
+                | sum(start=[])
+                | list
+               }}"
+  loop_control:
+    loop_var: debconf
+
+- # name:
+  become: yes
+  include: package.yml
+  with_items: "{{ packages
+                | default_key('name')
+               }}"
+  loop_control:
+    loop_var: package
+
+...

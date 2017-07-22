@@ -1,0 +1,17 @@
+---
+
+- assert:
+    that:
+      - gnome_settings is sequence
+
+- # name:
+  become: yes
+  include: gnome_setting.yml
+  with_items: "{{ gnome_settings
+                | mass_table_join(gnome_settings_list, 'id')
+                | list
+               }}"
+  loop_control:
+    loop_var: gnome_setting
+
+...

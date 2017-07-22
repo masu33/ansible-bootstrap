@@ -1,0 +1,18 @@
+---
+
+optional_keys_wo_user:
+  - "login_background"
+
+optional_keys_w_user:
+  - "avatar"
+  - "background"
+  - "bookmarks"
+  - "hide_login"
+  - "launcher_position"
+  - "lock_background"
+  - "onclick_minimize"
+  - "show_icons"
+  - "show_name"
+  - "workspaces_h"
+  - "workspaces_v"
+  - "xzap"

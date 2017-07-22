@@ -1,0 +1,21 @@
+---
+
+dependencies:
+  - role: _apt
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
+    packages:
+      - name: libfreetype6  # fonts
+      - name: libfreetype6-dev  # fonts
+      - name: ttf-ubuntu-font-family  # fonts
+      - name: fonts-ubuntu-font-family-console  # fonts
+      - name: libfontconfig  # fonts
+      - name: pdftk
+      - name: texlive
+      - name: texstudio
+  - role: _mscorefonts

@@ -1,0 +1,501 @@
+---
+
+- assert:
+    that:
+      - "( ( settings is defined )
+       and ( settings is sequence )
+         )"
+    msg: "settings should be defined and sequence"
+
+- assert:
+    that:
+      - "{{ settings
+          | selectattr('user', 'defined')
+          | rejectattr('user', 'user_exists')
+          | list
+          == []
+         }}"
+    msg: "the user key should be undefined or an existing user"
+
+- assert:
+    that:
+      - "{{ settings
+          | selectattr('user', 'undefined')
+          | map('list')
+          | sum(start=[])
+          | reject('in', optional_keys_wo_user)
+          | list
+          == []
+         }}"
+    msg: "{{ 'invalid keys found: '
+           + ', '.join( settings
+                      | selectattr('user', 'undefined')
+                      | map('list')
+                      | sum(start=[])
+                      | reject('in', optional_keys_wo_user)
+                      | list
+                      )
+           + '; '
+           + 'possible keys without user: '
+           + ', '.join(optional_keys_wo_user | d([]))
+          }}"
+
+- assert:
+    that:
+      - "{{ settings
+          | selectattr('user', 'defined')
+          | map('list')
+          | sum(start=[])
+          | reject('equalto', 'user')
+          | reject('in', optional_keys_w_user)
+          | list
+          == []
+         }}"
+    msg: "{{ 'invalid keys found: '
+           + ', '.join( settings
+                      | selectattr('user', 'defined')
+                      | map('list')
+                      | sum(start=[])
+                      | reject('equalto', 'user')
+                      | reject('in', optional_keys_w_user)
+                      | list
+                      )
+           + '; '
+           + 'possible keys with user: '
+           + ', '.join(optional_keys_w_user | d([]))
+          }}"
+
+############
+# Without user specified
+############
+
+############
+# login_background
+# ----------
+
+- name: "Set login background: disable display of custom backgrounds"
+  become: yes
+  gsettings:
+    state:  present
+    user:   "lightdm"
+    schema: "com.canonical.unity-greeter"
+    key:    "draw-user-backgrounds"
+    value:  "{{ __config.login_background is none | ternary('true', 'false') }}"
+  with_items: "{{ settings
+                | selectattr('user', 'undefined')
+                | selectattr('login_background', 'defined')
+                | list
+                }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set login background"
+  become: yes
+  gsettings:
+    state:  "{{ __config.login_background is none | ternary('absent', 'present') }}"
+    user:   "lightdm"
+    schema: "com.canonical.unity-greeter"
+    key:    "background"
+    value:  "{{ __config.login_background }}"
+  with_items: "{{ settings
+                | selectattr('user', 'undefined')
+                | selectattr('login_background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# login_background
+############
+
+############
+# With user specified
+############
+
+############
+# avatar
+# ----------
+
+- name: "Copy avatar"
+  become: yes
+  copy:
+    backup: no
+    dest:   "/var/lib/AccountsService/icons/{{__config.user}}"
+    follow: yes
+    force:  yes
+    group:  "{{ root_user | d('root') }}"
+    mode:   "0644"
+    owner:  "{{ root_user | d('root') }}"
+    src:    "{{ __config.avatar }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('avatar', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set avatar"
+  become: yes
+  lineinfile:
+    backup: yes
+    create: yes
+    dest:   "/var/lib/AccountsService/users/{{__config.user}}"
+    line:   "{{ __config.avatar is none
+              | ternary('Icon=', 'Icon=/var/lib/AccountsService/icons/'+__config.user)
+             }}"
+    regexp: "^Icon=.*$"
+    state:  present
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('avatar', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# avatar
+############
+
+############
+# background
+# ----------
+
+- name: "Set background"
+  become: yes
+  gsettings:
+    state:  "{{ __config.background is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.gnome.desktop.background"
+    key:    "picture-uri"
+    value:  "file://{{ __config.background | d(omit) }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# background
+############
+
+############
+# bookmarks
+# ----------
+
+- name: "Get bookmarks state - before"
+  become: yes
+  stat:
+    checksum: "sha1"
+    follow: yes
+    get_checksum: yes
+    get_md5: yes
+    mime: no
+    path: "{{ __home }}/.config/gtk-3.0/bookmarks"
+  register: bookmarks_state_before
+
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | map(attribute='user')
+                | map('user_home')
+                | list
+                | sort
+                | unique
+               }}"
+  loop_control:
+    loop_var: "__home"
+
+- name: "Set location bookmarks - remove"
+  become: yes
+  lineinfile:
+    backup: no
+    create: yes
+    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    owner:  "{{ __config.user }}"
+    group:  "{{ __config.group | d(__config.user) }}"
+    follow: yes
+    force:  yes
+    mode:   "0700"
+    regexp: "^{{ __config.location }}( .*)?$"
+    state:  "absent"
+  changed_when: no
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set location bookmarks - add-to-end"
+  become: yes
+  when: __config.state is undefined or __config.state is equalto 'present'
+  lineinfile:
+    insertafter: EOF
+    backup: no
+    create: yes
+    dest:   "{{ __config.user  | user_home }}/.config/gtk-3.0/bookmarks"
+    owner:  "{{ __config.user }}"
+    group:  "{{ __config.group | d(__config.user) }}"
+    follow: yes
+    force:  yes
+    mode:   "0700"
+    line:   "{{ __config.location
+             }}{%
+              if 'name' in __config
+             %} {{ __config.name }}{%
+              endif
+             %}"
+  changed_when: no
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Get bookmarks state - after"
+  become: yes
+  stat:
+    checksum: "sha1"
+    follow: yes
+    get_checksum: yes
+    get_md5: yes
+    mime: no
+    path: "{{ __home }}/.config/gtk-3.0/bookmarks"
+  register: bookmarks_state_after
+  changed_when: ( bookmarks_state_before.results
+                    | selectattr('__home', 'equalto', __home)
+                    | first
+                ).stat.md5 != bookmarks_state_after.stat.md5
+
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('bookmarks', 'defined')
+                | map(attribute='user')
+                | map('user_home')
+                | list
+                | sort
+                | unique
+               }}"
+  loop_control:
+    loop_var: "__home"
+
+# ----------
+# bookmarks
+############
+
+############
+# hide_login
+# ----------
+
+
+# ----------
+# hide_login
+############
+
+############
+# launcher_position
+# ----------
+
+- name: "Set launcher position"
+  become: yes
+  gsettings:
+    state:  "{{ __config.launcher_position is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.Unity.Launcher"
+    key:    "launcher-position"
+    value:  "{{ __config.launcher_position }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('launcher_position', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# launcher_position
+############
+
+############
+# lock_background
+# ----------
+
+- name: "Set lockscreen background: disable display of custom backgrounds"
+  become: yes
+  gsettings:
+    state:  present
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.unity-greeter"
+    key:    "draw-user-backgrounds"
+    value:  "{{ __config.lock_background is none | ternary('true', 'false') }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set lockscreen background"
+  become: yes
+  gsettings:
+    state:  "{{ __config.lock_background is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.unity-greeter"
+    key:    "background"
+    value:  "{{ __config.lock_background }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('lock_background', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# lock_background
+############
+
+############
+# onclick_minize
+# ----------
+
+- name: "Set on-click minimization"
+  become: yes
+  gsettings:
+    state:  "{{ __config.onclick_minimize is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.unityshell:/org/compiz/profiles/unity/plugins/unityshell/"
+    key:    "launcher-minimize-window"
+    value:  "{{ __config.onclick_minimize | bool }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('onclick_minimize', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# onclick_minize
+############
+
+############
+# show_icons
+# ----------
+
+- name: "Show/Hide desktop icons"
+  become: yes
+  gsettings:
+    state:  "{{ __config.show_icons is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.gnome.desktop.background"
+    key:    "show-desktop-icons"
+    value:  "{{ __config.show_icons }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('show_icons', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# show_icons
+############
+
+############
+# show_name
+# ----------
+
+- name: "Show/Hide user's name on panel"
+  become: yes
+  gsettings:
+    state:  "{{ __config.show_name is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "com.canonical.indicator.session"
+    key:    "show-real-name-on-panel"
+    value:  "{{ __config.show_name }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('show_name', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# show_name
+############
+
+############
+# workspaces_(h|v)
+# ----------
+
+- name: "Set workspaces (horizontal)"
+  become: yes
+  gsettings:
+    state:  "{{ __config.workspaces_h is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key:    "hsize"
+    value:  "{{ __config.workspaces_h }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_h', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+- name: "Set workspaces (vertical)"
+  become: yes
+  gsettings:
+    state:  "{{ __config.workspaces_v is none | ternary('absent', 'present') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.compiz.core:/org/compiz/profiles/unity/plugins/core/"
+    key:    "vsize"
+    value:  "{{ __config.workspaces_v }}"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('workspaces_v', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# workspaces_(h|v)
+############
+
+############
+# xzap
+# ----------
+
+- name: "Set xkb-option to restart X"
+  become: yes
+  gsettings:
+    state:  "{{ __config.xzap | ternary('present', 'absent') }}"
+    user:   "{{ __config.user }}"
+    schema: "org.gnome.desktop.input-sources"
+    key:    "xkb-options"
+    value:  "terminate:ctrl_alt_bksp"
+  with_items: "{{ settings
+                | selectattr('user', 'defined')
+                | selectattr('xzap', 'defined')
+                | list
+               }}"
+  loop_control:
+    loop_var: "__config"
+
+# ----------
+# xzap
+############

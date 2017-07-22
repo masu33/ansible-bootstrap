@@ -1,0 +1,17 @@
+---
+
+- assert:
+    that:
+      - gnome_setting is mapping
+
+- name: set gnome setting
+  gsettings:
+    user:   "{{ gnome_setting.user   | d(omit) }}"
+    schema: "{{ gnome_setting.schema | d(omit) }}"
+    path:   "{{ gnome_setting.path   | d(omit) }}"
+    key:    "{{ gnome_setting.key    | d(omit) }}"
+    value:  "{{ gnome_setting.value  | d(omit) }}"
+    state:  "{{ gnome_setting.state  | d(omit) }}"
+    raw:    "{{ gnome_setting.raw    | d(omit) }}"
+
+...

@@ -1,0 +1,18 @@
+---
+
+- assert:
+    that:
+      - "( ( default is undefined )
+        or ( default is equalto true )
+        or ( default is equalto false )
+         )"
+    msg: "default should be a flag"
+
+- name: "Set to default"
+#  when: default | d(false)  # BUG: -
+  include_role:
+    name: _apt
+  vars:
+    packages:
+#      - oracle-java8-set-default  # BUG: -
+       - name: "{{ set_default | d(false) | in([true, 'yes']) | ternary('oracle-java8-set-default', 'oracle-java8-installer') }}"  # BUG: +

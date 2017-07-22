@@ -1,0 +1,9 @@
+---
+
+- when: update_cache or force_update_cache
+  name: update apt cache
+  become: yes
+  apt:
+    update_cache: yes
+
+...

@@ -1,0 +1,67 @@
+---
+
+- assert:
+    that:
+      - users is sequence
+
+- name: set iptables present
+  apt:
+    package: iptables
+    state:   present
+
+- name: set netlimit groups
+  become: yes
+  group:
+    name:   "{{ group }}"
+    state:  present
+    system: yes
+  with_items:
+    - netlimit127
+    - netlimit192
+    - netlimit10
+  loop_control:
+    loop_var: group
+
+- name: set netlimit users
+  become: yes
+  user:
+    name:   "{{ user }}"
+    groups: "netlimit127,netlimit192,netlimit10"
+    append: yes
+    state:  present
+  with_items: "{{ users }}"
+  loop_control:
+    loop_var: user
+
+- name: set iptables rules
+  become: yes
+  copy:
+    backup: yes
+    dest:   "/etc/network/if-pre-up.d/"
+    follow: yes
+    force:  no
+    mode:   "0755"
+    owner:  root
+    src:    netlimit_group_rule
+
+- name: set netlimit commands
+  become: yes
+  copy:
+    content: |
+      #!/bin/bash
+      sg netlimit{{ group | d(127, True) }} "$1"
+    backup: yes
+    dest:   "/usr/bin/netlimit{{group}}"
+    follow: yes
+    force:  no
+    mode:   "0755"
+    owner:  root
+  with_items:
+    - 127
+    - 192
+    - 10
+    - ""
+  loop_control:
+    loop_var: group
+
+...

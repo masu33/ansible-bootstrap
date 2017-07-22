@@ -1,0 +1,14 @@
+---
+
+dependencies:
+  - role: _apt
+    debconfs: "{{ mscorefonts_debconfs }}"
+    repos: "{{ repos_ubuntu_main
+             + repos_ubuntu_updates_main
+             + repos_ubuntu_universe
+             + repos_ubuntu_updates_universe
+             + repos_ubuntu_multiverse
+             + repos_ubuntu_updates_multiverse
+            }}"
+    packages:
+      - name: ttf-mscorefonts-installer

@@ -1,0 +1,423 @@
+---
+
+repos: []
+update_cache: yes
+force_update_cache: no
+empty_sources_list: no
+
+default_type: deb
+default_url: "http://archive.ubuntu.com/ubuntu"
+default_release: "{{ ansible_distribution_release }}"
+default_name: main
+
+allowed_keys:
+  # apt module
+  - codename
+  - filename
+  - mode
+  - repo
+  - state
+  - update_cache
+  - validate_certs
+
+  # repo from params
+  - url
+  - release
+  - name
+  - src
+
+  # apt-key modules
+  - key
+  - keyserver
+  - url
+
+  # id for lookup
+  - id
+
+_aliases:
+  - &ubuntuurl "http://archive.ubuntu.com/ubuntu"
+  - &deb {}
+  - &src
+    type: deb-src
+  - &security
+    url: "http://security.ubuntu.com/ubuntu"
+    release: "{{ ansible_distribution_release }}-security"
+  - &updates
+    url: *ubuntuurl
+    release: "{{ ansible_distribution_release }}-updates"
+  - &backports
+    url: *ubuntuurl
+    release: "{{ ansible_distribution_release }}-backports"
+  - &proposed
+    url: *ubuntuurl
+    release: "{{ ansible_distribution_release }}-proposed"
+  - &main
+    name: main
+    filename: &ubuntulist ubuntu
+  - &restricted
+    name: restricted
+    filename: *ubuntulist
+  - &universe
+    name: universe
+    filename: *ubuntulist
+  - &multiverse
+    name: multiverse
+    filename: *ubuntulist
+  - &all
+    name: main restricted universe multiverse
+    filename: *ubuntulist
+  - &oss
+    name: main restricted
+    filename: *ubuntulist
+
+repo_list:
+
+  # Ubuntu main
+  deb-main:
+    <<: *deb
+    <<: *main
+  deb-restricted:
+    <<: *deb
+    <<: *restricted
+  deb-universe:
+    <<: *deb
+    <<: *universe
+  deb-multiverse:
+    <<: *deb
+    <<: *multiverse
+  deb-all:
+    <<: *deb
+    <<: *all
+  deb-oss:
+    <<: *deb
+    <<: *oss
+  src-main:
+    <<: *src
+    <<: *main
+  src-restricted:
+    <<: *src
+    <<: *restricted
+  src-universe:
+    <<: *src
+    <<: *universe
+  src-multiverse:
+    <<: *src
+    <<: *multiverse
+  src-all:
+    <<: *src
+    <<: *all
+  src-oss:
+    <<: *src
+    <<: *oss
+
+  # Ubuntu security
+  deb-security-main:
+    <<: *deb
+    <<: *security
+    <<: *main
+  deb-security-restricted:
+    <<: *deb
+    <<: *security
+    <<: *restricted
+  deb-security-universe:
+    <<: *deb
+    <<: *security
+    <<: *universe
+  deb-security-multiverse:
+    <<: *deb
+    <<: *security
+    <<: *multiverse
+  deb-security-all:
+    <<: *deb
+    <<: *security
+    <<: *all
+  deb-security-oss:
+    <<: *deb
+    <<: *security
+    <<: *oss
+  src-security-main:
+    <<: *src
+    <<: *security
+    <<: *main
+  src-security-restricted:
+    <<: *src
+    <<: *security
+    <<: *restricted
+  src-security-universe:
+    <<: *src
+    <<: *security
+    <<: *universe
+  src-security-multiverse:
+    <<: *src
+    <<: *security
+    <<: *multiverse
+  src-security-all:
+    <<: *src
+    <<: *security
+    <<: *all
+  src-security-oss:
+    <<: *src
+    <<: *security
+    <<: *oss
+
+  # Ubuntu updates
+  deb-updates-main:
+    <<: *deb
+    <<: *updates
+    <<: *main
+  deb-updates-restricted:
+    <<: *deb
+    <<: *updates
+    <<: *restricted
+  deb-updates-universe:
+    <<: *deb
+    <<: *updates
+    <<: *universe
+  deb-updates-multiverse:
+    <<: *deb
+    <<: *updates
+    <<: *multiverse
+  deb-updates-all:
+    <<: *deb
+    <<: *updates
+    <<: *all
+  deb-updates-oss:
+    <<: *deb
+    <<: *updates
+    <<: *oss
+  src-updates-main:
+    <<: *src
+    <<: *updates
+    <<: *main
+  src-updates-restricted:
+    <<: *src
+    <<: *updates
+    <<: *restricted
+  src-updates-universe:
+    <<: *src
+    <<: *updates
+    <<: *universe
+  src-updates-multiverse:
+    <<: *src
+    <<: *updates
+    <<: *multiverse
+  src-updates-all:
+    <<: *src
+    <<: *updates
+    <<: *all
+  src-updates-oss:
+    <<: *src
+    <<: *updates
+    <<: *oss
+
+  # Ubuntu backports
+  deb-backports-main:
+    <<: *deb
+    <<: *backports
+    <<: *main
+  deb-backports-restricted:
+    <<: *deb
+    <<: *backports
+    <<: *restricted
+  deb-backports-universe:
+    <<: *deb
+    <<: *backports
+    <<: *universe
+  deb-backports-multiverse:
+    <<: *deb
+    <<: *backports
+    <<: *multiverse
+  deb-backports-all:
+    <<: *deb
+    <<: *backports
+    <<: *all
+  deb-backports-oss:
+    <<: *deb
+    <<: *backports
+    <<: *oss
+  src-backports-main:
+    <<: *src
+    <<: *backports
+    <<: *main
+  src-backports-restricted:
+    <<: *src
+    <<: *backports
+    <<: *restricted
+  src-backports-universe:
+    <<: *src
+    <<: *backports
+    <<: *universe
+  src-backports-multiverse:
+    <<: *src
+    <<: *backports
+    <<: *multiverse
+  src-backports-all:
+    <<: *src
+    <<: *backports
+    <<: *all
+  src-backports-oss:
+    <<: *src
+    <<: *backports
+    <<: *oss
+
+  # Ubuntu proposed
+  deb-proposed-main:
+    <<: *deb
+    <<: *proposed
+    <<: *main
+  deb-proposed-restricted:
+    <<: *deb
+    <<: *proposed
+    <<: *restricted
+  deb-proposed-universe:
+    <<: *deb
+    <<: *proposed
+    <<: *universe
+  deb-proposed-multiverse:
+    <<: *deb
+    <<: *proposed
+    <<: *multiverse
+  deb-proposed-all:
+    <<: *deb
+    <<: *proposed
+    <<: *all
+  deb-proposed-oss:
+    <<: *deb
+    <<: *proposed
+    <<: *oss
+  src-proposed-main:
+    <<: *src
+    <<: *proposed
+    <<: *main
+  src-proposed-restricted:
+    <<: *src
+    <<: *proposed
+    <<: *restricted
+  src-proposed-universe:
+    <<: *src
+    <<: *proposed
+    <<: *universe
+  src-proposed-multiverse:
+    <<: *src
+    <<: *proposed
+    <<: *multiverse
+  src-proposed-all:
+    <<: *src
+    <<: *proposed
+    <<: *all
+  src-proposed-oss:
+    <<: *src
+    <<: *proposed
+    <<: *oss
+
+  # Ubuntu extras
+  deb-extras: &ubuntu-extras
+    url: "http://extras.ubuntu.com/ubuntu"
+    name: main
+  src-extras:
+    <<: *src
+    <<: *ubuntu-extras
+
+  # Canonical partner
+  deb-canonical: &canonical
+    url: "http://archive.canonical.com/ubuntu"
+    name: partner
+  src-canonical:
+    <<: *src
+    <<: *canonical
+
+  dropbox:
+    url: "http://linux.dropboxstatic.com/ubuntu/"
+    key: "5044912E"
+    keyserver: "pgp.mit.edu"
+
+  mega:
+    url: "https://mega.nz/linux/MEGAsync/xUbuntu_{{ ansible_distribution_version }}/"
+    release: "./"
+    name: ""
+    key: "23ACD201"
+    keyserver: "pgp.mit.edu"
+    filename: "megasync"
+
+  webupd8team-java:
+    url: "http://ppa.launchpad.net/webupd8team/java/ubuntu"
+    key: "EEA14886"
+    keyserver: "pgp.mit.edu"
+
+  webupd8team-tor:
+    url: "http://ppa.launchpad.net/webupd8team/java/ubuntu"
+    key: "EEA14886"
+    keyserver: "pgp.mit.edu"
+
+  git-lfs:
+    url: "https://packagecloud.io/github/git-lfs/ubuntu"
+    key: "D59097AB"
+    keyserver: "pgp.mit.edu"
+
+  slack-jessie:
+    url: "https://packagecloud.io/slacktechnologies/slack/debian"
+    release: "jessie"
+    key: "038651BD"
+    keyserver: "pgp.mit.edu"
+
+  virtualbox:
+    url: "http://download.virtualbox.org/virtualbox/debian"
+    name: "non-free contrib"
+    key: "2980AECF"
+    keyserver: "pgp.mit.edu"
+
+  umake:
+    url: "http://ppa.launchpad.net/ubuntu-desktop/ubuntu-make/ubuntu"
+    key: "A1231595"
+    keyserver: "pgp.mit.edu"
+
+  chrome-gnome:
+    url: "http://ppa.launchpad.net/ne0sight/chrome-gnome-shell/ubuntu"
+    key: "8AEB02C4"
+    keyserver: "pgp.mit.edu"
+
+_original_repo_list:  # based on ubuntu xenial
+  - id: deb-oss
+    state: absent
+  - id: src-oss
+    state: absent
+  - id: deb-updates-oss
+    state: absent
+  - id: src-updates-oss
+    state: absent
+  - id: deb-universe
+    state: absent
+  - id: src-universe
+    state: absent
+  - id: deb-updates-universe
+    state: absent
+  - id: src-updates-universe
+    state: absent
+  - id: deb-multiverse
+    state: absent
+  - id: src-multiverse
+    state: absent
+  - id: deb-updates-multiverse
+    state: absent
+  - id: src-updates-multiverse
+    state: absent
+  - id: deb-backports-all
+    state: absent
+  - id: src-backports-all
+    state: absent
+  - id: deb-security-oss
+    state: absent
+  - id: src-security-oss
+    state: absent
+  - id: deb-security-universe
+    state: absent
+  - id: src-security-universe
+    state: absent
+  - id: deb-security-multiverse
+    state: absent
+  - id: src-security-multiverse
+    state: absent
+  - id: deb-canonical
+    state: absent
+
+...

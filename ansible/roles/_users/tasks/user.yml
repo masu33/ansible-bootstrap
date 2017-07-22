@@ -1,0 +1,63 @@
+---
+
+- assert:
+    that:
+      - user is mapping
+      - user.name is defined
+
+- name: Set up user
+  user:
+    append:             "{{ user.append             | d(omit) }}"
+    comment:            "{{ user.comment            | d(omit) }}"
+    createhome:         "{{ user.createhome         | d(omit) }}"
+    expires:            "{{ user.expires            | d(omit) }}"
+    force:              "{{ user.force              | d(omit) }}"
+    generate_ssh_key:   "{{ user.generate_ssh_key   | d(omit) }}"
+    group:              "{{ user.group              | d(omit) }}"
+    groups:             "{{ user.groups             | d(omit) }}"
+    home:               "{{ user.home               | d(omit) }}"
+    login_class:        "{{ user.login_class        | d(omit) }}"
+    move_home:          "{{ user.move_home          | d(omit) }}"
+    name:               "{{ user.name               | d(omit) }}"
+    non_unique:         "{{ user.non_unique         | d(omit) }}"
+    password:           "{{ user.password           | d(omit) }}"
+    remove:             "{{ user.remove             | d(omit) }}"
+    seuser:             "{{ user.seuser             | d(omit) }}"
+    shell:              "{{ user.shell              | d(omit) }}"
+    skeleton:           "{{ user.skeleton           | d(omit) }}"
+    ssh_key_bits:       "{{ user.ssh_key_bits       | d(omit) }}"
+    ssh_key_comment:    "{{ user.ssh_key_comment    | d(omit) }}"
+    ssh_key_file:       "{{ user.ssh_key_file       | d(omit) }}"
+    ssh_key_passphrase: "{{ user.ssh_key_passphrase | d(omit) }}"
+    ssh_key_type:       "{{ user.ssh_key_type       | d(omit) }}"
+    state:              "{{ user.state              | d(omit) }}"
+    system:             "{{ user.system             | d(omit) }}"
+    uid:                "{{ user.uid                | d(omit) }}"
+    update_password:    "{{ user.update_password    | d(omit) }}"
+
+- when: user.bashrcd | d(false)
+  include: bashrcd.yml
+
+- when: user.bashstyle is defined
+  include: bashstyle.yml
+
+- name: show/hide user's name at login
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      yes
+    dest:        "/var/lib/AccountsService/users/{{ user.name }}"
+    group:       root
+    insertafter: "{{ item.insertafter }}"
+    line:        "{{ item.line }}"
+    owner:       root
+    regexp:      "{{ item.regexp | d(omit) }}"
+    state:       present
+  with_items:
+    - insertafter: "EOF"
+      line: "[User]"
+    - insertafter: "[User]"
+      line: "SystemAccount={{ user.hide | d(false) | ternary('true', 'false') }}"
+      regexp: "^SystemAccount=.*$"
+
+...

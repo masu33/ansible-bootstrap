@@ -1,0 +1,17 @@
+---
+
+- assert:
+    that:
+      - users is sequence
+
+- # name:
+  become: yes
+  include: user.yml
+  with_items: "{{ users
+                | default_key('name')
+                | list
+               }}"
+  loop_control:
+    loop_var: user
+
+...
