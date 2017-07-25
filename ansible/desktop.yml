@@ -409,13 +409,6 @@
         - pyinstaller
         - thefuck
 
-      umake: []
-
-#        - category: scala
-#          framework: scala-lang
-#        - category: ide
-#          framework: idea-ultimate
-
       gnome_settings:
         - id: keyboard_layouts
           value: "[('xkb', 'hu'), ('xkb', 'us')]"
@@ -509,21 +502,6 @@
         # TODO project repos git
         # TODO apt-cacher-ng
 
-#    - name: set IDE present
-#      become: yes
-#      become_user: masu
-#      umake:
-#        user: masu
-#        category:  "{{ item.category }}"
-#        framework: "{{ item.framework }}"
-#        path:      "/home/masu/.local/share/umake/{{ item.category }}/{{ item.framework }}"
-#        state:     present
-#      with_items: "{{ config.umake }}"
-#      tags:
-#        - download
-#        - programming
-#        - umake
-#
 #    - name: set python packages
 #      become: yes
 #      pip:
