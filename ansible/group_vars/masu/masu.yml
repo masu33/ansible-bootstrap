@@ -13,25 +13,22 @@ config:
 
     - name: ansible
       state: present
-      password: changeme
+      password: "{{ passwords.ansible }}"
       update_password: on_create
       groups: sudo
       append: yes
-      # TODO: vault pw
 
       hide: yes
 
     - name: masu
       state: present
-      password: changeme
-      update_password: on_create
+      password: "{{ passwords.masu }}"
+      update_password: always
       ssh_key_bits: 128
       ssh_key_comment: masu@$HOSTNAME
-      ssh_key_passphrase: ""
+      ssh_key_passphrase: "{{ passphrases.masu }}"
       groups: sudo,ansible
       append: yes
-      # TODO: vault pw
-      # TODO: vault passphrase
 
       hide: no
       bashrcd: yes
@@ -42,19 +39,17 @@ config:
 
     - name: willow
       state: present
-      password: changeme
+      password: "{{ passwords.willow }}"
       update_password: on_create
-      # TODO: vault pw
 
       hide: yes
 
     - name: rstrct
       state: present
-      password: changeme
+      password: "{{ passwords.rstrct }}"
       home: /var/rstrct
       update_password: on_create
       system: no
-      # TODO: vault pw
 
       hide: yes
 
@@ -401,8 +396,5 @@ config:
   # TODO background and co
   # TODO power options
   # TODO sound settings
-
-# TODO: urls
-  downloads: []
 
 ...

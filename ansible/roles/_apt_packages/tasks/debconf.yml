@@ -1,7 +1,5 @@
 ---
 
-- debug: var=debconf
-
 - assert:
     that:
       - debconf is mapping

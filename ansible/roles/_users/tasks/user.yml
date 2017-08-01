@@ -66,8 +66,6 @@
     owner:       root
     state:       present
 
-- debug: var=user
-
 - when: user.avatar is defined
   block:
 

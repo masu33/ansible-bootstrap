@@ -18,6 +18,32 @@
   # TODO apt-cacher-ng
 
 # ---
+- name: download resources
+
+  hosts: localhost
+
+  pre_tasks:
+
+    - name: download resources
+      get_url:
+        backup:           "{{ dl.backup           | d(omit) }}"
+        dest:             "{{ dl.dest             | d(omit) }}"
+        force:            "{{ dl.force            | d(omit) }}"
+        force_basic_auth: "{{ dl.force_basic_auth | d(omit) }}"
+        url:              "{{ dl.url              | d(omit) }}"
+        url_password:     "{{ dl.url_password     | d(omit) }}"
+        url_username:     "{{ dl.url_username     | d(omit) }}"
+        use_proxy:        "{{ dl.use_proxy        | d(omit) }}"
+        validate_certs:   "{{ dl.validate_certs   | d(omit) }}"
+        follow:           "{{ dl.follow           | d(omit) }}"
+        group:            "{{ dl.group            | d(omit) }}"
+        mode:             "{{ dl.mode             | d(omit) }}"
+        owner:            "{{ dl.owner            | d(omit) }}"
+      with_items: "{{ config.downloads }}"
+      loop_control:
+        loop_var: dl
+
+# ---
 - name: prerequisites, users and paths
 
   hosts: mymachine
@@ -32,23 +58,6 @@
       tags:
         - apt
         - download
-
-#  TODO: fix downloads
-#    - name: download user images
-#      become: yes
-#      get_url:
-#        backup: no
-#        dest: "resources/{{ item[0] }}"
-#        force: yes
-#        owner: masu
-#        group: masu
-#        mode: 0600
-#        url: "{{ item[1] }}"
-#      with_items:
-#        avatar: "{{ url_avatar }}"
-#      tags:
-#        - download
-#        - resources
 
   roles:
 
@@ -131,6 +140,7 @@
         - download
         - programming
         - python
+        - package
 
     - name: nodejs packages
       become: yes
@@ -193,11 +203,14 @@
 
     - name: set firefox-bme alias
       become: yes
+      vars:
+        cbc: blowfish-cbc
+        user: masu
+        host: ede.tmit.bme.hu
       blockinfile:
         backup: yes
         block: >
-          alias firefox-bme=ssh\ -D\ 8080\ -f\ -C\ -c\ blowfish-cbc\ -q\ masu@ede.tmit.bme.hu\ sleep\ 10\;\\
-          firefox\ -P\ bme
+          alias firefox-bme=ssh\ -D\ 8080\ -f\ -C\ -c\ {{cbc}}\ -q\ {{user}}@{{host}}\ sleep\ 10\;firefox\ -P\ bme
         create: yes
         follow: yes
         group: masu
