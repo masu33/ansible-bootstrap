@@ -1,0 +1,408 @@
+---
+
+config:
+
+  pre_packages:
+    - aptitude
+    - apt-transport-https
+    - accountsservice
+    - ca-certificates
+    - locales
+
+  users:
+
+    - name: ansible
+      state: present
+      password: changeme
+      update_password: on_create
+      groups: sudo
+      append: yes
+      # TODO: vault pw
+
+      hide: yes
+
+    - name: masu
+      state: present
+      password: changeme
+      update_password: on_create
+      ssh_key_bits: 128
+      ssh_key_comment: masu@$HOSTNAME
+      ssh_key_passphrase: ""
+      groups: sudo,ansible
+      append: yes
+      # TODO: vault pw
+      # TODO: vault passphrase
+
+      hide: no
+      bashrcd: yes
+      bashstyle:
+        names: "1;49;34"
+        misc: "1;49;93"
+      avatar: "/home/masu/Pictures/avatar"
+
+    - name: willow
+      state: present
+      password: changeme
+      update_password: on_create
+      # TODO: vault pw
+
+      hide: yes
+
+    - name: rstrct
+      state: present
+      password: changeme
+      home: /var/rstrct
+      update_password: on_create
+      system: no
+      # TODO: vault pw
+
+      hide: yes
+
+  _path_aliases:
+
+    - &dirmasu
+      owner: masu
+      group: masu
+      state: directory
+      follow: no
+    - &755masu
+      <<: *dirmasu
+      mode: "0755"
+    - &700masu
+      <<: *dirmasu
+      mode: "0700"
+
+  paths:
+
+    - <<: *755masu
+      path: "/home/masu"
+    - <<: *700masu
+      path: "/home/masu/Downloads"
+    - <<: *755masu
+      path: "/home/masu/Pictures"
+    - <<: *700masu
+      path: "/home/masu/Downloads/torrent"
+    - <<: *700masu
+      path: "/home/masu/Downloads/firefox"
+    - <<: *755masu
+      path: "/home/masu/Downloads/torrent/ncore"
+      recurse: yes
+    - <<: *700masu
+      path: "/home/masu/Downloads/torrent/current"
+    - <<: *700masu
+      path: "/home/masu/Downloads/torrent/stopped"
+    - <<: *700masu
+      path: "/home/masu/Downloads/torrent/watch"
+    - <<: *700masu
+      path: "/home/masu/Downloads/torrent/index"
+    - <<: *700masu
+      path: "/home/masu/Dropbox"
+    - <<: *700masu
+      path: "/home/masu/MEGA"
+    - <<: *700masu
+      path: "/home/masu/Projects"
+
+    - path: "/home/willow/ncore"
+      follow: no
+      force: yes
+      owner: "willow"
+      group: "willow"
+      src: "/home/masu/Downloads/torrent/ncore"
+      state: link
+
+    - path: "/home/ansible/.ssh/authorized_keys"
+      mode: "0600"
+
+    - path: "/var/rstrct/"
+      force: yes
+      mode: "0700"
+      owner: rstrct
+      group: rstrct
+      state: directory
+
+  repos:
+
+    # Ubuntu repos present
+    - id: deb-all
+      state: present
+    - id: deb-security-all
+      state: present
+    - id: deb-updates-all
+      state: present
+    - id: deb-backports-oss
+      state: present
+
+    # Ubuntu repos absent
+    - id: deb-backports-all
+      state: absent
+    - id: deb-proposed-oss
+      state: absent
+    - id: deb-proposed-all
+      state: absent
+
+    # Application repos
+    - dropbox
+    - mega
+    - git-lfs
+    - slack-jessie
+    - webupd8team-java
+    - webupd8team-tor
+    - umake
+    - virtualbox
+    - chrome-gnome
+
+  _package_aliases:
+    - &absent
+      state: absent
+      purge: yes
+
+  packages:
+
+    # Defaults to remove
+    - <<: *absent
+      name: account-plugin-facebook
+    - <<: *absent
+      name: account-plugin-flickr
+    - <<: *absent
+      name: aisleriot
+    - <<: *absent
+      name: bogofilter
+    - <<: *absent
+      name: bogofilter-common
+    - <<: *absent
+      name: bogofilter-bdb
+    - <<: *absent
+      name: brasero
+    - <<: *absent
+      name: brasero-common
+    - <<: *absent
+      name: brasero-cdrkit
+    - <<: *absent
+      name: brltty
+    - <<: *absent
+      name: dc
+    - <<: *absent
+      name: dvd+rw-tools
+    - <<: *absent
+      name: espeak-data
+    - <<: *absent
+      name: genisoimg
+    - <<: *absent
+      name: libbrasero-media3-1
+    - <<: *absent
+      name: gnome-mahjongg
+    - <<: *absent
+      name: gnome-orca
+    - <<: *absent
+      name: gnome-sudoku
+    - <<: *absent
+      name: rhythmbox
+    - <<: *absent
+      name: rhythmbox-data
+    - <<: *absent
+      name: rhythmbox-plugins
+    - <<: *absent
+      name: rhythmbox-plugin-zeitgeist
+
+    - <<: *absent
+      name: totem
+    - <<: *absent
+      name: totem-common
+    - <<: *absent
+      name: totem-plugins
+
+    - <<: *absent
+      name: wodim
+
+    # Ubuntu system
+    - systemd
+    - fakeroot
+    - file
+    - findutils
+    - rsync
+    - gparted
+    - gdisk
+    - baobab
+    - iptables
+    - macchanger
+    - traceroute
+    - netcat
+    - telnet
+    - htop
+    - tree
+    - rar
+    - unrar
+    - zip
+    - unzip
+    - apt
+    - aptitude
+    - apt-cacher-ng
+
+    # Security
+    - openvpn
+    - network-manager-openvpn
+    - network-manager-openvpn-gnome
+
+    # Programming
+    - git
+    - gitk
+    - ubuntu-make
+    - g++
+    - gcc
+    - make
+    - libc-bin
+    - lsb
+    - build-essential
+    - gawk
+    - python
+    - python-pip
+    - python-dev
+    - python3
+    - python3-pip
+    - python3-dev
+    - virtualenv
+    - npm
+    - nodejs
+    - nodejs-legacy
+
+    # Java
+    - oracle-java8-installer
+    - oracle-java8-set-default
+    - oracle-java8-unlimited-jce-policy
+
+    # Desktop
+    - accountsservice
+    - chrome-gnome-shell
+    - gnome-shell-extensions
+    - gnome-tweak-tool
+    - shutter
+    - caffeine
+    - firefox
+    - firefox-locale-en
+    - chromium-browser
+    - chromium-codecs-ffmpeg
+
+    # Media
+    - clementine
+    - mplayer
+    - smplayer
+    - libavcodec-extra
+    - ffmpeg
+    - ubuntu-restricted-extras
+
+    # Virtualisation
+    - docker.io
+    - docker-compose
+    - virtualbox
+    - vagrant
+
+    # Office
+    - vim
+    - gedit
+    - evince
+    - pdftk
+    - calibre
+    - texlive
+    - texstudio
+    - ttf-mscorefonts-installer
+    - ttf-ubuntu-font-family
+    - libfreetype6
+    - libfreetype6-dev
+    - libfontconfig
+    - fonts-ubuntu-font-family-console
+    - eog
+    - pinta
+    - gimp
+    - inkscape
+    - libreoffice-writer
+    - libreoffice-calc
+    - libreoffice-impress
+    - hunspell-en-us
+
+    # Transimission
+    - curl
+    - wget
+    - youtube-dl
+    - deluged
+    - deluge-gtk
+    - deluge-console
+    - deluge-webui
+#        - skype  # TODO: take care of skype
+    - empathy
+    - cheese
+    - dropbox
+    - megasync
+    - megatools
+
+    # Remote access
+    - openssh-server
+    - vnc4server
+    - xrdp
+    - rdesktop
+    - vinagre
+    - synergy
+
+  python3_packages:
+
+    # Dev
+    - tqdm
+    - pytz
+    - cython
+    - selenium
+
+    # Data science
+    - numpy
+    - scipy
+    - scikit-learn
+    - xgboost
+    - pandas
+    - matplotlib
+    - seaborn
+
+    # Interface
+    - ipython
+    - ipywidgets
+    - jupyter
+    - jupyter-declarativewidgets
+
+    # tools
+    - pymongo
+    - py4j
+    - pyinstaller
+    - thefuck
+
+  gnome_settings:
+
+    - id: keyboard_layouts
+      user: masu
+      value: "[('xkb', 'hu'), ('xkb', 'us')]"
+      state: present
+
+    - id: keyboard_layout
+      user: masu
+      value: 0
+      state: present
+
+    - id: keyboard_layout_per_window
+      user: masu
+      value: "false"
+      state: present
+
+    - id: keyboard_layout_show_all
+      user: masu
+      value: "false"
+      state: present
+
+    - id: keyboard_xkb_options
+      user: masu
+      value: "terminate:ctrl_alt_bksp"
+      state: absent
+
+  # TODO background and co
+  # TODO power options
+  # TODO sound settings
+
+# TODO: urls
+  downloads: []
+
+...

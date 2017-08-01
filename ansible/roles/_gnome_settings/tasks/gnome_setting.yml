@@ -4,8 +4,6 @@
     that:
       - gnome_setting is mapping
 
-- debug: var=gnome_setting
-
 - name: set gnome setting
   gsettings:
     user:      "{{ gnome_setting.user      | d(omit) }}"
@@ -17,5 +15,6 @@
     composite: "{{ gnome_setting.composite | d(omit) }}"
     range:     "{{ gnome_setting.raw       | d(omit) }}"
     x_user:    "{{ gnome_setting.x_user    | d(default_x_user) | d(omit) }}"
+    x_path:    "{{ gnome_setting.x_path    | d(omit) }}"
 
 ...

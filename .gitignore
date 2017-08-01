@@ -71,4 +71,4 @@ __test.yml
 # Idea
 .idea
 
-ansible/blobvault.yml
+ansible/resources

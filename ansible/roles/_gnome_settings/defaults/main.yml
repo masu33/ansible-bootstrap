@@ -47,7 +47,7 @@ gnome_settings_list:
   keyboard_layout_show_all:
     schema: org.gnome.desktop.input-sources
     key: show-all-sources
-  keyboarx_xkb_options:
+  keyboard_xkb_options:
     schema: org.gnome.desktop.input-sources
     key: xkb-options
 

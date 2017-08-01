@@ -1,7 +1,7 @@
-[mymachine]
+[masu]
 mymachine
 
-[mymachine:vars]
+[masu:vars]
 ansible_connection="ssh"
 ansible_ssh_host="localhost"
 ansible_user="ansible"

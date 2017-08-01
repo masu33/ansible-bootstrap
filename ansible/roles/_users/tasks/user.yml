@@ -41,6 +41,18 @@
 - when: user.bashstyle is defined
   include: bashstyle.yml
 
+- name: set User part in AccountServices configuration
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      yes
+    dest:        "/var/lib/AccountsService/users/{{ user.name }}"
+    group:       root
+    insertafter: EOF
+    line:        "[User]"
+    owner:       root
+    state:       present
+
 - name: show/hide user's name at login
   become: yes
   lineinfile:
@@ -48,16 +60,37 @@
     create:      yes
     dest:        "/var/lib/AccountsService/users/{{ user.name }}"
     group:       root
-    insertafter: "{{ item.insertafter }}"
-    line:        "{{ item.line }}"
+    insertafter: "[User]"
+    line:        "SystemAccount={{ user.hide | d(false) | ternary('true', 'false') }}"
+    regexp:      "^SystemAccount=.*$"
     owner:       root
-    regexp:      "{{ item.regexp | d(omit) }}"
     state:       present
-  with_items:
-    - insertafter: "EOF"
-      line: "[User]"
-    - insertafter: "[User]"
-      line: "SystemAccount={{ user.hide | d(false) | ternary('true', 'false') }}"
-      regexp: "^SystemAccount=.*$"
+
+- debug: var=user
+
+- when: user.avatar is defined
+  block:
+
+    - name: copy avatar
+      become: yes
+      copy:
+        src: "{{ user.avatar }}"
+        dest: "/var/lib/AccountsService/icons/{{ user.name }}"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: set avatar
+      become: yes
+      lineinfile:
+        backup:      no
+        create:      yes
+        dest:        "/var/lib/AccountsService/users/{{ user.name }}"
+        group:       root
+        insertafter: "[User]"
+        line:        "Icon=/var/lib/AccountsService/icons/{{ user.name }}"
+        regexp:      "^Icon=.*$"
+        owner:       root
+        state:       present
 
 ...

@@ -30,46 +30,59 @@ class AnsibleGSettingModule(object):
     def __init__(self):
         self.user = None
         self.x_user = None
+        self.__x_path = None
         self.variant_type = None
-        self.variant_class = None
 
-    def __del__(self):  # TODO: uncomment delete
+    def __del__(self):
         script = '''
-            # sudo rm -f {file}
+            sudo rm -f {file}
         '''.format(
             file=self.xauth_file
         )
         subprocess.check_output(script, shell=True).strip()
 
     @property
+    def x_path(self):
+        if self.__x_path:
+            return self.__x_path
+        else:
+            self.__x_path = '~{}/.Xauthority'.format(self.x_user)
+            return self.__x_path
+
+    @x_path.setter
+    def x_path(self, x_path):
+        self.__x_path = x_path
+
+    @property
     def xauth_file(self):
         try:
-            return '-'.join([
-                '/tmp/.Xauthority',
+            return '''/tmp/.Xauthority-{}-{}'''.format(
                 self.user,
                 self.x_user
-            ])
+            )
         except AttributeError:
             raise AttributeError('X access not granted yet.')
 
-    def __grant(self, user, x_user):
+    def __grant(self, user, x_user=None, x_path=None):
         """
-        Initializes the message bus.
+        Copies Xauthority
 
         :param user: username
-        :param x_user: user with .Xauthority
+        :param x_user: user with .Xauthority (optional)
+        :param x_path: path of the .Xauthority file (optinal)
         """
         self.user = user
-        self.x_user = x_user
+        self.x_user = x_user or user
+        self.x_path = x_path
         script = '''
             sudo touch {file}
             sudo chown {user}:{user} {file}
             sudo chmod 0600 {file}
-            sudo cp -f ~{x_user}/.Xauthority {file}
+            sudo cp -f {x_path} {file}
         '''.format(
             user=user,
-            x_user=x_user,
             file=self.xauth_file,
+            x_path=self.x_path
         )
         return subprocess.check_output(script, shell=True).strip()
 
@@ -94,7 +107,7 @@ class AnsibleGSettingModule(object):
 
     def get_range_string(self, schema, path, key):
         """
-        Gets the range of the gsetting for the given `schema` and `key`.
+        Gets the range of the gsetting.
 
         :param schema: schema name
         :param path: path for relocatable schemas
@@ -114,9 +127,8 @@ class AnsibleGSettingModule(object):
 
     def get_param(self, schema, path, key):
         """
-        Gets the gsetting value for the given `key` in the given `schema`.
+        Gets the gsetting value.
 
-        :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
@@ -131,11 +143,11 @@ class AnsibleGSettingModule(object):
             key=key
         )
         output = self.__execute(command)
-        return self.variant_class(self.variant_type, output)
+        return MyVariant(self.variant_type, output)
 
     def get_default(self, schema, path, key):
         """
-        Gets the default gsetting value for the given `key` in the given `schema`.
+        Gets the default gsetting value.
 
         :param schema: schema name
         :param path: path for relocatable schemas
@@ -151,11 +163,11 @@ class AnsibleGSettingModule(object):
             key=key
         )
         output = self.__execute(command)
-        return self.variant_class(self.variant_type, output)
+        return MyVariant(self.variant_type, output)
 
-    def set_param(self, user, schema, path, key, value):
+    def set_param(self, schema, path, key, value):
         """
-        Sets the gsetting value to the `value` specified for the given `key` in the given `schema`.
+        Sets the gsetting value.
 
         :param schema: schema name
         :param path: path for relocatable schemas
@@ -174,11 +186,10 @@ class AnsibleGSettingModule(object):
         output = self.__execute(command)
         return output
 
-    def reset_param(self, user, schema, path, key):
+    def reset_param(self, schema, path, key):
         """
-        Resets the `user`'s gsetting value for the given `key` in the given `schema` and returns the new value.
+        Resets the gsetting value.
 
-        :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
@@ -201,21 +212,17 @@ class AnsibleGSettingModule(object):
         range_type, range_desc = range_string.split(' ', 1)
         if range_type == 'type':
             self.variant_type = range_desc
-            self.variant_class = MyVariant
         elif range_type == 'flags':
             self.variant_type = 'as'
-            self.variant_class = MyVariant
         elif range_type == 'range':
             self.variant_type = range_desc[0]
-            self.variant_class = MyVariant
         elif range_type == 'enum':
             self.variant_type = 's'
-            self.variant_class = MyVariant
         else:
             raise NotImplementedError('Unknown range type: {}'.format(range_string))
 
     def __use_type(self, value):
-        return self.variant_class(self.variant_type, value)
+        return MyVariant(self.variant_type, value)
 
     def main(self):
         """
@@ -234,6 +241,7 @@ class AnsibleGSettingModule(object):
                 'composite': {'required': False, 'default': False, 'choices': [True, False]},
                 'range':     {'required': False, 'default': None},
                 'x_user':    {'required': False, 'default': None},
+                'x_path':    {'required': False, 'default': None},
             },
             supports_check_mode=True,
         )
@@ -249,15 +257,19 @@ class AnsibleGSettingModule(object):
         composite = params.get('composite')
         range_string = params.get('range_string')
         x_user = params.get('x_user')
+        x_path = params.get('x_path')
 
         # Check mode
         check_mode = m.check_mode
 
         # Error check
         if state == 'present' and value is None:
-            raise ValueError('The value parameter have to be set with the state "present".')
+            m.fail_json(
+                changed=False,
+                msg='The value parameter have to be set with the state "present".'
+            )
 
-        self.__grant(user, x_user=x_user or user)
+        self.__grant(user, x_user=x_user, x_path=x_path)
         self.__setup_class(schema, path, key, range_string)
 
         value_before = self.get_param(schema, path, key)
@@ -265,7 +277,11 @@ class AnsibleGSettingModule(object):
         if composite:
 
             if not value_before.is_container():
-                raise ValueError('Arg `composite` should be used for collections not {}.'.format(self.variant_type))
+                m.fail_json(
+                    changed=False,
+                    msg='Arg `composite` should be used for collections not {}.'.format(self.variant_type)
+                )
+                raise NotImplementedError()
 
             else:
 
@@ -309,18 +325,28 @@ class AnsibleGSettingModule(object):
 
             elif state == 'absent' and not composite:
 
-                self.reset_param(user, schema, path, key)
+                self.reset_param(schema, path, key)
                 changed = True
                 value_after = self.get_param(schema, path, key)
 
             else:
 
-                self.set_param(user, schema, path, key, value_wanted)
+                self.set_param(schema, path, key, value_wanted)
                 changed = True
                 value_after = self.get_param(schema, path, key)
 
             if value_after != value_wanted:
-                raise ValueError('Unknown error, value change mismatch...')
+
+                m.fail_json(
+                    changed=value_after == value_before,
+                    user=user,
+                    schema=schema,
+                    path=path,
+                    key=key,
+                    value_before=str(value_before),
+                    value_after=str(value_after),
+                    msg='Unknown error, value change mismatch...'
+                )
 
         m.exit_json(
             changed=changed,
@@ -354,7 +380,7 @@ class MyVariant(object):
                 Could not parse {} as type {} using formats {}
             '''.format(
                     value,
-                    self.type,
+                    self.type.dup_string(),
                     formats
             ))
 
