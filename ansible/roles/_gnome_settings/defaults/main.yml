@@ -1,5 +1,7 @@
 ---
 
+default_x_user: "{{ ansible_ssh_user }}"
+
 gnome_settings: []
 
 gnome_settings_list:
@@ -33,23 +35,19 @@ gnome_settings_list:
 
   # Keyboard
   keyboard_layouts:
-    user: root
     schema: org.gnome.desktop.input-sources
     key: sources
+    range: type a(ss)
   keyboard_layout:
-    user: root
     schema: org.gnome.desktop.input-sources
     key: current
   keyboard_layout_per_window:
-    user: root
     schema: org.gnome.desktop.input-sources
     key: per-window
   keyboard_layout_show_all:
-    user: root
     schema: org.gnome.desktop.input-sources
     key: show-all-sources
   keyboarx_xkb_options:
-    user: root
     schema: org.gnome.desktop.input-sources
     key: xkb-options
 
@@ -89,17 +87,14 @@ gnome_settings_list:
 
   # Sound
   sound_events:
-    user: root
     schema: org.gnome.desktop.sound
     key: event-sounds
     type: b
   sound_feedback:
-    user: root
     schema: org.gnome.desktop.sound
     key: input-feedback-sounds
     type: b
   sound_theme:
-    user: root
     schema: org.gnome.desktop.sound
     key: theme-name
     type: s

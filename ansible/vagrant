@@ -1,7 +1,7 @@
-[localhost]
-localhost
+[mymachine]
+mymachine
 
-[localhost:vars]
+[mymachine:vars]
 ansible_connection="ssh"
 ansible_ssh_host="localhost"
 ansible_user="vagrant"

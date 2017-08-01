@@ -4,11 +4,8 @@
 This module implements an Ansible module to get access to the gettings application.
 """
 
-import os
-import signal
 import subprocess
 
-from abc import ABCMeta, abstractmethod, abstractproperty
 from ansible.module_utils.basic import AnsibleModule
 from gi.repository import GLib
 
@@ -31,162 +28,150 @@ class AnsibleGSettingModule(object):
     """
 
     def __init__(self):
-        self.enabled = None
-        self.dbus_pid = None
-        self.dbus_address = None
         self.user = None
+        self.x_user = None
         self.variant_type = None
-        self.variant_class = Variant
+        self.variant_class = None
 
-    def __destruct(self):
-        """
-        Kill DBUS created and remove xhost privileges if necessary.
-        """
-        if self.enabled == "0":
-            subprocess.check_output('''
-                DISPLAY=:1 sudo xhost -SI:localuser:{user}
-                '''.format(user=self.user),
-                                    shell=True
-                                    )
-        if self.dbus_pid is not None:
-            try:
-                os.kill(int(self.dbus_pid), signal.SIGTERM)
-            except OSError:
-                pass
-        self.enabled = None
-        self.dbus_pid = None
-        self.dbus_address = None
-        self.user = None
+    def __del__(self):  # TODO: uncomment delete
+        script = '''
+            # sudo rm -f {file}
+        '''.format(
+            file=self.xauth_file
+        )
+        subprocess.check_output(script, shell=True).strip()
 
-    def __init_dbus(self, user):
+    @property
+    def xauth_file(self):
+        try:
+            return '-'.join([
+                '/tmp/.Xauthority',
+                self.user,
+                self.x_user
+            ])
+        except AttributeError:
+            raise AttributeError('X access not granted yet.')
+
+    def __grant(self, user, x_user):
         """
         Initializes the message bus.
 
         :param user: username
+        :param x_user: user with .Xauthority
         """
         self.user = user
-        dbus_output = subprocess.check_output('''
-            sudo -H -s /bin/bash -c "xhost +SI:localuser:{user}"
-            sudo -H -u {user} -s /bin/bash -c "/usr/bin/dbus-launch"
-            '''.format(
-            user=user
-        ),
-            shell=True
+        self.x_user = x_user
+        script = '''
+            sudo touch {file}
+            sudo chown {user}:{user} {file}
+            sudo chmod 0600 {file}
+            sudo cp -f ~{x_user}/.Xauthority {file}
+        '''.format(
+            user=user,
+            x_user=x_user,
+            file=self.xauth_file,
         )
-        for line in dbus_output.split('\n'):
-            if line.startswith('DBUS_SESSION_BUS_ADDRESS='):
-                self.dbus_address = line.split('=', 1)[1]
-            elif line.startswith('DBUS_SESSION_BUS_PID='):
-                self.dbus_pid = line.split('=', 1)[1]
-        if self.dbus_address is None or self.dbus_pid is None:
-            raise IOError('Error launching DBUS')
+        return subprocess.check_output(script, shell=True).strip()
 
-    def __execute(self, user, command):
+    def __execute(self, command):
         """
-        Executes a given command with the `user` used as username and returns its output.
+        Executes a given command and returns its output.
 
-        :param user: username
         :param command: command to execute
-        :return: command output
+        :return: script output
         :rtype: str
         """
-        if self.dbus_pid is None:
-            self.__init_dbus(user)
-        shell_command = '''
-            export DBUS_SESSION_BUS_ADDRESS={dbus_address}
-            export DBUS_SESSION_BUS_PID={dbus_pid}
-            sudo -H -u {user} -s /bin/bash -c "{command}"
-            '''.format(
-            dbus_address=self.dbus_address,
-            dbus_pid=self.dbus_pid,
-            user=user,
-            command=command.replace('"', r'\"')
+        script = '''
+            export XAUTHORITY={file}
+            export $(dbus-launch)
+            sudo -H -s -u {user} {command}
+        '''.format(
+            file=self.xauth_file,
+            user=self.user,
+            command=command,
         )
-        return subprocess.check_output(shell_command, shell=True).strip()
+        return subprocess.check_output(script, shell=True).strip()
 
-    def get_range_string(self, user, schema, path, key):
+    def get_range_string(self, schema, path, key):
         """
-        Gets the range of the `user`'s gsetting for the given `schema` and `key`.
+        Gets the range of the gsetting for the given `schema` and `key`.
 
-        :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
         :return: command output
         :rtype: str
         """
-        command = "/usr/bin/gsettings range {schema}{colon}{path} {key}".format(
+        command = "gsettings range {schema}{colon}{path} {key}".format(
+            user=self.user,
             schema=schema,
             colon='' if path is None else ':',
             path='' if path is None else path,
             key=key
         )
-        output = self.__execute(user, command).replace('\n', ' ').replace('\r', ' ')
+        output = self.__execute(command).replace('\n', ' ').replace('\r', ' ')
         return output
 
-    def get_param(self, user, schema, path, key):
+    def get_param(self, schema, path, key):
         """
-        Gets the `user`'s gsetting value for the given `key` in the given `schema`.
+        Gets the gsetting value for the given `key` in the given `schema`.
 
         :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
         :return: command output
-        :rtype: Variant
+        :rtype: MyVariant
         """
-        command = "/usr/bin/gsettings get {schema}{colon}{path} {key}".format(
+        command = "gsettings get {schema}{colon}{path} {key}".format(
+            user=self.user,
             schema=schema,
             colon='' if path is None else ':',
             path='' if path is None else path,
             key=key
         )
-        output = self.__execute(user, command)
+        output = self.__execute(command)
         return self.variant_class(self.variant_type, output)
 
-    def get_default(self, user, schema, path, key):
+    def get_default(self, schema, path, key):
         """
         Gets the default gsetting value for the given `key` in the given `schema`.
 
-        :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
-        :return: command output
-        :rtype: Variant
+        :return: object holding the resulting value
+        :rtype: MyVariant
         """
-        command = "XDG_CONFIG_HOME=/nonexistent /usr/bin/gsettings get {schema}{colon}{path} {key}".format(
+        command = 'XDG_CONFIG_HOME=/nonexistent gsettings get {schema}{colon}{path} {key}'.format(
+            user=self.user,
             schema=schema,
             colon='' if path is None else ':',
             path='' if path is None else path,
             key=key
         )
-        output = self.__execute(user, command)
+        output = self.__execute(command)
         return self.variant_class(self.variant_type, output)
 
     def set_param(self, user, schema, path, key, value):
         """
-        Sets the `user`'s gsetting value to the `value` specified for the given `key` in the given `schema` and
-        returns the new value.
+        Sets the gsetting value to the `value` specified for the given `key` in the given `schema`.
 
-        :param user: username
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
         :param value: value as a string
-        :return: command output
+        :return: script output
         :rtype: str
         """
-        command = (
-            '/usr/bin/gsettings set {schema}{colon}{path} {key} "{value}"'.format(
-                schema=schema,
-                colon='' if path is None else ':',
-                path='' if path is None else path,
-                key=key,
-                value=value.replace('"', r'\"')
-            )
+        command = 'gsettings set {schema}{colon}{path} {key} "{value}"'.format(
+            schema=schema,
+            colon='' if path is None else ':',
+            path='' if path is None else path,
+            key=key,
+            value=str(value).replace('"', r'\"')
         )
-        output = self.__execute(user, command)
+        output = self.__execute(command)
         return output
 
     def reset_param(self, user, schema, path, key):
@@ -197,31 +182,35 @@ class AnsibleGSettingModule(object):
         :param schema: schema name
         :param path: path for relocatable schemas
         :param key: key identifier
-        :return: command output
+        :return: script output
         :rtype: str
         """
-        command = '/usr/bin/gsettings reset {schema}{colon}{path} {key}'.format(
+        command = 'gsettings reset {schema}{colon}{path} {key}'.format(
             schema=schema,
             colon='' if path is None else ':',
             path='' if path is None else path,
             key=key
         )
-        output = self.__execute(user, command)
+        output = self.__execute(command)
         return output
 
-    def __setup_class(self, user, schema, path, key, range_string=None):
+    def __setup_class(self, schema, path, key, range_string=None):
         if range_string is None:
-            range_string = self.get_range_string(user, schema, path, key)
+            range_string = self.get_range_string(schema, path, key)
 
         range_type, range_desc = range_string.split(' ', 1)
         if range_type == 'type':
             self.variant_type = range_desc
+            self.variant_class = MyVariant
         elif range_type == 'flags':
             self.variant_type = 'as'
+            self.variant_class = MyVariant
         elif range_type == 'range':
             self.variant_type = range_desc[0]
+            self.variant_class = MyVariant
         elif range_type == 'enum':
             self.variant_type = 's'
+            self.variant_class = MyVariant
         else:
             raise NotImplementedError('Unknown range type: {}'.format(range_string))
 
@@ -242,8 +231,9 @@ class AnsibleGSettingModule(object):
                 'key':       {'required': True},
                 'value':     {'required': False, 'default': None},
                 'state':     {'required': False, 'default': 'present', 'choices': ['present', 'absent']},
-                'set_type':  {'required': False, 'default': False, 'choices': [True, False]},
+                'composite': {'required': False, 'default': False, 'choices': [True, False]},
                 'range':     {'required': False, 'default': None},
+                'x_user':    {'required': False, 'default': None},
             },
             supports_check_mode=True,
         )
@@ -256,8 +246,9 @@ class AnsibleGSettingModule(object):
         key = params.get('key')
         value = params.get('value')
         state = params.get('state')
-        set_type = params.get('set_type')
+        composite = params.get('composite')
         range_string = params.get('range_string')
+        x_user = params.get('x_user')
 
         # Check mode
         check_mode = m.check_mode
@@ -266,27 +257,43 @@ class AnsibleGSettingModule(object):
         if state == 'present' and value is None:
             raise ValueError('The value parameter have to be set with the state "present".')
 
-        self.__setup_class(user, schema, path, key, range_string)
+        self.__grant(user, x_user=x_user or user)
+        self.__setup_class(schema, path, key, range_string)
 
-        default = self.get_default(user, schema, path, key)
-        value_before = self.get_param(user, schema, path, key)
+        value_before = self.get_param(schema, path, key)
 
-        if set_type:
+        if composite:
 
-            if not default.is_container():
-                raise('The `composite` argument can only be used for collections, not {}.'.format(self.variant_type))
+            if not value_before.is_container():
+                raise ValueError('Arg `composite` should be used for collections not {}.'.format(self.variant_type))
 
             else:
-                value_wanted = 2
+
+                if state == 'present':
+
+                    value_wanted = value_before.present(value)
+
+                elif state == 'absent':
+
+                    value_wanted = value_before.absent(value)
+
+                else:
+
+                    raise NotImplementedError('Unknown state: {}'.format(state))
 
         else:
 
-            value = {
-                'present': value,
-                'absent': default
-            }[state]
+            if state == 'present':
 
-            value_wanted = self.__use_type(value)
+                value_wanted = self.__use_type(value)
+
+            elif state == 'absent':
+
+                value_wanted = self.get_default(schema, path, key)
+
+            else:
+
+                raise NotImplementedError('Unknown state: {}'.format(state))
 
         if check_mode:
 
@@ -300,17 +307,17 @@ class AnsibleGSettingModule(object):
                 changed = False
                 value_after = value_before
 
-            elif value_wanted == default:
+            elif state == 'absent' and not composite:
 
                 self.reset_param(user, schema, path, key)
                 changed = True
-                value_after = self.get_param(user, schema, path, key)
+                value_after = self.get_param(schema, path, key)
 
             else:
 
                 self.set_param(user, schema, path, key, value_wanted)
                 changed = True
-                value_after = self.get_param(user, schema, path, key)
+                value_after = self.get_param(schema, path, key)
 
             if value_after != value_wanted:
                 raise ValueError('Unknown error, value change mismatch...')
@@ -326,37 +333,57 @@ class AnsibleGSettingModule(object):
         )
 
 
-class Variant(object):
+class MyVariant(object):
 
-    def __convert(self, value):
-        return GLib.Variant.parse(self.type, value, '\n', '\n')
+    def __convert(self, value, formats=None):
+        try:
+            if formats is None:
+                return GLib.Variant.parse(self.type, value, '\n', '\n')
+            elif isinstance(formats, (list, tuple)):
+                e = Exception()
+                for f in formats:
+                    try:
+                        return GLib.Variant.parse(self.type, f.format(value), '\n', '\n')
+                    except GLib.Error as e:
+                        pass
+                raise e
+            else:
+                return GLib.Variant.parse(self.type, formats.format(value), '\n', '\n')
+        except GLib.Error:
+            raise ValueError('''
+                Could not parse {} as type {} using formats {}
+            '''.format(
+                    value,
+                    self.type,
+                    formats
+            ))
 
-    def __init__(self, type_string, value, encode=False):
+    def __init__(self, type_string, value):
         if not GLib.variant_type_string_is_valid(type_string):
             raise ValueError('Invalid type string {}'.format(type_string))
 
         self.type = GLib.VariantType.new(type_string)
         self.value = self.__convert(value)
 
-    def __encode(self, obj):
-        raise NotImplementedError()
-
-    def __encode_item(self, obj):
-        raise NotImplementedError()
-
-    def __present(self, item):
+    def present(self, item):
         if not isinstance(item, str):
             raise NotImplementedError('Value must be string, not {}.'.format(type(item)))
-        item = self.__convert('[{}]'.format(item))
+        item = self.__convert(item, formats=("[{}]", "['{}']"))
         if item[0] not in self.value:
-            self.value = self.__convert(str(list(item) + list(self.value)))
+            result = self.__convert(str(list(item) + list(self.value)))
+        else:
+            result = self.value
+        return self.__child(result)
 
-    def __absent(self, item):
+    def absent(self, item):
         if not isinstance(item, str):
             raise NotImplementedError('Value must be string, not {}.'.format(type(item)))
-        item = self.__convert('[{}]'.format(item))
+        item = self.__convert(item, formats=("[{}]", "['{}']"))
         if item[0] in self.value:
-            self.value = self.__convert(str([i for i in list(self.value) if i != item[0]]))
+            result = self.__convert(str([i for i in list(self.value) if i != item[0]]))
+        else:
+            result = self.value
+        return self.__child(result)
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -370,8 +397,11 @@ class Variant(object):
     def is_container(self):
         return self.value.is_container()
 
-    def replace(self, *args, **kwargs):
-        return str(self).replace(*args, **kwargs)
+    def copy(self):
+        return self.__child(self.value)
+
+    def __child(self, value):
+        return MyVariant(self.type.dup_string(), str(value))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 ---
 
-- hosts: localhost
+- hosts: mymachine
 
   vars:
 
@@ -16,8 +16,7 @@
           append: yes
           # TODO: vault pw
 
-          system: no
-          hide: no
+          hide: yes
 
         - name: masu
           state: present
@@ -31,6 +30,7 @@
           # TODO: vault pw
           # TODO: vault passphrase
 
+          hide: no
           bashrcd: yes
           bashstyle:
             names: "1;49;34"
@@ -189,23 +189,6 @@
         - <<: *absent
           name: espeak-data
         - <<: *absent
-          name: evolution
-        - <<: *absent
-          name: evolution-common
-        - <<: *absent
-          name: evolution-data-server
-        - <<: *absent
-          name: evolution-data-server-common
-        - <<: *absent
-          name: evolution-data-server-online-accounts
-        - <<: *absent
-          name: evolution-plugins
-        - <<: *absent
-          name: folks-common
-# foomatic-db-compressed-ppds
-# freepats
-# freerdp-x11
-        - <<: *absent
           name: genisoimg
         - <<: *absent
           name: libbrasero-media3-1
@@ -215,22 +198,6 @@
           name: gnome-orca
         - <<: *absent
           name: gnome-sudoku
-# hunspell-en-us
-# modemmanager
-# mokutils
-# mutter
-# seahorse
-# tipa
-# tk
-# toshset
-# tracker-miner-fs
-# unoconv
-# wamerican
-# wbritish
-# webbrowser-app
-# whiptail
-# yelp-*
-
         - <<: *absent
           name: rhythmbox
         - <<: *absent
@@ -353,6 +320,7 @@
         - libreoffice-writer
         - libreoffice-calc
         - libreoffice-impress
+        - hunspell-en-us
 
         # Transimission
         - curl
@@ -395,7 +363,6 @@
         - pandas
         - matplotlib
         - seaborn
-        - beautifulsoup
 
         # Interface
         - ipython
@@ -410,12 +377,17 @@
         - thefuck
 
       gnome_settings:
+
         - id: keyboard_layouts
+          user: masu
           value: "[('xkb', 'hu'), ('xkb', 'us')]"
           state: present
-#        - id: keyboard_layout
-#          value: 0
-#          state: present
+
+        - id: keyboard_layout
+          user: masu
+          value: 0
+          state: present
+
 #        - id: keyboard_layout_per_window
 #          value: no
 #          state: present
@@ -433,23 +405,23 @@
 
   pre_tasks:
 
-    - name: install prerequisite packages
-      become: yes
-      apt:
-        package: "{{ item }}"
-      with_items: "{{ config.pre_packages }}"
-      tags:
-        - apt
-        - download
+#    - name: install prerequisite packages
+#      become: yes
+#      apt:
+#        package: "{{ item }}"
+#      with_items: "{{ config.pre_packages }}"
+#      tags:
+#        - apt
+#        - download
 
   roles:
 
-#    - role: _users
-#      users: "{{ config.users }}"
-#      tags:
-#        - user
-#        - password
-#
+    - role: _users
+      users: "{{ config.users }}"
+      tags:
+        - user
+        - password
+
 #    - role: _paths
 #      users: "{{ config.users }}"
 #      tags:
@@ -479,32 +451,33 @@
 #      tags:
 #        - security
 #        - network
-
+#
     - role: _gnome_settings
       gnome_settings: "{{ config.gnome_settings }}"
-
-  tasks:
-
-      # TODO environment variables
-      # TODO aliases
-      # TODO startup applications
-      # TODO application configurations
-        # TODO docker settings (dlast, docker group, etc)
-        # TODO VNC server
-        # TODO firefox
-        # TODO dropbox
-        # TODO megasync
-        # TODO ssh
-        # TODO VPN
-        # TODO deluge
-        # TODO idea
-        # TODO git
-        # TODO project repos git
-        # TODO apt-cacher-ng
-
+#
+#  tasks:
+#
+#      # TODO environment variables
+#      # TODO aliases
+#      # TODO startup applications
+#      # TODO application configurations
+#        # TODO docker settings (dlast, docker group, etc)
+#        # TODO VNC server
+#        # TODO firefox
+#        # TODO dropbox
+#        # TODO megasync
+#        # TODO ssh
+#        # TODO VPN
+#        # TODO deluge
+#        # TODO idea
+#        # TODO git
+#        # TODO project repos git
+#        # TODO apt-cacher-ng
+#
 #    - name: set python packages
 #      become: yes
 #      pip:
+#        extra_args: --upgrade
 #        executable: pip3
 #        name: "{{ package }}"
 #      with_items: "{{ config.python3_packages }}"
@@ -541,7 +514,7 @@
 #      become: yes
 #      blockinfile:
 #        backup: yes
-#        block: |
+#        block: >
 #          alias firefox-bme=ssh\ -D\ 8080\ -f\ -C\ -c\ blowfish-cbc\ -q\ masu@ede.tmit.bme.hu\ sleep\ 10\;\\
 #          firefox\ -P\ bme
 #        create: yes
@@ -574,9 +547,10 @@
 #    - name: apt upgrade & cleanup
 #      become: yes
 #      apt:
+#        autoremove: yes
+#        force: yes
 #        purge: yes
 #        upgrade: full
-#        autoremove: yes
 #      tags:
 #        - package
 #        - apt

@@ -13,5 +13,7 @@
                }}"
   loop_control:
     loop_var: gnome_setting
+  vars:
+    ansible_ssh_pipelining: yes
 
 ...

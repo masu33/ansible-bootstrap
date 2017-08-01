@@ -1,5 +1,5 @@
-[localhost]
-localhost
+[mymachine]
+mymachine
 
-[localhost:vars]
+[mymachine:vars]
 ansible_connection=local
