@@ -334,7 +334,6 @@ config:
     - deluge-gtk
     - deluge-console
     - deluge-webui
-#        - skype  # TODO: take care of skype
     - empathy
     - cheese
     - dropbox
@@ -404,9 +403,5 @@ config:
       user: masu
       value: "terminate:ctrl_alt_bksp"
       state: absent
-
-  # TODO background and co
-  # TODO power options
-  # TODO sound settings
 
 ...
