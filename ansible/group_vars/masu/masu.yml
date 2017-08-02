@@ -37,6 +37,18 @@ config:
         misc: "1;49;93"
       avatar: "/home/masu/Pictures/avatar"
 
+      bookmarks:
+        append: no
+        bookmarks:
+          - /home/masu/Documents
+          - /home/masu/Pictures
+          - /home/masu/Downloads
+          - ""
+          - /home/masu/Desktop Desktop
+          - /home/masu/MEGA MEGA
+          - /home/masu/Dropbox Dropbox
+          - /home/masu/Downloads/torrent/ncore nCore
+
     - name: willow
       state: present
       password: "{{ passwords.willow }}"

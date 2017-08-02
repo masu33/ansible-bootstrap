@@ -1,7 +1,5 @@
 ---
 
-# TODO environment variables
-# TODO aliases
 # TODO startup applications
 # TODO application configurations
   # TODO docker settings (dlast, docker group, etc)
@@ -16,6 +14,7 @@
   # TODO git
   # TODO project repos git
   # TODO apt-cacher-ng
+  # TODO apache spark
 
 # ---
 - name: download resources
