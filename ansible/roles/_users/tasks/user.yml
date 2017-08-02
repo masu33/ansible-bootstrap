@@ -67,28 +67,9 @@
     state:       present
 
 - when: user.avatar is defined
-  block:
+  include: avatar.yml
 
-    - name: copy avatar
-      become: yes
-      copy:
-        src: "{{ user.avatar }}"
-        dest: "/var/lib/AccountsService/icons/{{ user.name }}"
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: set avatar
-      become: yes
-      lineinfile:
-        backup:      no
-        create:      yes
-        dest:        "/var/lib/AccountsService/users/{{ user.name }}"
-        group:       root
-        insertafter: "[User]"
-        line:        "Icon=/var/lib/AccountsService/icons/{{ user.name }}"
-        regexp:      "^Icon=.*$"
-        owner:       root
-        state:       present
+- when: user.bookmarks is defined
+  include: bookmarks.yml
 
 ...

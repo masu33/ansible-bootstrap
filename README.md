@@ -1,11 +1,16 @@
-# Installation
+This is how I install my machines with UbuntuGnome (currently 16.04).
 
-...
-
-# Sources worth to mention
-
-| Related resources    | Parts         | Name          | URL                                                         |
-|----------------------|---------------|---------------|-------------------------------------------------------------|
-| gsettings.py         | basic idea    | Jiry Stransky | https://github.com/jistr/ansible-gsetting                   |
-| vncserver config     | idea and code | Arbab Nazar   | https://github.com/arbabnazar/ansible-roles/tree/master/vnc |
-| login.png            | basic idea    | Jiry Stransky | https://github.com/jistr/ansible-gsetting                   |
+#### TODO
+ - docker settings (dlast, docker group, etc)
+ - VNC server
+ - firefox
+ - dropbox
+ - megasync
+ - ssh
+ - VPN
+ - deluge
+ - idea
+ - git
+ - project repos git
+ - apt-cacher-ng
+ - apache spark

@@ -1,21 +1,7 @@
 ---
 
-# TODO environment variables
-# TODO aliases
 # TODO startup applications
 # TODO application configurations
-  # TODO docker settings (dlast, docker group, etc)
-  # TODO VNC server
-  # TODO firefox
-  # TODO dropbox
-  # TODO megasync
-  # TODO ssh
-  # TODO VPN
-  # TODO deluge
-  # TODO idea
-  # TODO git
-  # TODO project repos git
-  # TODO apt-cacher-ng
 
 # ---
 - name: download resources
