@@ -1,0 +1,10 @@
+[masu]
+mymachine
+
+[masu:vars]
+ansible_connection="ssh"
+ansible_ssh_host="localhost"
+ansible_user="vagrant"
+ansible_ssh_private_key_file="ssh-keys/id_rsa"
+ansible_ssh_extra_args=" -oStrictHostKeyChecking=no"
+ansible_port="22221"

@@ -1,0 +1,28 @@
+---
+
+- assert:
+    that:
+      - package is mapping
+      - package | reject('in', allowed_keys) | empty
+
+- name: set package state - {{ package.name }}
+  apt:
+    allow_unauthenticated: "{{ package.allow_unauthenticated | d(omit) }}"
+    autoclean:             "{{ package.autoclean             | d(omit) }}"
+    autoremove:            "{{ package.autoremove            | d(omit) }}"
+    cache_valid_time:      "{{ package.cache_valid_time      | d(omit) }}"
+    deb:                   "{{ package.deb                   | d(omit) }}"
+    default_release:       "{{ package.default_release       | d(omit) }}"
+    dpkg_options:          "{{ package.dpkg_options          | d(omit) }}"
+    force:                 "{{ package.force                 | d(omit) }}"
+    install_recommends:    "{{ package.install_recommends    | d(omit) }}"
+    name:                  "{{ package.name                  | d(omit) }}"
+    package:               "{{ package.package               | d(omit) }}"
+    pkg:                   "{{ package.pkg                   | d(omit) }}"
+    only_upgrade:          "{{ package.only_upgrade          | d(omit) }}"
+    purge:                 "{{ package.purge                 | d(omit) }}"
+    state:                 "{{ package.state                 | d(omit) }}"
+    update_cache:          "{{ package.update_cache          | d(omit) }}"
+    upgrade:               "{{ package.upgrade               | d(omit) }}"
+
+...

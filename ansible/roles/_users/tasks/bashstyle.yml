@@ -1,0 +1,49 @@
+---
+
+- assert:
+    that:
+      - user.bashstyle is defined
+
+- name: set bash coloring
+  become: yes
+  lineinfile:
+    backup: no
+    create: yes
+    group: masu
+    insertafter: EOF
+    line: "export {{ item.key }}=\"{{ item.value }}\""
+    mode: "0644"
+    owner: masu
+    path: "{{ user.home | d('/home/' + user.name) }}/.bashrc"
+    regexp: "^export {{ item.key }}=.*$"
+    state: present
+  with_dict:
+    PS1: "{{ '\\[\\e[0;' + (user.bashstyle.names | d(39) | string) + 'm\\]' + '\\u'
+           + '\\[\\e[0;' + (user.bashstyle.misc  | d(39) | string) + 'm\\]' + '@'
+           + '\\[\\e[0;' + (user.bashstyle.names | d(39) | string) + 'm\\]' + '\\h'
+           + '\\[\\e[0;' + (user.bashstyle.misc  | d(39) | string) + 'm\\]' + ':'
+           + '\\[\\e[0;' + (user.bashstyle.names | d(39) | string) + 'm\\]' + '\\W'
+           + '\\[\\e[0;' + (user.bashstyle.misc  | d(39) | string) + 'm\\]' + '\\$'
+           + '\\[\\e[0m\\]'
+           + ' '
+          }}"
+    PS2: "{{ '\\[\\e[0;' + (user.bashstyle.names | d(39) | string) + 'm\\]' + '\\u'
+           + '\\[\\e[0;' + (user.bashstyle.misc  | d(39) | string) + 'm\\]' + '>'
+           + '\\[\\e[0m\\]'
+           + ' '
+          }}"
+    PS3: "{{ '#'
+           + '?'
+           + ' '
+          }}"
+    PS4: "{{ '\\${0}'
+           + '\\${LINENO}'
+           + ':'
+           + '>'
+          }}"
+  tags:
+    - user
+    - shell
+
+
+...

@@ -1,0 +1,17 @@
+---
+
+- when: repo.keyserver is defined
+  name: set repository keys with keyserver
+  apt_key:
+    state:     "{{ repo.state     | d(omit)              }}"
+    keyserver: "{{ repo.keyserver                        }}"
+    id:        "{{ repo.key                              }}"
+
+- when: repo.key_url is defined and repo.keyserver is undefined
+  name: set repository keys with key URL
+  apt_key:
+    state: "{{ repo.state   | d(omit) }}"
+    url:   "{{ repo.key_url           }}"
+    key:   "{{ repo.key     | d(omit) }}"
+
+...

@@ -1,6 +1,0 @@
----
-
-dependencies:
-  - role: devenv
-  - role: _oraclejdk8
-    set_default: yes

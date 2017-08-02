@@ -1,0 +1,5 @@
+[masu]
+mymachine
+
+[masu:vars]
+ansible_connection=local

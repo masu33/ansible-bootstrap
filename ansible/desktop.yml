@@ -1,0 +1,211 @@
+---
+
+# ---
+- name: download resources
+
+  hosts: localhost
+
+  pre_tasks:
+
+    - name: download resources
+      get_url:
+        backup:           "{{ dl.backup           | d(omit) }}"
+        dest:             "{{ dl.dest             | d(omit) }}"
+        force:            "{{ dl.force            | d(omit) }}"
+        force_basic_auth: "{{ dl.force_basic_auth | d(omit) }}"
+        url:              "{{ dl.url              | d(omit) }}"
+        url_password:     "{{ dl.url_password     | d(omit) }}"
+        url_username:     "{{ dl.url_username     | d(omit) }}"
+        use_proxy:        "{{ dl.use_proxy        | d(omit) }}"
+        validate_certs:   "{{ dl.validate_certs   | d(omit) }}"
+        follow:           "{{ dl.follow           | d(omit) }}"
+        group:            "{{ dl.group            | d(omit) }}"
+        mode:             "{{ dl.mode             | d(omit) }}"
+        owner:            "{{ dl.owner            | d(omit) }}"
+      with_items: "{{ config.downloads }}"
+      loop_control:
+        loop_var: dl
+
+# ---
+- name: prerequisites, users and paths
+
+  hosts: mymachine
+
+  pre_tasks:
+
+    - name: install prerequisite packages
+      become: yes
+      apt:
+        package: "{{ item }}"
+      with_items: "{{ config.pre_packages }}"
+      tags:
+        - apt
+        - download
+
+  roles:
+
+    - role: _users
+      users: "{{ config.users }}"
+      tags:
+        - user
+        - password
+
+    - role: _paths
+      paths: "{{ config.paths }}"
+      tags:
+        - user
+        - password
+
+  post_tasks:
+
+    - name: put user images
+      become: yes
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        force: yes
+        owner: masu
+        group: masu
+        mode: 0600
+      with_items:
+        - src: resources/avatar
+          dest: /home/masu/Pictures/avatar
+        - src: resources/background
+          dest: /home/masu/Pictures/background
+        - src: resources/lock
+          dest: /home/masu/Pictures/lock
+        - src: resources/login
+          dest: /home/masu/Pictures/login
+
+# ---
+- name: repos, packages and applications
+
+  hosts: mymachine
+
+  roles:
+
+    - role: _apt_repos
+      repos: "{{ config.repos }}"
+      empty_sources_list: yes
+      update_cache: yes
+      tags:
+        - repository
+        - apt
+        - download
+
+    - role: _apt_packages
+      packages: "{{ config.packages }}"
+      tags:
+        - package
+        - apt
+        - download
+
+    - role: netlimit
+      users:
+        - root
+        - masu
+      tags:
+        - security
+        - network
+
+  tasks:
+
+    - name: set python packages
+      become: yes
+      pip:
+        extra_args: --upgrade
+        executable: pip3
+        name: "{{ package }}"
+      with_items: "{{ config.python3_packages }}"
+      loop_control:
+        loop_var: package
+      tags:
+        - download
+        - programming
+        - python
+        - package
+
+    - name: nodejs packages
+      become: yes
+      npm:
+        name: "{{ item }}"
+        global: yes
+        state: present
+      with_items:
+        - phantomjs-prebuilt
+      tags:
+        - npm
+        - package
+        - download
+
+    - name: apt upgrade & cleanup
+      become: yes
+      apt:
+        autoremove: yes
+        force: yes
+        purge: yes
+        upgrade: full
+      tags:
+        - package
+        - apt
+        - network
+
+# ---
+- name: environment settings
+
+  hosts: mymachine
+
+  roles:
+
+    - role: _gnome_settings
+      gnome_settings: "{{ config.gnome_settings }}"
+
+  tasks:
+
+    - name: set python aliases
+      become: yes
+      blockinfile:
+        backup: yes
+        block: |
+          alias python=python3
+          alias pip=pip3
+          alias ipython=ipython3
+        create: yes
+        follow: yes
+        group: masu
+        insertafter: EOF
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - python alias"
+        mode: "0664"
+        owner: masu
+        path: "/home/masu/.profile"
+        state: present
+      tags:
+        - programming
+        - python
+        - shell
+
+    - name: set firefox-bme alias
+      become: yes
+      vars:
+        cbc: blowfish-cbc
+        user: masu
+        host: ede.tmit.bme.hu
+      blockinfile:
+        backup: yes
+        block: >
+          alias firefox-bme=ssh\ -D\ 8080\ -f\ -C\ -c\ {{cbc}}\ -q\ {{user}}@{{host}}\ sleep\ 10\;firefox\ -P\ bme
+        create: yes
+        follow: yes
+        group: masu
+        insertafter: EOF
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - firefox-bme alias"
+        mode: "0664"
+        owner: masu
+        path: "/home/masu/.profile"
+        state: present
+      tags:
+        - network
+        - bme
+        - shell
+
+...
