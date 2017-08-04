@@ -389,19 +389,29 @@ config:
       value: 0
       state: present
 
-    - id: keyboard_layout_per_window
-      user: masu
-      value: "false"
-      state: present
-
-    - id: keyboard_layout_show_all
-      user: masu
-      value: "false"
-      state: present
-
     - id: keyboard_xkb_options
       user: masu
       value: "terminate:ctrl_alt_bksp"
       state: absent
+
+    - id: background_show
+      user: masu
+      value: "true"
+      state: present
+
+    - id: background
+      user: masu
+      value: "file:///home/masu/Pictures/background"
+      state: present
+
+    - id: background_icons
+      user: masu
+      value: "true"
+      state: present
+
+    - id: lockscreen
+      user: masu
+      value: "file:///home/masu/Pictures/lock"
+      state: present
 
 ...

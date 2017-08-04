@@ -361,7 +361,7 @@ class AnsibleGSettingModule(object):
 
 class MyVariant(object):
 
-    def __convert(self, value, formats=None):
+    def __convert(self, value, formats=["{}", "'{}'"]):
         try:
             if formats is None:
                 return GLib.Variant.parse(self.type, value, '\n', '\n')
