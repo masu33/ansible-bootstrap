@@ -379,6 +379,7 @@ config:
 
   gnome_settings:
 
+      # Keyboard
     - id: keyboard_layouts
       user: masu
       value: "[('xkb', 'hu'), ('xkb', 'us')]"
@@ -409,6 +410,7 @@ config:
       value: "terminate:ctrl_alt_bksp"
       state: absent
 
+      # Background
     - id: background_show
       user: masu
       value: "true"
@@ -429,6 +431,7 @@ config:
       value: "file:///home/masu/Pictures/lock"
       state: present
 
+      # Power
     - user: masu
       schema: org.gnome.settings-daemon.plugins.power
       key: button-power
@@ -462,6 +465,43 @@ config:
     - user: masu
       schema: org.gnome.settings-daemon.plugins.power
       key: lid-close-suspend-with-external-monitor
+      value: "false"
+      state: present
+
+      # Sound
+    - user: masu
+      schema: org.gnome.desktop.sound
+      key: theme-name
+      value: "__custom"
+      state: present
+
+    - user: root
+      schema: org.gnome.desktop.sound
+      key: theme-name
+      value: "__custom"
+      state: present
+
+    - user: masu
+      schema: org.gnome.desktop.sound
+      key: input-feedback-sounds
+      value: "false"
+      state: present
+
+    - user: root
+      schema: org.gnome.desktop.sound
+      key: input-feedback-sounds
+      value: "false"
+      state: present
+
+    - user: masu
+      schema: org.gnome.desktop.sound
+      key: event-sounds
+      value: "false"
+      state: present
+
+    - user: root
+      schema: org.gnome.desktop.sound
+      key: event-sounds
       value: "false"
       state: present
 
