@@ -74,8 +74,6 @@
           dest: /home/masu/Pictures/background
         - src: resources/lock
           dest: /home/masu/Pictures/lock
-        - src: resources/login
-          dest: /home/masu/Pictures/login
 
 # ---
 - name: repos, packages and applications
@@ -159,6 +157,10 @@
 
     - role: _gnome_settings
       gnome_settings: "{{ config.gnome_settings }}"
+      tags:
+        - gnome
+        - desktop
+        - settings
 
   tasks:
 

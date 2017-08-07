@@ -18,7 +18,18 @@ gnome_settings_list:
 #    org.gnome.desktop.app-folders.folder:/
 
   # Background
-#    org.gnome.desktop.background
+  background_show:
+    schema: org.gnome.desktop.background
+    key: draw-background
+    range: type b
+  background:
+    schema: org.gnome.desktop.background
+    key: picture-uri
+    range: type s
+  background_icons:
+    schema: org.gnome.desktop.background
+    key: show-desktop-icons
+    range: type b
 
   # Datetime
 #    org.gnome.desktop.datetime
@@ -41,12 +52,6 @@ gnome_settings_list:
   keyboard_layout:
     schema: org.gnome.desktop.input-sources
     key: current
-  keyboard_layout_per_window:
-    schema: org.gnome.desktop.input-sources
-    key: per-window
-  keyboard_layout_show_all:
-    schema: org.gnome.desktop.input-sources
-    key: show-all-sources
   keyboard_xkb_options:
     schema: org.gnome.desktop.input-sources
     key: xkb-options
@@ -76,8 +81,11 @@ gnome_settings_list:
   # Privacy
 #    org.gnome.desktop.privacy
 
-  # Screensaver
-#    org.gnome.desktop.screensaver
+  # Screensaver and lockscreen
+  lockscreen:
+    schema: org.gnome.desktop.screensaver
+    key: picture-uri
+    type: s
 
   # Search
 #    org.gnome.desktop.search-providers
@@ -106,7 +114,5 @@ gnome_settings_list:
   # Windowmanager
 #    org.gnome.desktop.wm.keybindings
 #    org.gnome.desktop.wm.preferences
-
-
 
 ...
