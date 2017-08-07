@@ -389,8 +389,23 @@ config:
       value: 0
       state: present
 
+    - id: keyboard_layouts
+      user: root
+      value: "[('xkb', 'hu'), ('xkb', 'us')]"
+      state: present
+
+    - id: keyboard_layout
+      user: root
+      value: 0
+      state: present
+
     - id: keyboard_xkb_options
       user: masu
+      value: "terminate:ctrl_alt_bksp"
+      state: absent
+
+    - id: keyboard_xkb_options
+      user: root
       value: "terminate:ctrl_alt_bksp"
       state: absent
 
@@ -412,6 +427,42 @@ config:
     - id: lockscreen
       user: masu
       value: "file:///home/masu/Pictures/lock"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: button-power
+      value: "suspend"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: sleep-inactive-ac-timeout
+      value: "14400"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: sleep-inactive-battery-timeout
+      value: "7200"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: lid-close-ac-action
+      value: "nothing"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: lid-close-battery-action
+      value: "nothing"
+      state: present
+
+    - user: masu
+      schema: org.gnome.settings-daemon.plugins.power
+      key: lid-close-suspend-with-external-monitor
+      value: "false"
       state: present
 
 ...
