@@ -68,11 +68,11 @@
         group: masu
         mode: 0600
       with_items:
-        - src: resources/avatar
+        - src: avatar
           dest: /home/masu/Pictures/avatar
-        - src: resources/background
+        - src: background
           dest: /home/masu/Pictures/background
-        - src: resources/lock
+        - src: lock
           dest: /home/masu/Pictures/lock
 
 # ---
@@ -189,7 +189,31 @@
         - desktop
         - settings
 
+    - role: configure_firefox
+      user: masu
+      remember_last: no
+      profiles:
+        - name: default
+          relative: yes
+        - name: proxy8080
+          relative: yes
+      tags:
+        - firefox
+        - settings
+        - config
+
   tasks:
+
+    - name: set login keyboard layout
+      become: yes
+      lineinfile:
+        path: /etc/default/keyboard
+        line: XKBLAYOUT="hu"
+        regexp: ^XKBLAYOUT=.*$
+      tags:
+        - gnome
+        - desktop
+        - settings
 
     - name: set python aliases
       become: yes
@@ -216,9 +240,9 @@
     - name: set firefox-bme alias
       become: yes
       vars:
-        cbc: blowfish-cbc
+        cbc: aes256-ctr
         user: masu
-        host: ede.tmit.bme.hu
+        host: ccnet2.tmit.bme.hu
       blockinfile:
         backup: yes
         block: >

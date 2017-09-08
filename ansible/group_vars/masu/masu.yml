@@ -151,7 +151,6 @@ config:
     - dropbox
     - mega
     - git-lfs
-    - slack-jessie
     - webupd8team-java
     - webupd8team-tor
     - umake
@@ -391,6 +390,36 @@ config:
       state: present
 
     - id: keyboard_layouts
+      user: willow
+      value: "[('xkb', 'hu'), ('xkb', 'us')]"
+      state: present
+
+    - id: keyboard_layout
+      user: willow
+      value: 0
+      state: present
+
+    - id: keyboard_layouts
+      user: ansible
+      value: "[('xkb', 'hu'), ('xkb', 'us')]"
+      state: present
+
+    - id: keyboard_layout
+      user: ansible
+      value: 0
+      state: present
+
+    - id: keyboard_layouts
+      user: gdm
+      value: "[('xkb', 'hu'), ('xkb', 'us')]"
+      state: present
+
+    - id: keyboard_layout
+      user: gdm
+      value: 0
+      state: present
+
+    - id: keyboard_layouts
       user: root
       value: "[('xkb', 'hu'), ('xkb', 'us')]"
       state: present
@@ -398,6 +427,12 @@ config:
     - id: keyboard_layout
       user: root
       value: 0
+      state: present
+
+    - user: gdm
+      schema: org.gnome.libgnomekbd.keyboard
+      key: layouts
+      value: "['hu', 'us\taltgr-intl']"
       state: present
 
     - id: keyboard_xkb_options
