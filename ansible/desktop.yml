@@ -191,10 +191,15 @@
 
     - role: configure_firefox
       user: masu
-      remember_last: no
+      start_with_last: no
       profiles:
         - name: default
           relative: yes
+          default: yes
+          account_data:
+            verified: no
+          prefs:
+            services.sync.username: sandor.kazi@gmail.com
         - name: proxy8080
           relative: yes
       tags:

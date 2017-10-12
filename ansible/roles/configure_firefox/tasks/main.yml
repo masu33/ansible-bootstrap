@@ -8,6 +8,7 @@
 - assert:
     that:
       - profile is mapping
+      - profile.name is defined
   with_items: "{{ profiles }}"
   loop_control:
     loop_var: profile
@@ -31,64 +32,18 @@
     - "{{ user_homes[user] }}/.mozilla/firefox/Pending Pings"
     - "{{ user_homes[user] }}/.mozilla/firefox/Crash Reports"
 
-- name: set profile folders
+- name: set profiles.ini
   become: yes
-  file:
+  template:
     owner: "{{ user }}"
     group: "{{ user }}"
     mode:  0700
-    path:  "{{ user_homes[user] }}/.mozilla/firefox/ansible.{{ profile.1.name | d(profile.0) }}"
-    state: directory
-  with_indexed_items: "{{ profiles }}"
-  loop_control:
-    loop_var: profile
+    dest:  "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
+    src:   profiles.ini.jinja2
 
-- name: set profile.ini StartWithLastProfile
-  become: yes
-  ini_file:
-    create: yes
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0774
-    path: "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
-    section: General
-    option: StartWithLastProfile
-    value: "{{ remember_last | ternary('1', '0') }}"
-    state: present
-
-- name: set profile.ini Name
-  become: yes
-  ini_file:
-    path: "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
-    section: "Profile{{ profile.0 }}"
-    option: Name
-    value: "{{ profile.1.name | d(profile.0) }}"
-    state: present
-  with_indexed_items: "{{ profiles }}"
-  loop_control:
-    loop_var: profile
-
-- name: set profile.ini IsRelative
-  become: yes
-  ini_file:
-    path: "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
-    section: "Profile{{ profile.0 }}"
-    option: IsRelative
-    value: "{{ profile.1.relative | d(1) | bool | ternary('1', '0') }}"
-    state: present
-  with_indexed_items: "{{ profiles }}"
-  loop_control:
-    loop_var: profile
-
-- name: set profile.ini Path
-  become: yes
-  ini_file:
-    path: "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
-    section: "Profile{{ profile.0 }}"
-    option: Path
-    value: "ansible.{{ profile.1.name | d(profile.0) }}"
-    state: present
-  with_indexed_items: "{{ profiles }}"
+- #name:
+  include: profile.yml
+  with_items: "{{ profiles }}"
   loop_control:
     loop_var: profile
 
