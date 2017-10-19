@@ -359,6 +359,7 @@ repo_list:
     release: "jessie"
     key: "038651BD"
     keyserver: "pgp.mit.edu"
+    filename: "slack"
 
   virtualbox:
     url: "http://download.virtualbox.org/virtualbox/debian"

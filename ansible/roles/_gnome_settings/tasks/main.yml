@@ -6,7 +6,7 @@
 
 - # name:
   become: yes
-  include: gnome_setting.yml
+  include_tasks: gnome_setting.yml
   with_items: "{{ gnome_settings
                 | mass_table_join(gnome_settings_list, 'id')
                 | list

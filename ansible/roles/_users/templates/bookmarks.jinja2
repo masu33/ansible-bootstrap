@@ -1,5 +1,4 @@
-{% if orig %}
-{% if user.bookmarks.append | d(true) %}
+{% if orig and (user.bookmarks.append | d(true)) %}
 {% for rawbm in orig.split('\n') %}
 {% if rawbm.strip().split(' ', 1)[0].replace('file://', '')
     not in (bookmarks | map(attribute='uri') | map('replace', 'file://', '') | list)
@@ -8,7 +7,6 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{% block create_new_bookmarks %}
 {% for bm in bookmarks %}
 {% if bm.state is undefined or bm.state == 'present' %}
 {% if bm.uri.startswith('/') %}file://{% endif %}
@@ -16,7 +14,3 @@
 {% endif %}
 
 {% endfor %}
-{% endblock create_new_bookmarks %}
-{% else %}
-{{ self.create_new_bookmarks() }}
-{% endif %}

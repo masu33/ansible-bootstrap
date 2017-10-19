@@ -13,7 +13,7 @@
   loop_control:
     loop_var: profile
 
-- include: library/user_homes.yml
+- import_tasks: library/user_homes.yml
   vars:
     user_name: "{{ user }}"
 
@@ -42,7 +42,7 @@
     src:   profiles.ini.jinja2
 
 - #name:
-  include: profile.yml
+  include_tasks: profile.yml
   with_items: "{{ profiles }}"
   loop_control:
     loop_var: profile

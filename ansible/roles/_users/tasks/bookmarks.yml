@@ -10,7 +10,7 @@
       - item.uri is defined or item is string
   with_items: "{{ user.bookmarks.bookmarks }}"
 
-- include: library/user_homes.yml
+- import_tasks: library/user_homes.yml
   vars:
     user_name: "{{ user.name }}"
 
@@ -45,7 +45,7 @@
 - name: set bookmarks
   become: yes
   vars:
-    bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') }}"
+    bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') | list }}"
     orig: "{{ bmfile.content | d('') | b64decode }}"
   template:
     src: bookmarks.jinja2

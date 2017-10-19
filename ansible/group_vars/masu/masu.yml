@@ -47,7 +47,6 @@ config:
           - /home/masu/Desktop Desktop
           - /home/masu/MEGA MEGA
           - /home/masu/Dropbox Dropbox
-          - /home/masu/Downloads/torrent/ncore nCore
 
     - name: willow
       state: present
@@ -78,6 +77,9 @@ config:
     - &700masu
       <<: *dirmasu
       mode: "0700"
+    - &777masu
+      <<: *dirmasu
+      mode: "0777"
 
   paths:
 
@@ -87,36 +89,19 @@ config:
       path: "/home/masu/Downloads"
     - <<: *755masu
       path: "/home/masu/Pictures"
-    - <<: *700masu
-      path: "/home/masu/Downloads/torrent"
-    - <<: *700masu
-      path: "/home/masu/Downloads/firefox"
-    - <<: *755masu
-      path: "/home/masu/Downloads/torrent/ncore"
-      recurse: yes
-    - <<: *700masu
-      path: "/home/masu/Downloads/torrent/current"
-    - <<: *700masu
-      path: "/home/masu/Downloads/torrent/stopped"
-    - <<: *700masu
-      path: "/home/masu/Downloads/torrent/watch"
-    - <<: *700masu
-      path: "/home/masu/Downloads/torrent/index"
-    - <<: *700masu
-      path: "/home/masu/Dropbox"
-    - <<: *700masu
-      path: "/home/masu/MEGA"
-    - <<: *700masu
-      path: "/home/masu/Projects"
+    - <<: *777masu
+      path: "/home/masu/Willow"
 
-    - path: "/home/willow/ncore"
+    - path: "/home/willow/Masu"
       follow: no
       force: yes
       owner: "willow"
       group: "willow"
-      src: "/home/masu/Downloads/torrent/ncore"
+      src: "/home/masu/Willow"
       state: link
 
+    - path: "/home/ansible/.ssh/"
+      mode: "0600"
     - path: "/home/ansible/.ssh/authorized_keys"
       mode: "0600"
 
@@ -243,6 +228,8 @@ config:
     - apt
     - aptitude
     - apt-cacher-ng
+    - gksu
+    - galternatives
 
     # Security
     - openvpn
@@ -260,14 +247,16 @@ config:
     - lsb
     - build-essential
     - gawk
+    - <<: *absent
+      name: python-pip
+    - <<: *absent
+      name: python3-pip
     - python
-    - python-pip
     - python-dev
+    - python-setuptools
     - python3
-    - python3-pip
     - python3-dev
-    - qtcreator
-    - pyqt5-dev-tools
+    - python3-setuptools
     - virtualenv
     - npm
     - nodejs
@@ -336,6 +325,7 @@ config:
     - deluge-console
     - deluge-webui
     - empathy
+    - slack
     - cheese
     - dropbox
     - megasync

@@ -29,62 +29,38 @@ class AnsibleGSettingModule(object):
 
     def __init__(self):
         self.user = None
-        self.x_user = None
-        self.__x_path = None
         self.variant_type = None
 
     def __del__(self):
-        script = '''
-            sudo rm -f {file}
-        '''.format(
-            file=self.xauth_file
-        )
-        subprocess.check_output(script, shell=True).strip()
+        pass
 
     @property
-    def x_path(self):
-        if self.__x_path:
-            return self.__x_path
-        else:
-            self.__x_path = '~{}/.Xauthority'.format(self.x_user)
-            return self.__x_path
+    def dbus(self):
+        """
+        Gets DBUS_SESSION_BUS_ADDRESS parameter.
 
-    @x_path.setter
-    def x_path(self, x_path):
-        self.__x_path = x_path
+        :return: dbus address string
+        :rtype: str
+        """
+        script = r'''
+            PID=$(pgrep gnome-session | tail -1)
+            sudo sed -z -n -e "s/DBUS_SESSION_BUS_ADDRESS=\(.*\)$/\\1/p" /proc/$PID/environ
+        '''
+        return subprocess.check_output(script, shell=True).decode('utf-8').strip().strip('\x00')
 
     @property
-    def xauth_file(self):
-        try:
-            return '''/tmp/.Xauthority-{}-{}'''.format(
-                self.user,
-                self.x_user
-            )
-        except AttributeError:
-            raise AttributeError('X access not granted yet.')
-
-    def __grant(self, user, x_user=None, x_path=None):
+    def xdg_dir(self):
         """
-        Copies Xauthority
+        Gets XDG_RUNTIME_DIR parameter.
 
-        :param user: username
-        :param x_user: user with .Xauthority (optional)
-        :param x_path: path of the .Xauthority file (optinal)
+        :return: xdg dir address string
+        :rtype: str
         """
-        self.user = user
-        self.x_user = x_user or user
-        self.x_path = x_path
-        script = '''
-            sudo touch {file}
-            sudo chown {user}:{user} {file}
-            sudo chmod 0600 {file}
-            sudo cp -f {x_path} {file}
-        '''.format(
-            user=user,
-            file=self.xauth_file,
-            x_path=self.x_path
-        )
-        return subprocess.check_output(script, shell=True).strip()
+        script = r'''
+            PID=$(pgrep gnome-session | tail -1)
+            sudo sed -z -n -e "s/XDG_RUNTIME_DIR=\(.*\)$/\\1/p" /proc/$PID/environ
+        '''
+        return subprocess.check_output(script, shell=True).decode('utf-8').strip().strip('\x00')
 
     def __execute(self, command):
         """
@@ -94,16 +70,32 @@ class AnsibleGSettingModule(object):
         :return: script output
         :rtype: str
         """
-        script = '''
-            export XAUTHORITY={file}
-            export $(dbus-launch)
-            sudo -H -s -u {user} {command}
-        '''.format(
-            file=self.xauth_file,
+        env = r'''
+            export DBUS_SESSION_BUS_ADDRESS="{dbus}"
+            export XDG_RUNTIME_DIR="{xdg_dir}"
+            unset HOME
+        '''
+        if self.user == 'root':
+            calls = r'''
+                sudo -i {command}
+            '''
+        else:
+            calls = r'''
+                sudo -E -u {user} {command}
+            '''
+        script = (env + calls).format(
+            dbus=self.dbus,
+            xdg_dir=self.xdg_dir,
             user=self.user,
             command=command,
         )
-        return subprocess.check_output(script, shell=True).strip()
+        with open('/tmp/tmp.tmp', 'a') as f:
+            f.write(script)
+            return subprocess.check_output(
+                script,
+                stderr=f,
+                shell=True
+            ).decode('utf-8').strip()
 
     def get_range_string(self, schema, path, key):
         """
@@ -205,7 +197,9 @@ class AnsibleGSettingModule(object):
         output = self.__execute(command)
         return output
 
-    def __setup_class(self, schema, path, key, range_string=None):
+    def __setup_class(self, user, schema, path, key, range_string=None):
+        self.user = user
+
         if range_string is None:
             range_string = self.get_range_string(schema, path, key)
 
@@ -269,8 +263,7 @@ class AnsibleGSettingModule(object):
                 msg='The value parameter have to be set with the state "present".'
             )
 
-        self.__grant(user, x_user=x_user, x_path=x_path)
-        self.__setup_class(schema, path, key, range_string)
+        self.__setup_class(user, schema, path, key, range_string)
 
         value_before = self.get_param(schema, path, key)
 
@@ -345,7 +338,7 @@ class AnsibleGSettingModule(object):
                     key=key,
                     value_before=str(value_before),
                     value_after=str(value_after),
-                    msg='Unknown error, value change mismatch...'
+                    msg='Unknown error, value change mismatch...',
                 )
 
         m.exit_json(
@@ -361,7 +354,9 @@ class AnsibleGSettingModule(object):
 
 class MyVariant(object):
 
-    def __convert(self, value, formats=["{}", "'{}'"]):
+    def __convert(self, value, formats=None):
+        if formats is None:
+            formats = ["{}", "'{}'"]
         try:
             if formats is None:
                 return GLib.Variant.parse(self.type, value, '\n', '\n')
@@ -373,8 +368,10 @@ class MyVariant(object):
                     except GLib.Error as e:
                         pass
                 raise e
-            else:
+            elif isinstance(formats, str):
                 return GLib.Variant.parse(self.type, formats.format(value), '\n', '\n')
+            else:
+                raise NotImplementedError('Unknown format: {}'.format(formats))
         except GLib.Error:
             raise ValueError('''
                 Could not parse {} as type {} using formats {}
