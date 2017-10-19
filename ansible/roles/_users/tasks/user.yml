@@ -36,10 +36,10 @@
     update_password:    "{{ user.update_password    | d(omit) }}"
 
 - when: user.bashrcd | d(false)
-  include: bashrcd.yml
+  include_tasks: bashrcd.yml
 
 - when: user.bashstyle is defined
-  include: bashstyle.yml
+  include_tasks: bashstyle.yml
 
 - name: set User part in AccountServices configuration
   become: yes
@@ -67,9 +67,9 @@
     state:       present
 
 - when: user.avatar is defined
-  include: avatar.yml
+  include_tasks: avatar.yml
 
 - when: user.bookmarks is defined
-  include: bookmarks.yml
+  include_tasks: bookmarks.yml
 
 ...

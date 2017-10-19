@@ -4,14 +4,12 @@
 # INSTALL ansible
 # -----------
 sudo apt-get update
-sudo apt-get install python-pip \
-                     python-setuptools \
+sudo apt-get install python-setuptools \
                      build-essential \
                      autoconf \
                      libtool \
                      pkg-config \
                      python-dev \
-                     python-apt \
                      libffi-dev \
                      libssl-dev \
                      aptitude \

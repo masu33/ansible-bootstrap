@@ -6,7 +6,7 @@
 
 - # name:
   become: yes
-  include: debconf.yml
+  include_tasks: debconf.yml
   with_items: "{{ packages
                 | default_key('name')
                 | mass_table_join(debconf_list, 'name', collection=true)
@@ -18,9 +18,10 @@
 
 - # name:
   become: yes
-  include: package.yml
+  include_tasks: package.yml
   with_items: "{{ packages
                 | default_key('name')
+                | list
                }}"
   loop_control:
     loop_var: package

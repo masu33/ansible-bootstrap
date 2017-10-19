@@ -10,12 +10,9 @@
       - item.uri is defined or item is string
   with_items: "{{ user.bookmarks.bookmarks }}"
 
-- name: get user home
-  become: yes
-  getent:
-    database: passwd
-    key: "{{ user.name }}"
-    split: ":"
+- import_tasks: library/user_homes.yml
+  vars:
+    user_name: "{{ user.name }}"
 
 - name: set bookmarks dir
   become: yes
@@ -26,8 +23,8 @@
     mode: 0700
     state: directory
   with_items:
-    - "{{ getent_passwd[user.name][4] }}/.config"
-    - "{{ getent_passwd[user.name][4] }}/.config/gtk-3.0"
+    - "{{ user_homes[user.name] }}/.config"
+    - "{{ user_homes[user.name] }}/.config/gtk-3.0"
   loop_control:
     loop_var: path
 
@@ -35,7 +32,7 @@
   become: yes
   stat:
     path: &bmfile
-      "{{ getent_passwd[user.name][4] }}/.config/gtk-3.0/bookmarks"
+      "{{ user_homes[user.name] }}/.config/gtk-3.0/bookmarks"
   register: bmfile
 
 - when: bmfile.stat.exists
@@ -48,7 +45,7 @@
 - name: set bookmarks
   become: yes
   vars:
-    bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') }}"
+    bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') | list }}"
     orig: "{{ bmfile.content | d('') | b64decode }}"
   template:
     src: bookmarks.jinja2

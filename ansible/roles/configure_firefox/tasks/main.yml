@@ -1,0 +1,50 @@
+---
+
+- assert:
+    that:
+      - profiles is sequence
+      - user is defined
+
+- assert:
+    that:
+      - profile is mapping
+      - profile.name is defined
+  with_items: "{{ profiles }}"
+  loop_control:
+    loop_var: profile
+
+- import_tasks: library/user_homes.yml
+  vars:
+    user_name: "{{ user }}"
+
+- name: set mozilla folder
+  become: yes
+  file:
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode:  0700
+    path:  "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ user_homes[user] }}/.mozilla"
+    - "{{ user_homes[user] }}/.mozilla/extensions"
+    - "{{ user_homes[user] }}/.mozilla/firefox"
+    - "{{ user_homes[user] }}/.mozilla/firefox/Pending Pings"
+    - "{{ user_homes[user] }}/.mozilla/firefox/Crash Reports"
+
+- name: set profiles.ini
+  become: yes
+  template:
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode:  0700
+    dest:  "{{ user_homes[user] }}/.mozilla/firefox/profiles.ini"
+    src:   profiles.ini.jinja2
+
+- #name:
+  include_tasks: profile.yml
+  with_items: "{{ profiles }}"
+  loop_control:
+    loop_var: profile
+
+...

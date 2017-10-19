@@ -6,7 +6,7 @@
 
 - # name:
   become: yes
-  include: user.yml
+  include_tasks: user.yml
   with_items: "{{ users
                 | default_key('name')
                 | list

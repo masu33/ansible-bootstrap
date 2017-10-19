@@ -6,7 +6,7 @@
 
 - # name:
   become: yes
-  include: path.yml
+  include_tasks: path.yml
   with_items: "{{ paths }}"
   loop_control:
     loop_var: path
