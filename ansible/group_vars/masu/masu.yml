@@ -17,6 +17,7 @@ config:
       update_password: on_create
       groups: sudo
       append: yes
+      shell: /bin/bash
 
       hide: yes
 
@@ -29,6 +30,7 @@ config:
       ssh_key_passphrase: "{{ passphrases.masu }}"
       groups: sudo,ansible
       append: yes
+      shell: /bin/bash
 
       hide: no
       bashrcd: yes
@@ -52,6 +54,8 @@ config:
       state: present
       password: "{{ passwords.willow }}"
       update_password: on_create
+      system: no
+      shell: /bin/bash
 
       hide: yes
 
@@ -61,6 +65,7 @@ config:
       home: /var/rstrct
       update_password: on_create
       system: no
+      shell: /bin/bash
 
       hide: yes
 
