@@ -338,6 +338,7 @@ config:
 
     # Remote access
     - openssh-server
+    - paprefs
     - vnc4server
     - xrdp
     - rdesktop
