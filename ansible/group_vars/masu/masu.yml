@@ -367,6 +367,9 @@ config:
     - ipywidgets
     - jupyter
     - jupyter-declarativewidgets
+    - openpyxl
+    - xlwt
+    - xlr
 
     # tools
     - pymongo
