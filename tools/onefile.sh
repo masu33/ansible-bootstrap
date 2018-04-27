@@ -4,6 +4,7 @@
 # Download this file and execute it to download and install everything else in this repo
 # ----------
 
+GITUSER="sandorkazi"
 GITHUBNAME="ansible-ubuntu-bootstrap"
 
 INSTALLIT="???"
@@ -14,7 +15,7 @@ done
 
 sudo apt-get install git <<< "y"
 
-git clone "https://github.com/masu33/${GITHUBNAME}.git"
+git clone "https://github.com/${GITUSER}/${GITHUBNAME}.git"
 
 if [ "${INSTALLIT}" == "n" ]; then
     exit 0

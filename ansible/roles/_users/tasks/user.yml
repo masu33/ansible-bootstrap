@@ -6,6 +6,7 @@
       - user.name is defined
 
 - name: Set up user
+  become: yes
   user:
     append:             "{{ user.append             | d(omit) }}"
     comment:            "{{ user.comment            | d(omit) }}"
