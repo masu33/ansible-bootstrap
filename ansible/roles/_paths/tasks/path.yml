@@ -5,6 +5,7 @@
       - path is mapping
 
 - name: Set up path
+  become: yes
   file:
     attributes:    "{{ path.attributes    | d(omit) }}"
     follow:        "{{ path.follow        | d(omit) }}"

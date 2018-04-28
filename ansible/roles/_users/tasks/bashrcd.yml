@@ -6,6 +6,7 @@
       - user.name is defined
 
 - name: Set up bashrc.d support (folder) for {{ user.name }}
+  become: yes
   file:
     path:  "{{ user.home | d('/home/' + user.name) }}/.bashrc.d"
     mode:  "0755"
@@ -14,6 +15,7 @@
     state: directory
 
 - name: set up bashrc.d support (inclusion) for {{ user.name }}
+  become: yes
   blockinfile:
     backup:      yes
     block:       |

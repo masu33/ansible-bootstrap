@@ -5,6 +5,7 @@
       - debconf is mapping
 
 - name: set debconf
+  become: yes
   debconf:
     name:     "{{ debconf.name     | d(omit) }}"
     question: "{{ debconf.question | d(omit) }}"
