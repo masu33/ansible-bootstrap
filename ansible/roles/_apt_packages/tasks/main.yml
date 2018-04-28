@@ -5,7 +5,6 @@
       - packages is sequence
 
 - # name:
-  become: yes
   include_tasks: debconf.yml
   with_items: "{{ packages
                 | default_key('name')
@@ -17,7 +16,6 @@
     loop_var: debconf
 
 - # name:
-  become: yes
   include_tasks: package.yml
   with_items: "{{ packages
                 | default_key('name')

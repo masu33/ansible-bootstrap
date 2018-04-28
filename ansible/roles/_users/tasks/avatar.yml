@@ -1,5 +1,14 @@
 ---
 
+- name: create avatar folder
+  become: yes
+  file:
+    path: "/var/lib/AccountsService/icons/"
+    owner: root
+    group: root
+    mode: 0644
+    state: directory
+
 - name: copy avatar
   become: yes
   copy:
