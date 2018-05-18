@@ -63,7 +63,7 @@ target/
 
 # Ansible
 *.retry
-__test.yml
+ansible/__test.yml
 
 # vim
 *.swp

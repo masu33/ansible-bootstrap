@@ -22,7 +22,7 @@
         group:            "{{ dl.group            | d(omit) }}"
         mode:             "{{ dl.mode             | d(omit) }}"
         owner:            "{{ dl.owner            | d(omit) }}"
-      with_items: "{{ config.downloads }}"
+      with_items: []
       loop_control:
         loop_var: dl
 
@@ -470,10 +470,6 @@
         - ipywidgets
         - jupyter
         - jupyter-declarativewidgets
-        - openpyxl
-        - xlwt
-        - xlr
-
         # tools
         - pymongo
         - py4j
@@ -539,15 +535,15 @@
           value: 0
           state: present
 
-        - id: keyboard_layouts
-          user: gdm
-          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-          state: present
-
-        - id: keyboard_layout
-          user: gdm
-          value: 0
-          state: present
+#        - id: keyboard_layouts
+#          user: gdm
+#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+#          state: present
+#
+#        - id: keyboard_layout
+#          user: gdm
+#          value: 0
+#          state: present
 
         - id: keyboard_layouts
           user: root
@@ -559,11 +555,11 @@
           value: 0
           state: present
 
-        - user: gdm
-          schema: org.gnome.libgnomekbd.keyboard
-          key: layouts
-          value: "['hu', 'us\taltgr-intl']"
-          state: present
+#        - user: gdm
+#          schema: org.gnome.libgnomekbd.keyboard
+#          key: layouts
+#          value: "['hu', 'us\taltgr-intl']"
+#          state: present
 
         - id: keyboard_xkb_options
           user: masu
