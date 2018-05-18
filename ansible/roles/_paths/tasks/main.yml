@@ -5,7 +5,6 @@
       - paths is sequence
 
 - # name:
-  become: yes
   include_tasks: path.yml
   with_items: "{{ paths }}"
   loop_control:

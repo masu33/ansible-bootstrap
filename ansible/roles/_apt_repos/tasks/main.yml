@@ -6,7 +6,6 @@
       - allowed_keys is sequence
 
 - # name:
-  become: yes
   include_tasks: key.yml
   with_items: "{{ repos
                 | default_key('id')
@@ -17,7 +16,6 @@
     loop_var: repo
 
 - # name:
-  become: yes
   include_tasks: repo.yml
   with_items: "{{ repos
                 | default_key('id')
@@ -40,6 +38,7 @@
     - update apt cache
 
 - when: force_update_cache
+  become: yes
   meta: noop
   changed_when: yes
   notify:

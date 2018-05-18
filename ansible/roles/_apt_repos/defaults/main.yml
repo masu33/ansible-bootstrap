@@ -29,6 +29,7 @@ allowed_keys:
   # apt-key modules
   - key
   - keyserver
+  - gpgkey
   - url
 
   # id for lookup
@@ -53,22 +54,18 @@ _aliases:
     release: "{{ ansible_distribution_release }}-proposed"
   - &main
     name: main
-    filename: &ubuntulist ubuntu
   - &restricted
     name: restricted
-    filename: *ubuntulist
   - &universe
     name: universe
-    filename: *ubuntulist
   - &multiverse
     name: multiverse
-    filename: *ubuntulist
   - &all
     name: main restricted universe multiverse
-    filename: *ubuntulist
+  - &ext
+    name: restricted universe multiverse
   - &oss
     name: main restricted
-    filename: *ubuntulist
 
 repo_list:
 
@@ -88,6 +85,9 @@ repo_list:
   deb-all:
     <<: *deb
     <<: *all
+  deb-ext:
+    <<: *deb
+    <<: *ext
   deb-oss:
     <<: *deb
     <<: *oss
@@ -106,6 +106,9 @@ repo_list:
   src-all:
     <<: *src
     <<: *all
+  src-ext:
+    <<: *src
+    <<: *ext
   src-oss:
     <<: *src
     <<: *oss
@@ -329,53 +332,596 @@ repo_list:
   dropbox:
     url: "http://linux.dropboxstatic.com/ubuntu/"
     key: "5044912E"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+      mQENBEt0ibEBCACv4hZRPqwtpU6z8+BB5YZU1a3yjEvg2W68+a6hEwxtCa2U++4d
+      zQ+7EqaUq5ybQnwtbDdpFpsOi9x31J+PCpufPUfIG694/0rlEpmzl2GWzY8NqfdB
+      FGGm/SPSSwvKbeNcFMRLu5neo7W9kwvfMbGjHmvUbzBUVpCVKD0OEEf1q/Ii0Qce
+      kx9CMoLvWq7ZwNHEbNnij7ecnvwNlE2MxNsOSJj+hwZGK+tM19kuYGSKw4b5mR8I
+      yThlgiSLIfpSBh1n2KX+TDdk9GR+57TYvlRu6nTPu98P05IlrrCP+KF0hYZYOaMv
+      Qs9Rmc09tc/eoQlN0kkaBWw9Rv/dvLVc0aUXABEBAAG0MURyb3Bib3ggQXV0b21h
+      dGljIFNpZ25pbmcgS2V5IDxsaW51eEBkcm9wYm94LmNvbT6IXgQQEQgABgUCS+lk
+      lQAKCRD8kg8z/8ZzxODyAP49juQqN9TnciJEOFQAy+9W5AFl6DA272Ffn4MXxtnI
+      WgEAltr4KGWLsyGnjuDtMAuj1tYXM5/swJY3kozxCSEjVamJARwEEAECAAYFAk6l
+      vwUACgkQwF8Jr9F5j5dtlgf/RN9SiK4z8Ae8Mbmp+LB8ruYLdYV2K1d1deOqeKFQ
+      JYTNQPgpREx/5JDvb+0lGPvym8d56mfs1SzfXEQT2ldFGoQJJX0x2r2L4g9iSBi6
+      zijXFFktuVKXt2laqlQWM09SmKobiAWmG2ZtatfvTw2aHq5rdMDc2C1HiqPxD5rM
+      CCqWmLk0SHuMiqo9HHqGYgoTHV1Pt8QbAjnzI4gBEZJZxyvwgCoelwTx/6fX5I2k
+      eiCRrFKw2pmP04bbX/3HOk7YdqSR5mjUDbh/58DcyHKtwnq7rT+ucHlbvF9F7xa2
+      mACv4JfcQbaDTrwLdSwmW3NB7x8cubLAi2pvTKhaW9sMtIkBNgQTAQIAIAUCS3SJ
+      sQIbAwYLCQgHAwIEFQIIAwQWAgMBAh4BAheAAAoJEPyRizNQRJEuL/MH/AyxwRrX
+      mtL7SYimw5GScPuRrArDJ1r4sd21lzSEP/vdAYUg1HY/bdROiX9HifIAUS5g2wXQ
+      LggAPrLikvj15nvYiS0+uvgfbtD15eE1l8mEPsG9AwHHvkvQXmBJDC4LsZ1g2XBK
+      UIPQACFBuLvRUHDN4iAhMGQxBwkiEu+WVij8AoPsa/2G7LhEtoihJ6h+n7ZDTNQc
+      0+X/vPKY6q77k7F7WW24lP+R3/yFT43lY3ElNJo4rSwXX/BYUzqtZ3pdBQ/TdXI2
+      iwB69fm0Gj76IPVZjb+UVVQmS8C+B7ZYWTdzq0DBlP+0rGykXLgz+01sMp7K+vrz
+      lconD16LoZw4YcM=
+      =U3vA
+      -----END PGP PUBLIC KEY BLOCK-----
 
   mega:
     url: "https://mega.nz/linux/MEGAsync/xUbuntu_{{ ansible_distribution_version }}/"
     release: "./"
     name: ""
     key: "23ACD201"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
     filename: "megasync"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-  webupd8team-java:
+      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
+      EiwMOXt92WvryjBhf4Yn7idVdBmJFIo=
+      =kkrN
+      -----END PGP PUBLIC KEY BLOCK-----
+
+  webupd8team:
     url: "http://ppa.launchpad.net/webupd8team/java/ubuntu"
     key: "EEA14886"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-  webupd8team-tor:
-    url: "http://ppa.launchpad.net/webupd8team/java/ubuntu"
-    key: "EEA14886"
-    keyserver: "pgp.mit.edu"
+      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
+      =P4SR
+      -----END PGP PUBLIC KEY BLOCK-----
 
   git-lfs:
     url: "https://packagecloud.io/github/git-lfs/ubuntu"
     key: "D59097AB"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-  slack-jessie:
-    url: "https://packagecloud.io/slacktechnologies/slack/debian"
-    release: "jessie"
-    key: "038651BD"
-    keyserver: "pgp.mit.edu"
-    filename: "slack"
+      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
+      A3x+pZzlTHtcgMOhjKQAsA==
+      =KUpS
+      -----END PGP PUBLIC KEY BLOCK-----
 
   virtualbox:
     url: "http://download.virtualbox.org/virtualbox/debian"
     name: "non-free contrib"
     key: "2980AECF"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+      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
+      Z+8AtEM=
+      =PRfv
+      -----END PGP PUBLIC KEY BLOCK-----
 
   umake:
     url: "http://ppa.launchpad.net/ubuntu-desktop/ubuntu-make/ubuntu"
     key: "A1231595"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+      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
+      =9Pas
+      -----END PGP PUBLIC KEY BLOCK-----
 
   chrome-gnome:
     url: "http://ppa.launchpad.net/ne0sight/chrome-gnome-shell/ubuntu"
     key: "8AEB02C4"
-    keyserver: "pgp.mit.edu"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+      mQINBFbKHAEBEACbXmVaChoAapB5VU9XRYOOFdn03gLc3JZuL+r7eXLIH6T3TaqZ
+      efeOWffeDJlHie/9m3p5BiBobu87zWzctankPp9Key4wdMLtPSTAvASpSHa8OTDi
+      +3Y0/VrmUkjosIC3QnO+UQysBczT+SoK/hOuVvUie2bxtvb+oYj37k6d8SALoMWt
+      EYq/Gw/rdd87gyeldXrL40j6doF7ESDHlyoI6WZ5x0xpxjOlOvCL04k/lqOpGCTC
+      RjxumG1jsrjcpXJC9sGtaT/Zdg7L23yKDCKHoBL4whJ4xhLBSys9C6BxX1FKMO9D
+      MqsOPhhHOrcvJ4+lUnVpfXldRH6EVL/aB/1XFsrKLpZgITcxK3OnsyTsCL4kCL6f
+      SiMjuXZJQvzzN9TmYgF1b2/Zg3H6moZ42is5OjE1mIXZr7CH9kgoaMcxmMVtU6Bb
+      i8xG1wtSVOQpQPZOZMMR8caSRx+Ri+AhyUn+QApdyhaiejhMS37bfWVzRcESLgrN
+      oyJ1+n2zMR/uebTn9KnlZlFLt9r+jzxpOlTW2B2upKK9cExTPQG8bGdO8TI6UIvA
+      1VHhwP2yhU0cyrdbv49JhsEw2SOABs9C4QKsf8Rgv1j5CvdwxOelQYQCL+C5cwCl
+      oCdrTB5SKDiQGOTHn9emP4Qp9dju88cN4vLLYM+VijKHGnTQ0jX6W2HbsQARAQAB
+      tBpMYXVuY2hwYWQgUFBBIGZvciBuRTBzSWdoVIkCOAQTAQIAIgUCVsocAQIbAwYL
+      CQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQyDNxk4rrAsT3jRAAj8LuFFlMNHTR
+      98y0BRZU+/Ffb1u4lDw9CPYqPEoUvXsNXGhHHRTpXcJ40+JS7KkgG0WalJpekoYB
+      wCNpGryVT/SJFHEOVIMFMkFCl8tgBRJCGqK/PYLiLJy6WBrpy2A9JWbgBxcHOfGV
+      JEjA51udbAQlWl7JC/FS+sk75YTlMqHb7drL12Xd4bm40asBvJ3k+piQlGvYGkcB
+      TvBbJQqZCQ1zEXKldpueKamHDHIfRP5oXu8qXYbSThgy13HpwynptOP0YezrPdAD
+      A6d464PQ3NVxCwuDT2AmO9AzyymGUCxiIBCWyChjfzg7s8Lrz3HFHCfh2Ks2D89l
+      MlCcq9bc2oKQ1RGqFPex2qbQUp7vcQwu1s0E6mQuxOO7H7JQGs9ZxsvtfNUZCYSh
+      q/w8x+wGhhcfEHFhP/LJpXIucAUI+iEt6XGBTNGb5CiTyLEkn7ADhGJG9mecwQSR
+      SQYXGgHradjoCL9jH1JSxdC555lqt7exUZ1EqP9sqCTOLPHgWzfVpw335UxqWLY/
+      +TwiAo+v9+LbwXhRTFF5/oVJkl4mM5gYZ4s8SqhlZIeU5E5Oviqb3cprzAlYe4nS
+      c6XKrLaigePEXzGxo40vhKvdqjVFJ6FxUsvs7R6HxkegKB0+FRxCPjeRtGy86Vpy
+      mjukts5YzmDBrpLpuJ+W/CVPb3hZO8o=
+      =mWZM
+      -----END PGP PUBLIC KEY BLOCK-----
 
 _original_repo_list:  # based on ubuntu xenial
   - id: deb-oss

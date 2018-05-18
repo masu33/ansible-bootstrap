@@ -5,7 +5,8 @@
       - user is mapping
       - user.name is defined
 
-- name: Set up user
+- name: set up user
+  become: yes
   user:
     append:             "{{ user.append             | d(omit) }}"
     comment:            "{{ user.comment            | d(omit) }}"
@@ -67,9 +68,11 @@
     state:       present
 
 - when: user.avatar is defined
+  become: yes
   include_tasks: avatar.yml
 
 - when: user.bookmarks is defined
+  become: yes
   include_tasks: bookmarks.yml
 
 ...

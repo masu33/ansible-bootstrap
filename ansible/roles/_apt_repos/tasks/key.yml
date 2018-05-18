@@ -1,13 +1,23 @@
 ---
 
-- when: repo.keyserver is defined
+- when: repo.gpgkey is defined
+  become: yes
+  name: set repository keys
+  apt_key:
+    state: "{{ repo.state  | d(omit) }}"
+    data:  "{{ repo.gpgkey           }}"
+    id:    "{{ repo.key              }}"
+
+- when: repo.gpgkey is undefined and repo.keyserver is defined
+  become: yes
   name: set repository keys with keyserver
   apt_key:
-    state:     "{{ repo.state     | d(omit)              }}"
-    keyserver: "{{ repo.keyserver                        }}"
-    id:        "{{ repo.key                              }}"
+    state:     "{{ repo.state     | d(omit) }}"
+    keyserver: "{{ repo.keyserver           }}"
+    id:        "{{ repo.key                 }}"
 
-- when: repo.key_url is defined and repo.keyserver is undefined
+- when: repo.gpgkey is undefined and repo.keyserver is undefined and repo.key_url is defined
+  become: yes
   name: set repository keys with key URL
   apt_key:
     state: "{{ repo.state   | d(omit) }}"

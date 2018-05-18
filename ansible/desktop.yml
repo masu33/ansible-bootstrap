@@ -22,7 +22,7 @@
         group:            "{{ dl.group            | d(omit) }}"
         mode:             "{{ dl.mode             | d(omit) }}"
         owner:            "{{ dl.owner            | d(omit) }}"
-      with_items: "{{ config.downloads }}"
+      with_items: []
       loop_control:
         loop_var: dl
 
@@ -37,7 +37,12 @@
       become: yes
       apt:
         package: "{{ item }}"
-      with_items: "{{ config.pre_packages }}"
+      with_items:
+        - aptitude
+        - apt-transport-https
+        - accountsservice
+        - ca-certificates
+        - locales
       tags:
         - apt
         - download
@@ -45,13 +50,112 @@
   roles:
 
     - role: _users
-      users: "{{ config.users }}"
+      users:
+
+        - name: ansible
+          state: present
+          password: "{{ passwords.ansible }}"
+          update_password: on_create
+          groups: sudo
+          append: yes
+          shell: /bin/bash
+
+          hide: yes
+
+        - name: masu
+          state: present
+          password: "{{ passwords.masu }}"
+          update_password: always
+          ssh_key_bits: 128
+          ssh_key_comment: masu@$HOSTNAME
+          ssh_key_passphrase: "{{ passphrases.masu }}"
+          groups: sudo,ansible
+          append: yes
+          shell: /bin/bash
+
+          hide: no
+          bashrcd: yes
+          bashstyle:
+            names: "1;49;34"
+            misc: "1;49;93"
+          avatar: avatar
+
+          bookmarks:
+            append: no
+            bookmarks:
+              - /home/masu/Documents
+              - /home/masu/Pictures
+              - /home/masu/Downloads
+              - ""
+              - /home/masu/Desktop Desktop
+              - /home/masu/MEGA MEGA
+              - /home/masu/Dropbox Dropbox
+
+        - name: willow
+          state: present
+          password: "{{ passwords.willow }}"
+          update_password: on_create
+          system: no
+          shell: /bin/bash
+
+          hide: yes
+
+        - name: rstrct
+          state: present
+          password: "{{ passwords.rstrct }}"
+          home: /var/rstrct
+          update_password: on_create
+          system: no
+          shell: /bin/bash
+
+          hide: yes
+
       tags:
         - user
         - password
 
     - role: _paths
-      paths: "{{ config.paths }}"
+      __paths:
+        - &dirmasu
+          owner: masu
+          group: masu
+          state: directory
+          follow: no
+        - &755masu
+          <<: *dirmasu
+          mode: "0755"
+        - &700masu
+          <<: *dirmasu
+          mode: "0700"
+        - &777masu
+          <<: *dirmasu
+          mode: "0777"
+      paths:
+        - <<: *755masu
+          path: "/home/masu"
+        - <<: *700masu
+          path: "/home/masu/Downloads"
+        - <<: *755masu
+          path: "/home/masu/Pictures"
+        - <<: *777masu
+          path: "/home/masu/Willow"
+        - path: "/home/willow/Masu"
+          follow: no
+          force: yes
+          owner: "willow"
+          group: "willow"
+          src: "/home/masu/Willow"
+          state: link
+        - path: "/home/ansible/.ssh/"
+          mode: "0600"
+          state: directory
+        - path: "/var/rstrct/"
+          force: yes
+          mode: "0700"
+          owner: rstrct
+          group: rstrct
+          state: directory
+
       tags:
         - user
         - password
@@ -83,7 +187,27 @@
   roles:
 
     - role: _apt_repos
-      repos: "{{ config.repos }}"
+      repos:
+        # Ubuntu repos
+        - id: deb-main
+          state: present
+        - id: deb-ext
+          state: present
+        - id: deb-security-all
+          state: present
+        - id: deb-updates-all
+          state: present
+        - id: deb-backports-oss
+          state: present
+        # Application repos
+        - id: dropbox
+          release: xenial  # TODO: reconsider release
+        - mega
+        - webupd8team
+        - id: umake
+          release: zesty  # TODO: reconsider release
+        - id: chrome-gnome
+          release: zesty  # TODO: reconsider release
       empty_sources_list: yes
       update_cache: yes
       tags:
@@ -92,7 +216,191 @@
         - download
 
     - role: _apt_packages
-      packages: "{{ config.packages }}"
+      __packages:
+        - &absent
+          state: absent
+          purge: yes
+      packages:
+        # Defaults to remove
+        - <<: *absent
+          name: account-plugin-facebook
+        - <<: *absent
+          name: account-plugin-flickr
+        - <<: *absent
+          name: aisleriot
+        - <<: *absent
+          name: bogofilter
+        - <<: *absent
+          name: bogofilter-common
+        - <<: *absent
+          name: bogofilter-bdb
+        - <<: *absent
+          name: brasero
+        - <<: *absent
+          name: brasero-common
+        - <<: *absent
+          name: brasero-cdrkit
+        - <<: *absent
+          name: brltty
+        - <<: *absent
+          name: dc
+        - <<: *absent
+          name: dvd+rw-tools
+        - <<: *absent
+          name: espeak-data
+        - <<: *absent
+          name: genisoimg
+        - <<: *absent
+          name: libbrasero-media3-1
+        - <<: *absent
+          name: gnome-mahjongg
+        - <<: *absent
+          name: gnome-orca
+        - <<: *absent
+          name: gnome-sudoku
+        - <<: *absent
+          name: rhythmbox
+        - <<: *absent
+          name: rhythmbox-data
+        - <<: *absent
+          name: rhythmbox-plugins
+        - <<: *absent
+          name: rhythmbox-plugin-zeitgeist
+        - <<: *absent
+          name: totem
+        - <<: *absent
+          name: totem-common
+        - <<: *absent
+          name: totem-plugins
+        - <<: *absent
+          name: wodim
+
+        # Ubuntu system
+        - systemd
+        - fakeroot
+        - file
+        - findutils
+        - rsync
+        - gparted
+        - gdisk
+        - baobab
+        - iptables
+        - macchanger
+        - traceroute
+        - netcat
+        - telnet
+        - htop
+        - tree
+        - rar
+        - unrar
+        - zip
+        - unzip
+        - apt
+        - aptitude
+        - apt-cacher-ng
+#        - gksu  # TODO: consider readding
+        - galternatives
+
+        # Security
+        - openvpn
+        - network-manager-openvpn
+        - network-manager-openvpn-gnome
+
+        # Programming
+        - git
+        - gitk
+        - ubuntu-make
+        - g++
+        - gcc
+        - make
+        - libc-bin
+        - lsb
+        - build-essential
+        - gawk
+        - python3
+        - python3-dev
+        - python3-setuptools
+        - python3-pip
+        - virtualenv
+
+        # Java
+        - oracle-java8-installer
+        - oracle-java8-set-default
+        - oracle-java8-unlimited-jce-policy
+
+        # Desktop
+        - accountsservice
+        - chrome-gnome-shell
+        - gnome-shell-extensions
+        - gnome-tweak-tool
+        - shutter
+        - caffeine
+        - firefox
+        - firefox-locale-en
+        - chromium-browser
+        - chromium-codecs-ffmpeg
+
+        # Media
+        - clementine
+        - mplayer
+        - smplayer
+        - libavcodec-extra
+        - ffmpeg
+        - ubuntu-restricted-extras
+
+        # Virtualisation
+        - docker.io
+        - docker-compose
+        - virtualbox
+        - vagrant
+
+        # Office
+        - vim
+        - gedit
+        - evince
+#        - pdftk  # TODO: consider readding
+        - calibre
+        - texlive
+        - texstudio
+        - ttf-mscorefonts-installer
+        - ttf-ubuntu-font-family
+        - libfreetype6
+        - libfreetype6-dev
+        - libfontconfig
+        - fonts-ubuntu-font-family-console
+        - eog
+        - pinta
+        - gimp
+        - inkscape
+        - libreoffice-writer
+        - libreoffice-calc
+        - libreoffice-impress
+        - hunspell-en-us
+
+        # Transimission
+        - curl
+        - wget
+        - youtube-dl
+        - deluged
+        - deluge-gtk
+        - deluge-console
+        - deluge-webui
+        - empathy
+        - slack
+        - cheese
+        - dropbox
+        - megasync
+        - megatools
+
+        # Remote access
+        - openssh-server
+        - paprefs
+        - vnc4server
+        - xrdp
+        - rdesktop
+        - vinagre
+        - synergy
+
       tags:
         - package
         - apt
@@ -135,80 +443,45 @@
         - alias
         - shell
 
-    - name: python setuptools
-      become: yes
-      apt:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - python
-        - python-dev
-        - python-setuptools
-        - python3
-        - python3-dev
-        - python3-setuptools
-      tags:
-        - download
-        - programming
-        - python
-        - package
-
-    - name: set pip2 and pip3
-      become: yes
-      easy_install:
-        name: pip
-        executable: "{{ item }}"
-      with_items:
-        - easy_install
-        - easy_install3
-      tags:
-        - download
-        - programming
-        - python
-        - package
-
     - name: set python3 packages
       become: yes
       pip:
         state: latest
         executable: pip3
         name: "{{ package }}"
-      with_items: "{{ config.python3_packages | d([]) }}"
-      loop_control:
-        loop_var: package
-      tags:
-        - download
-        - programming
-        - python
-        - package
-
-    - name: set python2 packages
-      become: yes
-      pip:
-        extra_args: --upgrade
-        executable: pip
-        name: "{{ package }}"
-      with_items: "{{ config.python2_packages | d([]) }}"
-      loop_control:
-        loop_var: package
-      tags:
-        - download
-        - programming
-        - python
-        - package
-
-    - name: nodejs packages
-      become: yes
-      npm:
-        name: "{{ item }}"
-        global: yes
-        state: present
       with_items:
-        - phantomjs-prebuilt
+        # Dev
+        - tqdm
+        - pytz
+        - cython
+        - selenium
+
+        # Data science
+        - numpy
+        - scipy
+        - scikit-learn
+        - xgboost
+        - pandas
+        - matplotlib
+        - seaborn
+
+        # Interface
+        - ipython
+        - ipywidgets
+        - jupyter
+        - jupyter-declarativewidgets
+        # tools
+        - pymongo
+        - py4j
+        - pyinstaller
+        - thefuck
+      loop_control:
+        loop_var: package
       tags:
-        - npm
-        - package
         - download
+        - programming
+        - python
+        - package
 
     - name: apt upgrade & cleanup
       become: yes
@@ -230,7 +503,168 @@
   roles:
 
     - role: _gnome_settings
-      gnome_settings: "{{ config.gnome_settings }}"
+      gnome_settings:
+          # Keyboard
+        - id: keyboard_layouts
+          user: masu
+          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+          state: present
+
+        - id: keyboard_layout
+          user: masu
+          value: 0
+          state: present
+
+        - id: keyboard_layouts
+          user: willow
+          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+          state: present
+
+        - id: keyboard_layout
+          user: willow
+          value: 0
+          state: present
+
+        - id: keyboard_layouts
+          user: ansible
+          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+          state: present
+
+        - id: keyboard_layout
+          user: ansible
+          value: 0
+          state: present
+
+#        - id: keyboard_layouts
+#          user: gdm
+#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+#          state: present
+#
+#        - id: keyboard_layout
+#          user: gdm
+#          value: 0
+#          state: present
+
+        - id: keyboard_layouts
+          user: root
+          value: "[('xkb', 'hu'), ('xkb', 'us')]"
+          state: present
+
+        - id: keyboard_layout
+          user: root
+          value: 0
+          state: present
+
+#        - user: gdm
+#          schema: org.gnome.libgnomekbd.keyboard
+#          key: layouts
+#          value: "['hu', 'us\taltgr-intl']"
+#          state: present
+
+        - id: keyboard_xkb_options
+          user: masu
+          value: "terminate:ctrl_alt_bksp"
+          state: absent
+
+        - id: keyboard_xkb_options
+          user: root
+          value: "terminate:ctrl_alt_bksp"
+          state: absent
+
+          # Background
+        - id: background_show
+          user: masu
+          value: "true"
+          state: present
+
+        - id: background
+          user: masu
+          value: "file:///home/masu/Pictures/background"
+          state: present
+
+        - id: background_icons
+          user: masu
+          value: "true"
+          state: present
+
+        - id: lockscreen
+          user: masu
+          value: "file:///home/masu/Pictures/lock"
+          state: present
+
+          # Power
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: button-power
+          value: "suspend"
+          state: present
+
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: sleep-inactive-ac-timeout
+          value: "14400"
+          state: present
+
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: sleep-inactive-battery-timeout
+          value: "7200"
+          state: present
+
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: lid-close-ac-action
+          value: "nothing"
+          state: present
+
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: lid-close-battery-action
+          value: "nothing"
+          state: present
+
+        - user: masu
+          schema: org.gnome.settings-daemon.plugins.power
+          key: lid-close-suspend-with-external-monitor
+          value: "false"
+          state: present
+
+          # Sound
+        - user: masu
+          schema: org.gnome.desktop.sound
+          key: theme-name
+          value: "__custom"
+          state: present
+
+        - user: root
+          schema: org.gnome.desktop.sound
+          key: theme-name
+          value: "__custom"
+          state: present
+
+        - user: masu
+          schema: org.gnome.desktop.sound
+          key: input-feedback-sounds
+          value: "false"
+          state: present
+
+        - user: root
+          schema: org.gnome.desktop.sound
+          key: input-feedback-sounds
+          value: "false"
+          state: present
+
+        - user: masu
+          schema: org.gnome.desktop.sound
+          key: event-sounds
+          value: "false"
+          state: present
+
+        - user: root
+          schema: org.gnome.desktop.sound
+          key: event-sounds
+          value: "false"
+          state: present
       tags:
         - gnome
         - desktop
@@ -289,28 +723,21 @@
         - python
         - shell
 
-    - name: set firefox-bme alias
+    - name: set firefox socket proxy tunnel alias
       become: yes
-      vars:
-        cbc: aes256-ctr
-        user: masu
-        host: ccnet2.tmit.bme.hu
-      blockinfile:
+      copy:
         backup: yes
-        block: >
-          alias firefox-bme=ssh\ -D\ 8080\ -f\ -C\ -c\ {{cbc}}\ -q\ {{user}}@{{host}}\ sleep\ 10\;firefox\ -P\ bme
-        create: yes
+        content: !unsafe |
+          #!/bin/bash
+          ssh -D 22344 -f -C -c aes256-ctr -q $@ sleep 10
+          firefox -P proxy22344 &
+        dest: "/usr/bin/proxyfox"
         follow: yes
-        group: masu
-        insertafter: EOF
-        marker: "# {mark} ANSIBLE MANAGED BLOCK - firefox-bme alias"
-        mode: "0664"
-        owner: masu
-        path: "/home/masu/.profile"
-        state: present
+        group: root
+        mode: "0755"
+        owner: root
       tags:
         - network
-        - bme
         - shell
 
 ...
