@@ -5,7 +5,7 @@
 # ----------
 
 GITUSER="sandorkazi"
-GITHUBNAME="ansible-ubuntu-bootstrap"
+GITHUBNAME="ansible-linux-bootstrap"
 
 INSTALLIT="???"
 while [ "${INSTALLIT}" != "y" -a "${INSTALLIT}" != "n" ]; do
@@ -13,7 +13,18 @@ while [ "${INSTALLIT}" != "y" -a "${INSTALLIT}" != "n" ]; do
     echo    ""
 done
 
-sudo apt-get install git <<< "y"
+DISTRO=$(
+    cat /etc/*-release \
+    | sed -n -e 's/^ID=\(.*\)$/\1/p'
+)
+
+if [ "${DISTRO}" == "ubuntu" ]; then
+    sudo apt install -y git
+elif [ "${DISTRO}" == "manjaro" ]; then
+    sudo pacman -S git
+else
+    echo "Unknown DISTRO: ${DISTRO}"
+fi
 
 git clone "https://github.com/${GITUSER}/${GITHUBNAME}.git"
 
