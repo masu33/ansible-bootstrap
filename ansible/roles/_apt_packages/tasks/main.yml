@@ -16,7 +16,7 @@
     loop_var: debconf
 
 - # name:
-  include_tasks: package.yml
+  include_tasks: apt.yml
   with_items: "{{ packages
                 | default_key('name')
                 | list
