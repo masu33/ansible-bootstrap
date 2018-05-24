@@ -1,30 +1,5 @@
 ---
 
-- name: download resources
-
-  hosts: localhost
-
-  pre_tasks:
-
-    - name: download resources
-      get_url:
-        backup:           "{{ dl.backup           | d(omit) }}"
-        dest:             "{{ dl.dest             | d(omit) }}"
-        force:            "{{ dl.force            | d(omit) }}"
-        force_basic_auth: "{{ dl.force_basic_auth | d(omit) }}"
-        url:              "{{ dl.url              | d(omit) }}"
-        url_password:     "{{ dl.url_password     | d(omit) }}"
-        url_username:     "{{ dl.url_username     | d(omit) }}"
-        use_proxy:        "{{ dl.use_proxy        | d(omit) }}"
-        validate_certs:   "{{ dl.validate_certs   | d(omit) }}"
-        follow:           "{{ dl.follow           | d(omit) }}"
-        group:            "{{ dl.group            | d(omit) }}"
-        mode:             "{{ dl.mode             | d(omit) }}"
-        owner:            "{{ dl.owner            | d(omit) }}"
-      with_items: []
-      loop_control:
-        loop_var: dl
-
 - name: prerequisites, users and paths
   hosts: mymachine
   pre_tasks:
@@ -92,13 +67,11 @@
           bashstyle:
             names: "1;49;34"
             misc: "1;49;93"
-          avatar: avatar
 
           bookmarks:
             append: no
             bookmarks:
               - /home/masu/Documents
-              - /home/masu/Pictures
               - /home/masu/Downloads
               - ""
               - /home/masu/Desktop Desktop
@@ -174,25 +147,6 @@
         - user
         - password
 
-  post_tasks:
-
-    - name: put user images
-      become: yes
-      copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        force: yes
-        owner: masu
-        group: masu
-        mode: 0600
-      with_items:
-        - src: avatar
-          dest: /home/masu/Pictures/avatar
-        - src: background
-          dest: /home/masu/Pictures/background
-        - src: lock
-          dest: /home/masu/Pictures/lock
-
 - name: repos
   hosts: mymachine
   roles:
@@ -225,18 +179,6 @@
       tags:
         - repository
         - apt
-        - download
-
-    - when: ansible_os_family == "Archlinux"
-      role: _pacman_repos
-      repos:
-        # Manjaro repos
-        # Application repos
-      empty_sources_list: yes
-      update_cache: yes
-      tags:
-        - repository
-        - pacman
         - download
 
 - name: default packages to remove
@@ -297,30 +239,212 @@
 
 - name: packages
   hosts: mymachine
-  pre_tasks:
-
-#    - when: ansible_os_family == "Debian"
-#      name: set debconf for microsoft TTF
-#      become: yes
-#      debconf:
-#        name:     "Accept MS-TTF EULA"
-#        question: "msttcorefonts/accepted-mscorefonts-eula"
-#        value:    "true"
-#        vtype:    "select"
-
-    - when: ansible_os_family == "Debian"
-      name: set debconf for oracle java
-      become: yes
-      debconf:
-        name:     "Accept Oracle License"
-        question: "shared/accepted-oracle-license-v1-1"
-        value:    "true"
-        vtype:    "{{ item }}"
-      with_items:
-        - "select"
-        - "seen"
+  vars:
+    common_packages:
+      system:
+        - systemd
+        - fakeroot
+        - file
+        - findutils
+        - rsync
+        - gparted
+        - baobab
+        - iptables
+        - macchanger
+        - traceroute
+        - htop
+        - tree
+        - unrar
+        - zip
+        - unzip
+        - openvpn
+        - |
+          {{
+            {
+              'Debian': 'telnet',
+              'Archlinux': 'inetutils'
+            }[ansible_os_family]
+          }}
+        - |
+          {{
+            {
+              'Debian': 'netcat',
+              'Archlinux': 'gnu-netcat'
+            }[ansible_os_family]
+          }}
+      programming:
+        - |
+          {{
+            {
+              'Debian': 'python3',
+              'Archlinux': 'python'
+            }[ansible_os_family]
+          }}
+        - git
+        - gawk
+      desktop:
+        - accountsservice
+        - firefox
+        - |
+          {{
+            {
+              'Debian': 'shutter',
+              'Archlinux': 'spectacle'
+            }[ansible_os_family]
+          }}
+        - |
+          {{
+            {
+              'Debian': 'chromium-browser',
+              'Archlinux': 'chromium'
+            }[ansible_os_family]
+          }}
+      media:
+        - clementine
+        - mplayer
+        - smplayer
+        - ffmpeg
+        - vlc
+      virtual:
+        - docker-compose
+        - virtualbox
+        - vagrant
+        - |
+          {{
+            {
+              'Debian': 'docker.io',
+              'Archlinux': 'docker'
+            }[ansible_os_family]
+          }}
+      office:
+        - vim
+        - gedit
+        - evince
+        - calibre
+        - pinta
+        - gimp
+        - inkscape
+        # TODO: check for debian libreoffice package
+        - |
+          {{
+            {
+              'Debian': 'hunspell-en-us',
+              'Archlinux': 'hunspell'
+            }[ansible_os_family]
+          }}
+        - |
+          {{
+            {
+              'Debian': 'libreoffice-writer',
+              'Archlinux': 'libreoffice'
+            }[ansible_os_family]
+          }}
+        - |
+          {{
+            {
+              'Debian': 'libreoffice-calc',
+              'Archlinux': 'libreoffice'
+            }[ansible_os_family]
+          }}
+        - |
+          {{
+            {
+              'Debian': 'libreoffice-impress',
+              'Archlinux': 'libreoffice'
+            }[ansible_os_family]
+          }}
+      transmission:
+        - curl
+        - wget
+        - youtube-dl
+        # TODO: check for deluge debian package
+        - |
+          {{
+            {
+              'Debian': 'deluge-gtk',
+              'Archlinux': 'deluge'
+            }[ansible_os_family]
+          }}
+        - cheese
+      remote:
+        - |
+          {{
+            {
+              'Debian': 'openssh-server',
+              'Archlinux': 'openssh'
+            }[ansible_os_family]
+          }}
+        - paprefs
+        - rdesktop
+        - synergy
+    ubuntu_packages:
+      system:
+        - rar
+        - apt
+        - aptitude
+        - galternatives
+        - network-manager-openvpn
+        - network-manager-openvpn-gnome
+      programming:
+        - ubuntu-make
+        - python3
+        - python3-dev
+        - python3-setuptools
+        - python3-pip
+        - virtualenv
+      desktop:
+        - chrome-gnome-shell
+        - gnome-shell-extensions
+        - gnome-tweak-tool
+        - caffeine
+      media:
+      virtual:
+      office:
+#        - pdftk  # TODO: consider readding
+      transmission:
+        - slack
+        - dropbox
+        - megasync
+      remote:
+    manjaro_packages:
+      system:
+        - netcat  # TODO: fix error?!
+        - yaourt
+      programming:
+        - python3  # TODO: fix error?!
+      desktop:
+#        - caffeine-ng  # TODO: install with yaourt
+      media:
+      virtual:
+      office:
+#        - pdftk  # TODO: install with yaourt
+        - libreoffice
+        - hunspell
+      transmission:
+#        - slack  # TODO: install with yaourt
+#        - dropbox  # TODO: install with yaourt
+#        - megasync  # TODO: install with yaourt
+      remote:
 
   tasks:
+
+    - name: common packages
+      become: yes
+      package:
+        name: "{{ package }}"
+        state: present
+      loop_control:
+        loop_var: package
+      tags:
+        - package
+        - download
+      with_items: |
+        {{
+          common_packages.values()
+          | flatten
+          | map('trim')
+          | list
+        }}
 
     - when: ansible_os_family == "Debian"
       name: apt packages
@@ -334,109 +458,13 @@
         - package
         - apt
         - download
-      with_items:
-        # System
-        - systemd
-        - fakeroot
-        - file
-        - findutils
-        - rsync
-        - gparted
-        - baobab
-        - iptables
-        - macchanger
-        - traceroute
-        - netcat
-        - telnet
-        - htop
-        - tree
-        - unrar
-        - zip
-        - unzip
-        - openvpn
-        - rar
-        - apt
-        - aptitude
-#        - gksu  # TODO: consider readding
-        - galternatives
-        - network-manager-openvpn
-        - network-manager-openvpn-gnome
-
-        # Programming
-        - git
-        - gawk
-        - python3
-        - ubuntu-make
-        - python3-dev
-        - python3-setuptools
-        - python3-pip
-        - virtualenv
-
-        # Desktop
-        - accountsservice
-        - firefox
-        - chrome-gnome-shell
-        - gnome-shell-extensions
-        - gnome-tweak-tool
-        - shutter
-        - caffeine
-        - firefox-locale-en
-        - chromium-browser
-        - chromium-codecs-ffmpeg
-
-        # Media
-        - clementine
-        - mplayer
-        - smplayer
-        - ffmpeg
-        - vlc
-        - libavcodec-extra
-        - ubuntu-restricted-extras
-
-        # Virtual
-        - docker-compose
-        - virtualbox
-        - vagrant
-        - docker.io
-
-        # Office
-        - vim
-        - gedit
-        - evince
-#        - pdftk  # TODO: consider readding
-        - calibre
-        - texlive
-        - texstudio
-        - pinta
-        - gimp
-        - inkscape
-        - libreoffice-writer
-        - libreoffice-calc
-        - libreoffice-impress
-        - hunspell-en-us
-
-        # Transimission
-        - curl
-        - wget
-        - youtube-dl
-        - deluged
-        - deluge-gtk
-        - deluge-console
-        - deluge-webui
-        - slack
-        - cheese
-        - dropbox
-        - megasync
-        - megatools
-
-        # Remote access
-        - openssh-server
-        - paprefs
-        - vnc4server
-        - xrdp
-        - rdesktop
-        - vinagre
-        - synergy
+      with_items: |
+        {{
+          ubuntu_packages.values()
+          | flatten
+          | map('trim')
+          | list
+        }}
 
     - when: ansible_os_family == "Archlinux"
       name: pacman packages
@@ -450,91 +478,13 @@
         - package
         - pacman
         - download
-      with_items:
-        # System
-        - systemd
-        - fakeroot
-        - file
-        - findutils
-        - rsync
-        - gparted
-        - baobab
-        - iptables
-        - macchanger
-        - traceroute
-        - netcat
-        - htop
-        - tree
-        - unrar
-        - zip
-        - unzip
-        - openvpn
-        - yaourt
-
-        # Programming
-        - git
-        - gawk
-        - python3
-
-        # Desktop
-        - accountsservice
-        - firefox
-#        - shutter  # TODO: find alternative
-#        - caffeine  # TODO: find alternative
-        - chromium
-
-        # Media
-        - clementine
-        - mplayer
-        - smplayer
-        - ffmpeg
-        - vlc
-
-        # Virtual
-        - docker-compose
-        - virtualbox
-        - vagrant
-        - docker
-
-        # Office
-        - vim
-        - gedit
-        - evince
-#        - pdftk  # TODO: consider readding
-        - calibre
-#        - texlive  # TODO: find alternative
-        - texstudio
-        - pinta
-        - gimp
-        - inkscape
-#        - libreoffice  # TODO: FIX
-        - hunspell
-
-        # Transimission
-        - curl
-        - wget
-        - youtube-dl
-        - deluge
-#        - slack  # TODO: find alternative
-        - cheese
-#        - dropbox  # TODO: find alternative
-#        - megasync  # TODO: find alternative
-#        - megatools  # TODO: find alternative
-
-        # Remote access
-        - openssh
-        - paprefs
-#        - vnc4server  # TODO: find alternative
-#        - xrdp  # TODO: find alternative
-        - rdesktop
-        - vinagre
-        - synergy
-
-
-#        # Oracle Java
-#        - oracle-java8-installer
-#        - oracle-java8-set-default
-#        - oracle-java8-unlimited-jce-policy
+      with_items: |
+        {{
+          ubuntu_packages.values()
+          | flatten
+          | map('trim')
+          | list
+        }}
 
 - name: netlimit
   hosts: mymachine
@@ -651,246 +601,35 @@
         - pacman
         - network
 
-#- name: environment settings
-#  hosts: mymachine
-#  roles:
-#
-#    - role: _gnome_settings
-#      gnome_settings:
-#          # Keyboard
-#        - id: keyboard_layouts
-#          user: masu
-#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-#          state: present
-#
-#        - id: keyboard_layout
-#          user: masu
-#          value: 0
-#          state: present
-#
-#        - id: keyboard_layouts
-#          user: willow
-#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-#          state: present
-#
-#        - id: keyboard_layout
-#          user: willow
-#          value: 0
-#          state: present
-#
-#        - id: keyboard_layouts
-#          user: ansible
-#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-#          state: present
-#
-#        - id: keyboard_layout
-#          user: ansible
-#          value: 0
-#          state: present
-#
-##        - id: keyboard_layouts
-##          user: gdm
-##          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-##          state: present
-##
-##        - id: keyboard_layout
-##          user: gdm
-##          value: 0
-##          state: present
-#
-#        - id: keyboard_layouts
-#          user: root
-#          value: "[('xkb', 'hu'), ('xkb', 'us')]"
-#          state: present
-#
-#        - id: keyboard_layout
-#          user: root
-#          value: 0
-#          state: present
-#
-##        - user: gdm
-##          schema: org.gnome.libgnomekbd.keyboard
-##          key: layouts
-##          value: "['hu', 'us\taltgr-intl']"
-##          state: present
-#
-#        - id: keyboard_xkb_options
-#          user: masu
-#          value: "terminate:ctrl_alt_bksp"
-#          state: absent
-#
-#        - id: keyboard_xkb_options
-#          user: root
-#          value: "terminate:ctrl_alt_bksp"
-#          state: absent
-#
-#          # Background
-#        - id: background_show
-#          user: masu
-#          value: "true"
-#          state: present
-#
-#        - id: background
-#          user: masu
-#          value: "file:///home/masu/Pictures/background"
-#          state: present
-#
-#        - id: background_icons
-#          user: masu
-#          value: "true"
-#          state: present
-#
-#        - id: lockscreen
-#          user: masu
-#          value: "file:///home/masu/Pictures/lock"
-#          state: present
-#
-#          # Power
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: button-power
-#          value: "suspend"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: sleep-inactive-ac-timeout
-#          value: "14400"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: sleep-inactive-battery-timeout
-#          value: "7200"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: lid-close-ac-action
-#          value: "nothing"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: lid-close-battery-action
-#          value: "nothing"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.settings-daemon.plugins.power
-#          key: lid-close-suspend-with-external-monitor
-#          value: "false"
-#          state: present
-#
-#          # Sound
-#        - user: masu
-#          schema: org.gnome.desktop.sound
-#          key: theme-name
-#          value: "__custom"
-#          state: present
-#
-#        - user: root
-#          schema: org.gnome.desktop.sound
-#          key: theme-name
-#          value: "__custom"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.desktop.sound
-#          key: input-feedback-sounds
-#          value: "false"
-#          state: present
-#
-#        - user: root
-#          schema: org.gnome.desktop.sound
-#          key: input-feedback-sounds
-#          value: "false"
-#          state: present
-#
-#        - user: masu
-#          schema: org.gnome.desktop.sound
-#          key: event-sounds
-#          value: "false"
-#          state: present
-#
-#        - user: root
-#          schema: org.gnome.desktop.sound
-#          key: event-sounds
-#          value: "false"
-#          state: present
-#      tags:
-#        - gnome
-#        - desktop
-#        - settings
-#
-#    - role: configure_firefox
-#      user: masu
-#      start_with_last: no
-#      profiles:
-#        - name: default
-#          relative: yes
-#          default: yes
-#          account_data:
-#            verified: no
-#          prefs:
-#            services.sync.username: sandor.kazi@gmail.com
-#        - name: proxy8080
-#          relative: yes
-#      tags:
-#        - firefox
-#        - settings
-#        - config
-#
-#  tasks:
-#
-#    - name: set login keyboard layout
-#      become: yes
-#      lineinfile:
-#        path: /etc/default/keyboard
-#        line: XKBLAYOUT="hu"
-#        regexp: ^XKBLAYOUT=.*$
-#      tags:
-#        - gnome
-#        - desktop
-#        - settings
-#
-#    - name: set python aliases
-#      become: yes
-#      blockinfile:
-#        backup: yes
-#        block: |
-#          alias python=python3
-#          alias pip=pip3
-#          alias ipython=ipython3
-#        create: yes
-#        follow: yes
-#        group: masu
-#        insertafter: EOF
-#        marker: "# {mark} ANSIBLE MANAGED BLOCK - python alias"
-#        mode: "0664"
-#        owner: masu
-#        path: "/home/masu/.profile"
-#        state: present
-#      tags:
-#        - programming
-#        - python
-#        - shell
-#
-#    - name: set firefox socket proxy tunnel alias
-#      become: yes
-#      copy:
-#        backup: yes
-#        content: !unsafe |
-#          #!/bin/bash
-#          ssh -D 22344 -f -C -c aes256-ctr -q $@ sleep 10
-#          firefox -P proxy22344 &
-#        dest: "/usr/bin/proxyfox"
-#        follow: yes
-#        group: root
-#        mode: "0755"
-#        owner: root
-#      tags:
-#        - network
-#        - shell
-#
-#...
+- name: environment settings
+  hosts: mymachine
+  tasks:
+
+    - name: set login keyboard layout
+      become: yes
+      lineinfile:
+        path: /etc/default/keyboard
+        line: XKBLAYOUT="hu"
+        regexp: ^XKBLAYOUT=.*$
+      tags:
+        - desktop
+        - settings
+
+    - name: set firefox socket proxy tunnel alias
+      become: yes
+      copy:
+        backup: yes
+        content: !unsafe |
+          #!/bin/bash
+          ssh -D 22344 -f -C -c aes256-ctr -q $@ sleep 10
+          firefox -P proxy22344 &
+        dest: "/usr/bin/proxyfox"
+        follow: yes
+        group: root
+        mode: "0755"
+        owner: root
+      tags:
+        - network
+        - shell
+
+...
