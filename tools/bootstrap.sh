@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
 
-############
-# PLAYBOOK start for local desktop machine
-# ----------
-if [ -d ansible ] ; then
-    ansible-playbook -K ./ansible/desktop.yml -i ./ansible/localhost --ask-vault-pass $@
-elif [ -d ../ansible ] ; then
-    ansible-playbook -K ../ansible/desktop.yml -i ../ansible/localhost --ask-vault-pass $@
-else
-    echo "This should be run from the project folder or the tools folder in it."
-fi
+PROOT=`git rev-parse --show-toplevel`
+ansible-playbook -K ${PROOT}/ansible/desktop.yml -i ${PROOT}/ansible/localhost --ask-vault-pass $@

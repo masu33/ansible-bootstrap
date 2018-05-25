@@ -30,15 +30,29 @@
         - pacman
         - download
 
+    - name: "set {{ ansible_user }} nopasswd sudo package manager"
+      become: yes
+      vars:
+        pm: "{{ {
+              'Debian': '/usr/bin/apt',
+              'Archlinux': '/usr/bin/pacman',
+            }[ansible_os_family] }}"
+      copy:
+        dest: /etc/sudoers.d/{{ ansible_user }}-allow-to-sudo-package-manager
+        content: |
+          {{ ansible_user }} ALL=(ALL) NOPASSWD: {{ pm }}
+        validate: /usr/sbin/visudo -cf %s
+      tags:
+        - sudo
+
   roles:
 
     - role: _users
       vars:
         sudo: "{{ {
-              'Debian': 'sudo',
-              'Archlinux': 'wheel',
-            }[ansible_os_family]
-          }}"
+                'Debian': 'sudo',
+                'Archlinux': 'wheel',
+              }[ansible_os_family] }}"
       users:
 
         - name: ansible
@@ -152,9 +166,9 @@
   roles:
 
     - when: ansible_os_family == "Debian"
+      name: set repositories
       role: _apt_repos
       repos:
-        # Ubuntu repos
         - id: deb-main
           state: present
         - id: deb-ext
@@ -165,11 +179,11 @@
           state: present
         - id: deb-backports-oss
           state: present
-        # Application repos
         - id: dropbox
           release: xenial  # TODO: reconsider release
         - mega
         - webupd8team
+        - bionic-pdf
         - id: umake
           release: zesty  # TODO: reconsider release
         - id: chrome-gnome
@@ -240,6 +254,7 @@
 - name: packages
   hosts: mymachine
   vars:
+
     common_packages:
       system:
         - systemd
@@ -254,51 +269,54 @@
         - traceroute
         - htop
         - tree
+        - rar
         - unrar
         - zip
         - unzip
         - openvpn
-        - |
-          {{
-            {
-              'Debian': 'telnet',
-              'Archlinux': 'inetutils'
-            }[ansible_os_family]
-          }}
-        - |
-          {{
-            {
-              'Debian': 'netcat',
-              'Archlinux': 'gnu-netcat'
-            }[ansible_os_family]
-          }}
+        - "{{ {
+            'Debian': 'telnet',
+            'Archlinux': 'inetutils',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'netcat',
+            'Archlinux': 'gnu-netcat',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'bluez',
+            'Archlinux': 'bluez-utils',
+          }[ansible_os_family] }}"
       programming:
-        - |
-          {{
-            {
-              'Debian': 'python3',
-              'Archlinux': 'python'
-            }[ansible_os_family]
-          }}
+        - "{{ {
+            'Debian': 'python3',
+            'Archlinux': 'python',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'python3-pip',
+            'Archlinux': 'python-pip',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'python3-setuptools',
+            'Archlinux': 'python-setuptools',
+          }[ansible_os_family] }}"
         - git
         - gawk
       desktop:
         - accountsservice
         - firefox
-        - |
-          {{
-            {
-              'Debian': 'shutter',
-              'Archlinux': 'spectacle'
+        - "{{ {
+            'Debian': 'shutter',
+            'Archlinux': 'spectacle',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'chromium-browser',
+            'Archlinux': 'chromium',
             }[ansible_os_family]
-          }}
-        - |
-          {{
-            {
-              'Debian': 'chromium-browser',
-              'Archlinux': 'chromium'
-            }[ansible_os_family]
-          }}
+          }}"
+        - "{{ {
+            'Debian': 'caffeine',
+            'Archlinux': 'caffeine-ng',
+          }[ansible_os_family] }}"
       media:
         - clementine
         - mplayer
@@ -309,13 +327,10 @@
         - docker-compose
         - virtualbox
         - vagrant
-        - |
-          {{
-            {
-              'Debian': 'docker.io',
-              'Archlinux': 'docker'
-            }[ansible_os_family]
-          }}
+        - "{{ {
+            'Debian': 'docker.io',
+            'Archlinux': 'docker',
+          }[ansible_os_family] }}"
       office:
         - vim
         - gedit
@@ -324,127 +339,52 @@
         - pinta
         - gimp
         - inkscape
-        # TODO: check for debian libreoffice package
-        - |
-          {{
-            {
-              'Debian': 'hunspell-en-us',
-              'Archlinux': 'hunspell'
-            }[ansible_os_family]
-          }}
-        - |
-          {{
-            {
-              'Debian': 'libreoffice-writer',
-              'Archlinux': 'libreoffice'
-            }[ansible_os_family]
-          }}
-        - |
-          {{
-            {
-              'Debian': 'libreoffice-calc',
-              'Archlinux': 'libreoffice'
-            }[ansible_os_family]
-          }}
-        - |
-          {{
-            {
-              'Debian': 'libreoffice-impress',
-              'Archlinux': 'libreoffice'
-            }[ansible_os_family]
-          }}
+        - "{{ {
+            'Debian': 'hunspell-en-us',
+            'Archlinux': 'hunspell',
+          }[ansible_os_family] }}"
+        - "{{ {
+            'Debian': 'libreoffice',
+            'Archlinux': 'libreoffice-fresh',
+          }[ansible_os_family] }}"
+        - pdftk
       transmission:
         - curl
         - wget
         - youtube-dl
-        # TODO: check for deluge debian package
-        - |
-          {{
-            {
-              'Debian': 'deluge-gtk',
-              'Archlinux': 'deluge'
-            }[ansible_os_family]
-          }}
+        - deluge
         - cheese
+        - slack
+        - dropbox
+        - megasync
       remote:
-        - |
-          {{
-            {
-              'Debian': 'openssh-server',
-              'Archlinux': 'openssh'
-            }[ansible_os_family]
-          }}
+        - "{{ {
+            'Debian': 'openssh-server',
+            'Archlinux': 'openssh',
+          }[ansible_os_family] }}"
         - paprefs
         - rdesktop
         - synergy
     ubuntu_packages:
       system:
-        - rar
         - apt
         - aptitude
         - galternatives
         - network-manager-openvpn
         - network-manager-openvpn-gnome
       programming:
-        - ubuntu-make
-        - python3
         - python3-dev
-        - python3-setuptools
-        - python3-pip
         - virtualenv
       desktop:
         - chrome-gnome-shell
         - gnome-shell-extensions
         - gnome-tweak-tool
-        - caffeine
-      media:
-      virtual:
-      office:
-#        - pdftk  # TODO: consider readding
-      transmission:
-        - slack
-        - dropbox
-        - megasync
-      remote:
     manjaro_packages:
-      system:
-        - netcat  # TODO: fix error?!
-        - yaourt
-      programming:
-        - python3  # TODO: fix error?!
-      desktop:
-#        - caffeine-ng  # TODO: install with yaourt
-      media:
       virtual:
-      office:
-#        - pdftk  # TODO: install with yaourt
-        - libreoffice
-        - hunspell
-      transmission:
-#        - slack  # TODO: install with yaourt
-#        - dropbox  # TODO: install with yaourt
-#        - megasync  # TODO: install with yaourt
-      remote:
+        - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
+        - virtualbox-ext-oracle
 
   tasks:
-
-    - name: common packages
-      become: yes
-      package:
-        name: "{{ package }}"
-        state: present
-      loop_control:
-        loop_var: package
-      tags:
-        - package
-        - download
-      with_items: |
-        {{
-          common_packages.values()
-          | flatten
-          | map('trim')
-          | list
-        }}
 
     - when: ansible_os_family == "Debian"
       name: apt packages
@@ -460,30 +400,22 @@
         - download
       with_items: |
         {{
-          ubuntu_packages.values()
-          | flatten
-          | map('trim')
-          | list
+          ( ubuntu_packages.values() | flatten )
+          +
+          ( common_packages.values() | flatten )
         }}
 
     - when: ansible_os_family == "Archlinux"
-      name: pacman packages
-      become: yes
-      pacman:
+      aur:
         name: "{{ package }}"
-        state: present
+        auronly: no
       loop_control:
         loop_var: package
-      tags:
-        - package
-        - pacman
-        - download
       with_items: |
         {{
-          ubuntu_packages.values()
-          | flatten
-          | map('trim')
-          | list
+          ( manjaro_packages.values() | flatten )
+          +
+          ( common_packages.values() | flatten )
         }}
 
 - name: netlimit
@@ -566,7 +498,8 @@
         - ipywidgets
         - jupyter
         - jupyter-declarativewidgets
-        # tools
+
+        # Tools
         - pymongo
         - py4j
         - pyinstaller
