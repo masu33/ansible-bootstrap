@@ -183,7 +183,7 @@
           release: xenial  # TODO: reconsider release
         - mega
         - webupd8team
-        - bionic-pdf
+#        - bionic-pdf  # TODO: check for pdftk
         - id: umake
           release: zesty  # TODO: reconsider release
         - id: chrome-gnome
@@ -347,7 +347,7 @@
             'Debian': 'libreoffice',
             'Archlinux': 'libreoffice-fresh',
           }[ansible_os_family] }}"
-        - pdftk
+#        - pdftk  # TODO: check for ubuntu release
       transmission:
         - curl
         - wget
@@ -380,6 +380,8 @@
         - gnome-shell-extensions
         - gnome-tweak-tool
     manjaro_packages:
+      office:
+        - pdftk
       virtual:
         - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
         - virtualbox-ext-oracle
