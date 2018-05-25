@@ -9,9 +9,6 @@
   set_fact:
     last_user_home: "{{ user_homes[user_name] }}"
 
-- debug: var=user_homes
-- debug: var=user_name
-
 - when: user_homes is undefined or user_name not in user_homes
   name: not yet checked user home
   block:

@@ -5,7 +5,7 @@
 # ----------
 
 GITUSER="sandorkazi"
-GITHUBNAME="ansible-linux-bootstrap"
+GITHUBNAME="ansible-local-bootstrap"
 
 INSTALLIT="???"
 while [ "${INSTALLIT}" != "y" -a "${INSTALLIT}" != "n" ]; do
@@ -21,7 +21,7 @@ DISTRO=$(
 if [ "${DISTRO}" == "ubuntu" ]; then
     sudo apt install -y git
 elif [ "${DISTRO}" == "manjaro" ]; then
-    sudo pacman -S git
+    echo "Nothing to install"
 else
     echo "Unknown DISTRO: ${DISTRO}"
 fi
@@ -33,6 +33,6 @@ if [ "${INSTALLIT}" == "n" ]; then
 else
     cd "${GITHUBNAME}"
     ./tools/prerequisites.sh
-    ./tools/ansible_start.sh
+    ./tools/bootstrap.sh
     cd -
 fi

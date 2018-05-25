@@ -923,6 +923,24 @@ repo_list:
       =mWZM
       -----END PGP PUBLIC KEY BLOCK-----
 
+  bionic-pdf:
+    url: "http://ppa.launchpad.net/ginggs/bionic-pdf/ubuntu"
+    key: "08CC41D2"
+    keyserver: "hkp://pgp.mit.edu:80"
+    gpgkey: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+      mI0ET519LgEEAM0a2TllMzspWOBnmm6rnToJBBGDAqiBV4xXF48W1gXfZ6W467pX
+      Pe1kZdn/CNdFe7kQFv4DMadikQKza6zq6LFnSDZGM+1i5gbC8S0tw8lArr2pepmn
+      y5Bc/UzfoA+EMbwzAcOaB6HGqBHqLa19GpE0O2FomusFQczoGUA28WvDABEBAAG0
+      HkxhdW5jaHBhZCBQUEEgZm9yIEdyYWhhbSBJbmdnc4i4BBMBAgAiBQJPnX0uAhsD
+      BgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRC18ZXSCMxB0jAKBADIg1021HF5
+      tNYAbrUd33iK3KRpiVfs/Q9YP8DO/7915Sk/SBLCy20hAukxVcDvhcj8ejuXDGKO
+      kd9gq4m8NOCSOXivBspE9VYC7l+XLBlDaCShlYU/6YflhCcQIfNJHSzcAl/DwZVq
+      i39rryLc+VJSnsHn2xBPh4/NPsYpY/p0Kw==
+      =XjYF
+      -----END PGP PUBLIC KEY BLOCK-----
+
 _original_repo_list:  # based on ubuntu xenial
   - id: deb-oss
     state: absent
