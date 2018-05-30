@@ -1,0 +1,134 @@
+---
+
+- name: repos
+  hosts: mymachine
+
+  pre_tasks:
+
+    - assert:
+        that:
+          - ubuntu_repos is defined
+
+  roles:
+
+    - when: ansible_os_family == "Debian"
+      name: set repositories
+      role: _apt_repos
+      repos: "{{ ubuntu_repos }}"
+      empty_sources_list: yes
+      update_cache: yes
+      tags:
+        - repository
+        - apt
+        - download
+
+- name: packages
+  hosts: mymachine
+
+  pre_tasks:
+
+    - assert:
+        that:
+          - common_packages is defined
+          - ubuntu_packages is defined
+          - manjaro_packages is defined
+          - python3_packages is defined
+          - ubuntu_absent_packages is defined
+          - manjaro_absent_packages is defined
+
+  tasks:
+
+    - when: ansible_os_family == "Debian"
+      name: apt packages to remove
+      become: yes
+      apt:
+        name: "{{ package }}"
+        state: absent
+        purge: yes
+      loop_control:
+        loop_var: package
+      tags:
+        - package
+        - apt
+      with_items: "{{ ubuntu_absent_packages }}"
+
+    - when: ansible_os_family == "Archlinux"
+      name: pacman packages to remove
+      pacman:
+        name: "{{ package }}"
+        state: absent
+      loop_control:
+        loop_var: package
+      tags:
+        - package
+        - pacman
+      with_items: "{{ manjaro_absent_packages }}"
+
+    - when: ansible_os_family == "Debian"
+      name: apt packages
+      become: yes
+      apt:
+        name: "{{ package }}"
+        state: present
+      loop_control:
+        loop_var: package
+      tags:
+        - package
+        - apt
+        - download
+      with_items: "{{ common_packages + ubuntu_packages }}"
+
+    - when: ansible_os_family == "Archlinux"
+      aur:
+        name: "{{ package }}"
+        auronly: no
+      loop_control:
+        loop_var: package
+      tags:
+        - package
+        - pacman
+        - aur
+        - download
+      with_items: "{{ common_packages + manjaro_packages }}"
+
+    - name: set python3 packages
+      become: yes
+      pip:
+        state: latest
+        executable: pip3
+        name: "{{ package }}"
+      loop_control:
+        loop_var: package
+      tags:
+        - download
+        - programming
+        - python
+        - package
+      with_items: "{{ python3_packages }}"
+
+    - when: ansible_os_family == 'Debian'
+      name: apt upgrade
+      become: yes
+      apt:
+        autoremove: yes
+        force: yes
+        purge: yes
+        upgrade: full
+      tags:
+        - package
+        - apt
+        - network
+
+    - when: ansible_os_family == 'Archlinux'
+      name: pacman upgrade
+      become: yes
+      pacman:
+        force: yes
+        update_cache: yes
+        upgrade: yes
+      tags:
+        - package
+        - pacman
+        - network
+
+...
