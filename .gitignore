@@ -70,3 +70,4 @@ ansible/__test.yml
 
 # Idea
 .idea
+.idea/workspace.xml

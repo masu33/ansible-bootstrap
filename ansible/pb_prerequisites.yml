@@ -1,0 +1,48 @@
+---
+
+- name: prerequisites
+  hosts: mymachine
+  tasks:
+
+    - name: install prerequisite packages
+      when: ansible_os_family == "Debian"
+      become: yes
+      apt:
+        package: "{{ item }}"
+      with_items:
+        - aptitude
+        - apt-transport-https
+        - accountsservice
+        - ca-certificates
+        - locales
+      tags:
+        - apt
+        - download
+
+    - name: install prerequisite packages
+      when: ansible_os_family == "Archlinux"
+      become: yes
+      pacman:
+        package: "{{ item }}"
+      with_items:
+        - ca-certificates
+      tags:
+        - pacman
+        - download
+
+    - name: "set {{ ansible_user }} nopasswd sudo package manager"
+      become: yes
+      vars:
+        pm: "{{ {
+              'Debian': '/usr/bin/apt',
+              'Archlinux': '/usr/bin/pacman',
+            }[ansible_os_family] }}"
+      copy:
+        dest: /etc/sudoers.d/{{ ansible_user }}-allow-to-sudo-package-manager
+        content: |
+          {{ ansible_user }} ALL=(ALL) NOPASSWD: {{ pm }}
+        validate: /usr/sbin/visudo -cf %s
+      tags:
+        - sudo
+
+...

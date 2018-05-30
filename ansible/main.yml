@@ -1,0 +1,334 @@
+---
+
+- import_playbook: pb_prerequisites.yml
+
+- import_playbook: pb_users_paths.yml
+  vars:
+    users:
+      - name: ansible
+        state: present
+        password: "{{ passwords.ansible }}"
+        update_password: on_create
+        groups: "{{ sudo }}"
+        append: yes
+        shell: /bin/bash
+
+        hide: yes
+
+      - name: masu
+        state: present
+        password: "{{ passwords.masu }}"
+        update_password: always
+        ssh_key_bits: 128
+        ssh_key_comment: masu@$HOSTNAME
+        ssh_key_passphrase: "{{ passphrases.masu }}"
+        groups: "{{ sudo }},ansible"
+        append: yes
+        shell: /bin/bash
+
+        hide: no
+        bashrcd: yes
+        bashstyle:
+          names: "1;49;34"
+          misc: "1;49;93"
+
+        bookmarks:
+          append: no
+          bookmarks:
+            - /home/masu/Documents
+            - /home/masu/Downloads
+            - ""
+            - /home/masu/Desktop Desktop
+            - /home/masu/MEGA MEGA
+            - /home/masu/Dropbox Dropbox
+
+      - name: willow
+        state: present
+        password: "{{ passwords.willow }}"
+        update_password: on_create
+        system: no
+        shell: /bin/bash
+
+        hide: yes
+
+      - name: rstrct
+        state: present
+        password: "{{ passwords.rstrct }}"
+        home: /var/rstrct
+        update_password: on_create
+        system: no
+        shell: /bin/bash
+
+        hide: yes
+    __paths:
+      - &dirmasu
+        owner: masu
+        group: masu
+        state: directory
+        follow: no
+      - &755masu
+        <<: *dirmasu
+        mode: "0755"
+      - &700masu
+        <<: *dirmasu
+        mode: "0700"
+      - &777masu
+        <<: *dirmasu
+        mode: "0777"
+    paths:
+      - <<: *755masu
+        path: "/home/masu"
+      - <<: *700masu
+        path: "/home/masu/Downloads"
+      - <<: *755masu
+        path: "/home/masu/Pictures"
+      - <<: *777masu
+        path: "/home/masu/Willow"
+      - path: "/home/willow/Masu"
+        follow: no
+        force: yes
+        owner: "willow"
+        group: "willow"
+        src: "/home/masu/Willow"
+        state: link
+      - path: "/home/ansible/.ssh/"
+        mode: "0600"
+        state: directory
+      - path: "/var/rstrct/"
+        force: yes
+        mode: "0700"
+        owner: rstrct
+        group: rstrct
+        state: directory
+
+- import_playbook: pb_repos_packages.yml
+  vars:
+    ubuntu_repos:
+      - id: deb-main
+        state: present
+      - id: deb-ext
+        state: present
+      - id: deb-security-all
+        state: present
+      - id: deb-updates-all
+        state: present
+      - id: deb-backports-oss
+        state: present
+      - id: dropbox
+        release: xenial  # TODO: reconsider release
+      - mega
+      - webupd8team
+#      - bionic-pdf  # TODO: check for pdftk
+      - id: umake
+        release: zesty  # TODO: reconsider release
+      - id: chrome-gnome
+        release: zesty  # TODO: reconsider release
+    ubuntu_absent_packages:
+      - account-plugin-facebook
+      - account-plugin-flickr
+      - aisleriot
+      - bogofilter
+      - bogofilter-common
+      - bogofilter-bdb
+      - brasero
+      - brasero-common
+      - brasero-cdrkit
+      - brltty
+      - dc
+      - dvd+rw-tools
+      - espeak-data
+      - genisoimg
+      - libbrasero-media3-1
+      - gnome-mahjongg
+      - gnome-orca
+      - gnome-sudoku
+      - rhythmbox
+      - rhythmbox-data
+      - rhythmbox-plugins
+      - rhythmbox-plugin-zeitgeist
+      - totem
+      - totem-common
+      - totem-plugins
+      - wodim
+    manjaro_absent_packages: []
+    common_packages:
+      # System
+      - systemd
+      - fakeroot
+      - file
+      - findutils
+      - rsync
+      - gparted
+      - baobab
+      - iptables
+      - macchanger
+      - traceroute
+      - htop
+      - tree
+      - rar
+      - unrar
+      - zip
+      - unzip
+      - openvpn
+      - "{{ {
+          'Debian': 'telnet',
+          'Archlinux': 'inetutils',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'netcat',
+          'Archlinux': 'gnu-netcat',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'bluez',
+          'Archlinux': 'bluez-utils',
+        }[ansible_os_family] }}"
+
+      # Programming
+      - "{{ {
+          'Debian': 'python3',
+          'Archlinux': 'python',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'python3-pip',
+          'Archlinux': 'python-pip',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'python3-setuptools',
+          'Archlinux': 'python-setuptools',
+        }[ansible_os_family] }}"
+      - git
+      - gawk
+
+      # Desktop
+      - accountsservice
+      - firefox
+      - "{{ {
+          'Debian': 'shutter',
+          'Archlinux': 'spectacle',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'chromium-browser',
+          'Archlinux': 'chromium',
+          }[ansible_os_family]
+        }}"
+      - "{{ {
+          'Debian': 'caffeine',
+          'Archlinux': 'caffeine-ng',
+        }[ansible_os_family] }}"
+
+      # Media
+      - clementine
+      - mplayer
+      - smplayer
+      - ffmpeg
+      - vlc
+
+      # Virtual
+      - docker-compose
+      - virtualbox
+      - vagrant
+      - "{{ {
+          'Debian': 'docker.io',
+          'Archlinux': 'docker',
+        }[ansible_os_family] }}"
+
+      # Office
+      - vim
+      - gedit
+      - evince
+      - calibre
+      - pinta
+      - gimp
+      - inkscape
+      - "{{ {
+          'Debian': 'hunspell-en-us',
+          'Archlinux': 'hunspell',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'libreoffice',
+          'Archlinux': 'libreoffice-fresh',
+        }[ansible_os_family] }}"
+    #  - pdftk  # TODO: check for ubuntu release
+
+      # Transmission
+      - curl
+      - wget
+      - youtube-dl
+      - deluge
+      - cheese
+      - "{{ {
+          'Debian': 'slack',
+          'Archlinux': 'slack-desktop',
+        }[ansible_os_family] }}"
+      - dropbox
+      - megasync
+
+      # Remote
+      - "{{ {
+          'Debian': 'openssh-server',
+          'Archlinux': 'openssh',
+        }[ansible_os_family] }}"
+      - paprefs
+      - rdesktop
+      - synergy
+    ubuntu_packages:
+      - apt
+      - aptitude
+      - galternatives
+      - network-manager-openvpn
+      - network-manager-openvpn-gnome
+      - python3-dev
+      - virtualenv
+      - chrome-gnome-shell
+      - gnome-shell-extensions
+      - gnome-tweak-tool
+    manjaro_packages:
+      - pdftk
+      - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
+      - virtualbox-ext-oracle
+    python3_packages:
+      # Dev
+      - tqdm
+      - pytz
+      - cython
+      - selenium
+
+      # Data science
+      - numpy
+      - scipy
+      - scikit-learn
+      - xgboost
+      - pandas
+      - matplotlib
+      - seaborn
+      - beautifulsoup4
+
+      # Interface
+      - ipython
+      - ipywidgets
+      - jupyter
+      - jupyter-declarativewidgets
+
+      # Tools
+      - pymongo
+      - py4j
+      - pyinstaller
+      - thefuck
+
+- import_playbook: pb_netlimit.yml
+  vars:
+    users:
+      - root
+      - masu
+
+- import_playbook: pb_docker.yml
+  vars:
+    users:
+      - masu
+
+- import_playbook: pb_env.yml
+  vars:
+    xkblayout: hu
+    proxyport: 22344
+
+...

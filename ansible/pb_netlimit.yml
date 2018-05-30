@@ -1,0 +1,12 @@
+---
+
+- name: netlimit
+  hosts: mymachine
+  roles:
+
+    - role: netlimit
+      tags:
+        - security
+        - network
+
+...
