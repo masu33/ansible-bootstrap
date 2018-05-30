@@ -9,11 +9,11 @@
   lineinfile:
     backup: no
     create: yes
-    group: masu
+    group: "{{ user }}"
     insertafter: EOF
     line: "export {{ item.key }}=\"{{ item.value }}\""
     mode: "0644"
-    owner: masu
+    owner: "{{ user }}"
     path: "{{ user.home | d('/home/' + user.name) }}/.bashrc"
     regexp: "^export {{ item.key }}=.*$"
     state: present
