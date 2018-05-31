@@ -198,6 +198,7 @@
         }[ansible_os_family] }}"
       - git
       - gawk
+      - phantomjs
 
       # Desktop
       - accountsservice
