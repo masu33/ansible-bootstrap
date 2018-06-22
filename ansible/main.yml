@@ -293,6 +293,8 @@
       - pytz
       - cython
       - selenium
+      - xlwt
+      - jmespath
 
       # Data science
       - numpy
