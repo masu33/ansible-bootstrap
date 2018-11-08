@@ -1,0 +1,28 @@
+---
+
+- name: set Users part in sddm configuration
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      yes
+    dest:        "/etc/sddm.conf"
+    group:       root
+    insertafter: EOF
+    line:        "[Users]"
+    owner:       root
+    state:       present
+
+- name: show/hide user's name at login (sddm)
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      yes
+    dest:        "/etc/sddm.conf"
+    group:       root
+    insertafter: !unsafe "^\\[Users\\]$"
+    line:        "HideUsers={{ ','.join(hidden_users) }}"
+    regexp:      "^HideUsers=.*$"
+    owner:       root
+    state:       present
+
+...

@@ -1,0 +1,55 @@
+---
+
+- when: ansible_os_family == "Debian"
+  name: create avatar folder
+  become: yes
+  file:
+    path: "/var/lib/AccountsService/icons/"
+    owner: root
+    group: root
+    mode: 0644
+    state: directory
+
+- when: ansible_os_family == "Debian"
+  name: copy avatar
+  become: yes
+  copy:
+    src: "{{ user_avatars[user] }}"
+    dest: "/var/lib/AccountsService/icons/{{ user }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ user_avatars }}"
+  loop_control:
+    loop_var: user
+
+- when: ansible_os_family == "Debian"
+  name: set avatar
+  become: yes
+  lineinfile:
+    backup:      no
+    create:      yes
+    dest:        "/var/lib/AccountsService/users/{{ user }}"
+    group:       root
+    insertafter: !unsafe "^\\[User\\]$"
+    line:        "Icon=/var/lib/AccountsService/icons/{{ user }}"
+    regexp:      "^Icon=.*$"
+    owner:       root
+    state:       present
+  with_items: "{{ user_avatars }}"
+  loop_control:
+    loop_var: user
+
+- when: ansible_os_family == "Archlinux"
+  name: copy avatar
+  become: yes
+  copy:
+    src: "{{ user_avatars[user] }}"
+    dest: "{{ user_homes[user] }}/.face"
+    owner: "{{ user }}"
+    mode: 0644
+  with_items: "{{ user_avatars }}"
+  loop_control:
+    loop_var: user
+
+...

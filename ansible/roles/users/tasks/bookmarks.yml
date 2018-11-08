@@ -1,0 +1,14 @@
+---
+
+- when: ansible_os_family in ['Archlinux', 'Debian']
+  include: "bookmarks_gtk.yml"
+  vars:
+    user:      "{{ _bm.key }}"
+    bookmarks: "{{ _bm.value.bookmarks | d([])    }}"
+    top:       "{{ _bm.value.top       | d(false) }}"
+    override:  "{{ _bm.value.override  | d(false) }}"
+  with_dict: "{{ user_bookmarks }}"
+  loop_control:
+    loop_var: _bm
+
+...

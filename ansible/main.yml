@@ -2,104 +2,106 @@
 
 - import_playbook: pb_prerequisites.yml
 
-- import_playbook: pb_users_paths.yml
-  vars:
-    users:
-      - name: ansible
-        state: present
-        password: "{{ passwords.ansible }}"
-        update_password: on_create
-        groups: "{{ sudo }}"
-        append: yes
-        shell: /bin/bash
-
-        hide: yes
-
-      - name: masu
-        state: present
-        password: "{{ passwords.masu }}"
-        update_password: always
-        ssh_key_bits: 128
-        ssh_key_comment: masu@$HOSTNAME
-        ssh_key_passphrase: "{{ passphrases.masu }}"
-        groups: "{{ sudo }},ansible"
-        append: yes
-        shell: /bin/bash
-
-        hide: no
-        bashrcd: yes
-        bashstyle:
+- hosts: all
+  roles:
+    - role: users
+      sudo_group: |
+        {{ {
+          'Debian': 'sudo',
+          'Archlinux': 'wheel',
+        }[ansible_os_family] }}
+      users:
+        - name: ansible
+          password: "{{ passwords.ansible }}"
+          update_password: on_create
+          system: no
+          groups: "{{ sudo_group }}"
+          append: yes
+        - name: masu
+          password: "{{ passwords.masu }}"
+          update_password: on_create
+          system: no
+          groups: "{{ sudo_group }},ansible"
+          append: yes
+        - name: willow
+          password: "{{ passwords.willow }}"
+          update_password: on_create
+          system: no
+        - name: rstrct
+          password: "{{ passwords.rstrct }}"
+          home: /var/rstrct
+          update_password: on_create
+          system: no
+      hidden_users:
+        - willow
+        - ansible
+        - rstrct
+      bashrcd_users:
+        - masu
+        - willow
+      user_colors:
+        masu:
           names: "1;49;34"
           misc: "1;49;93"
-
-        bookmarks:
-          append: no
+      __paths:
+        - &dirmasu
+          owner: masu
+          group: masu
+          state: directory
+          follow: no
+        - &755masu
+          <<: *dirmasu
+          mode: "0755"
+        - &700masu
+          <<: *dirmasu
+          mode: "0700"
+        - &777masu
+          <<: *dirmasu
+          mode: "0777"
+      paths:
+        - <<: *755masu
+          path: "/home/masu"
+        - <<: *700masu
+          path: "/home/masu/Downloads"
+        - <<: *755masu
+          path: "/home/masu/Pictures"
+        - <<: *777masu
+          path: "/home/masu/Willow"
+        - path: "/home/willow/Masu"
+          follow: no
+          force: yes
+          owner: "willow"
+          group: "willow"
+          src: "/home/masu/Willow"
+          state: link
+        - path: "/home/ansible/.ssh/"
+          mode: "0600"
+          state: directory
+        - path: "/var/rstrct/"
+          force: yes
+          mode: "0700"
+          owner: rstrct
+          group: rstrct
+          state: directory
+      user_bookmarks:
+        masu:
+          top: yes
+          override: no
           bookmarks:
-            - /home/masu/Documents
-            - /home/masu/Downloads
-            - ""
-            - /home/masu/Desktop Desktop
-            - /home/masu/MEGA MEGA
-            - /home/masu/Dropbox Dropbox
-
-      - name: willow
-        state: present
-        password: "{{ passwords.willow }}"
-        update_password: on_create
-        system: no
-        shell: /bin/bash
-
-        hide: yes
-
-      - name: rstrct
-        state: present
-        password: "{{ passwords.rstrct }}"
-        home: /var/rstrct
-        update_password: on_create
-        system: no
-        shell: /bin/bash
-
-        hide: yes
-    __paths:
-      - &dirmasu
-        owner: masu
-        group: masu
-        state: directory
-        follow: no
-      - &755masu
-        <<: *dirmasu
-        mode: "0755"
-      - &700masu
-        <<: *dirmasu
-        mode: "0700"
-      - &777masu
-        <<: *dirmasu
-        mode: "0777"
-    paths:
-      - <<: *755masu
-        path: "/home/masu"
-      - <<: *700masu
-        path: "/home/masu/Downloads"
-      - <<: *755masu
-        path: "/home/masu/Pictures"
-      - <<: *777masu
-        path: "/home/masu/Willow"
-      - path: "/home/willow/Masu"
-        follow: no
-        force: yes
-        owner: "willow"
-        group: "willow"
-        src: "/home/masu/Willow"
-        state: link
-      - path: "/home/ansible/.ssh/"
-        mode: "0600"
-        state: directory
-      - path: "/var/rstrct/"
-        force: yes
-        mode: "0700"
-        owner: rstrct
-        group: rstrct
-        state: directory
+            - path: /home/masu/Documents
+              name: Documents
+            - path: /home/masu/Downloads
+              name: Downloads
+            - path: /home/masu/IdeaProjects
+              name: Projects
+            - path: /home/masu/Desktop
+              name: Desktop
+            - path: /home/masu/MEGA
+              name: MEGA
+            - path: /home/masu/Dropbox
+              name: Dropbox
+      user_avatars:
+        masu: masu_avatar.png
 
 - import_playbook: pb_repos_packages.yml
   vars:
@@ -118,7 +120,7 @@
         release: xenial  # TODO: reconsider release
       - mega
       - webupd8team
-#      - bionic-pdf  # TODO: check for pdftk
+      - bionic-pdf
       - id: umake
         release: zesty  # TODO: reconsider release
       - id: chrome-gnome
@@ -150,7 +152,8 @@
       - totem-common
       - totem-plugins
       - wodim
-    manjaro_absent_packages: []
+    manjaro_absent_packages:
+      - brasero
     common_packages:
       # System
       - systemd
@@ -249,7 +252,7 @@
           'Debian': 'libreoffice',
           'Archlinux': 'libreoffice-fresh',
         }[ansible_os_family] }}"
-    #  - pdftk  # TODO: check for ubuntu release
+      - pdftk
 
       # Transmission
       - curl
@@ -293,6 +296,7 @@
       - pytz
       - cython
       - selenium
+      - lxml
 
       # Data science
       - numpy

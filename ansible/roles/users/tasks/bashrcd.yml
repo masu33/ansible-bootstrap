@@ -1,0 +1,41 @@
+---
+
+- name: set up bashrc.d support (folder) for {{ user }}
+  become: yes
+  file:
+    path: "{{ user_homes[user] }}/.bashrc.d"
+    mode: "0755"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    state: directory
+  with_items: "{{ bashrcd_users }}"
+  loop_control:
+    loop_var: user
+
+- name: set up bashrc.d support (inclusion) for {{ user }}
+  become: yes
+  blockinfile:
+    backup: yes
+    block: |
+      if [[ $- != *i* ]] ; then
+        return
+      fi
+
+      # Load all files from .shell/bashrc.d directory
+      if [ -d $HOME/.bashrc.d ]; then
+        for file in `ls $HOME/.bashrc.d`; do
+          source $file
+        done
+      fi
+    create: yes
+    dest: "{{ user_homes[user] }}/.bashrc"
+    follow: yes
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
+    state: present
+  with_items: "{{ bashrcd_users }}"
+  loop_control:
+    loop_var: user
+
+...

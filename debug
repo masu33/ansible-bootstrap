@@ -1,0 +1,6 @@
+Script started on 2018-10-27 20:53:07+02:00
+Usage: ansible-playbook [options] playbook.yml [playbook2 ...]
+
+ansible-playbook: error: ambiguous option: --t (--tags, --timeout?)
+
+Script done on 2018-10-27 20:53:07+02:00

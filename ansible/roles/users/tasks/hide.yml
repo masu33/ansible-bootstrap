@@ -1,0 +1,5 @@
+---
+
+- include: "hide_{{ ansible_os_family | lower }}.yml"
+
+...

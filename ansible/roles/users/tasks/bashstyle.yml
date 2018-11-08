@@ -1,0 +1,11 @@
+---
+
+- include: bashstyle_colors.yml
+  vars:
+    user: "{{ _bs.key }}"
+    colors: "{{ _bs.value }}"
+  with_dict: "{{ user_colors }}"
+  loop_control:
+    loop_var: _bs
+
+...

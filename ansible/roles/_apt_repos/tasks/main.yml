@@ -5,8 +5,7 @@
       - repos is sequence
       - allowed_keys is sequence
 
-- # name:
-  include_tasks: key.yml
+- include_tasks: key.yml
   with_items: "{{ repos
                 | default_key('id')
                 | mass_table_join(repo_list, 'id')
@@ -15,8 +14,7 @@
   loop_control:
     loop_var: repo
 
-- # name:
-  include_tasks: repo.yml
+- include_tasks: repo.yml
   with_items: "{{ repos
                 | default_key('id')
                 | mass_table_join(repo_list, 'id')
@@ -26,24 +24,5 @@
     loop_var: repo
   notify:
     - update apt cache
-
-- when: empty_sources_list
-  name: empty source.list
-  become: yes
-  copy:
-    backup: yes
-    content: ""
-    dest: /etc/apt/sources.list
-  notify:
-    - update apt cache
-
-- when: force_update_cache
-  become: yes
-  meta: noop
-  changed_when: yes
-  notify:
-    - update apt cache
-
-- meta: flush_handlers
 
 ...
