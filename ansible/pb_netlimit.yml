@@ -1,7 +1,7 @@
 ---
 
 - name: netlimit
-  hosts: mymachine
+  hosts: all
   roles:
 
     - role: netlimit

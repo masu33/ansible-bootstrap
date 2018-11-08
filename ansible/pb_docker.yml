@@ -1,7 +1,7 @@
 ---
 
 - name: docker
-  hosts: mymachine
+  hosts: all
   tasks:
 
     - name: docker group

@@ -1,7 +1,7 @@
 ---
 
 - name: repos
-  hosts: mymachine
+  hosts: all
 
   pre_tasks:
 
@@ -23,7 +23,7 @@
         - download
 
 - name: packages
-  hosts: mymachine
+  hosts: all
 
   pre_tasks:
 
@@ -39,44 +39,43 @@
   tasks:
 
     - when: ansible_os_family == "Debian"
+      name: empty source.list
+      become: yes
+      copy:
+        backup: yes
+        content: ""
+        dest: /etc/apt/sources.list
+
+    - when: ansible_os_family == "Debian"
       name: apt packages to remove
       become: yes
       apt:
-        name: "{{ package }}"
+        name: "{{ ubuntu_absent_packages }}"
         state: absent
         purge: yes
-      loop_control:
-        loop_var: package
       tags:
         - package
         - apt
-      with_items: "{{ ubuntu_absent_packages }}"
 
     - when: ansible_os_family == "Archlinux"
       name: pacman packages to remove
       pacman:
-        name: "{{ package }}"
+        name: "{{ manjaro_absent_packages }}"
         state: absent
-      loop_control:
-        loop_var: package
       tags:
         - package
         - pacman
-      with_items: "{{ manjaro_absent_packages }}"
 
     - when: ansible_os_family == "Debian"
       name: apt packages
       become: yes
       apt:
-        name: "{{ package }}"
+        name: "{{ common_packages + ubuntu_packages }}"
         state: present
-      loop_control:
-        loop_var: package
       tags:
         - package
         - apt
         - download
-      with_items: "{{ common_packages + ubuntu_packages }}"
 
     - when: ansible_os_family == "Archlinux"
       aur:
@@ -96,15 +95,12 @@
       pip:
         state: latest
         executable: pip3
-        name: "{{ package }}"
-      loop_control:
-        loop_var: package
+        name: "{{ python3_packages }}"
       tags:
         - download
         - programming
         - python
         - package
-      with_items: "{{ python3_packages }}"
 
     - when: ansible_os_family == 'Debian'
       name: apt upgrade

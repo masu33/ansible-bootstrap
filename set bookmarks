@@ -1,0 +1,50 @@
+Script started on 2018-10-27 20:51:28+02:00
+Vault password: 
+
+playbook: /home/masu/IdeaProjects/ansible-local-bootstrap/ansible/main.yml
+
+  play #1 (all): all	TAGS: []
+    tasks:
+      users : assert user and path config	TAGS: []
+      users : set user_homes fact	TAGS: []
+      include	TAGS: []
+
+  play #2 (all): repos	TAGS: []
+    tasks:
+      assert	TAGS: []
+      assert	TAGS: [apt, download, repository]
+      include_tasks	TAGS: [apt, download, repository]
+      include_tasks	TAGS: [apt, download, repository]
+
+  play #3 (all): packages	TAGS: []
+    tasks:
+      assert	TAGS: []
+      empty source.list	TAGS: []
+      apt packages to remove	TAGS: [apt, package]
+      pacman packages to remove	TAGS: [package, pacman]
+      apt packages	TAGS: [apt, download, package]
+      aur	TAGS: [aur, download, package, pacman]
+      set python3 packages	TAGS: [download, package, programming, python]
+      apt upgrade	TAGS: [apt, network, package]
+      pacman upgrade	TAGS: [network, package, pacman]
+
+  play #4 (all): netlimit	TAGS: []
+    tasks:
+      assert	TAGS: [network, security]
+      netlimit : set iptables present	TAGS: [network, security]
+      netlimit : set netlimit groups	TAGS: [network, security]
+      netlimit : set netlimit users	TAGS: [network, security]
+      netlimit : set iptables rules	TAGS: [network, security]
+      netlimit : set netlimit commands	TAGS: [network, security]
+
+  play #5 (all): docker	TAGS: []
+    tasks:
+      docker group	TAGS: [docker, group, user]
+      dl command	TAGS: [docker, shell]
+
+  play #6 (all): environment settings	TAGS: []
+    tasks:
+      set login keyboard layout	TAGS: [desktop, settings]
+      set firefox socket proxy tunnel alias	TAGS: [network, shell]
+
+Script done on 2018-10-27 20:51:32+02:00

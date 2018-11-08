@@ -1,20 +1,19 @@
 ---
 
 - name: prerequisites
-  hosts: mymachine
+  hosts: all
   tasks:
 
     - name: install prerequisite packages
       when: ansible_os_family == "Debian"
       become: yes
       apt:
-        package: "{{ item }}"
-      with_items:
-        - aptitude
-        - apt-transport-https
-        - accountsservice
-        - ca-certificates
-        - locales
+        package:
+          - aptitude
+          - apt-transport-https
+          - accountsservice
+          - ca-certificates
+          - locales
       tags:
         - apt
         - download
@@ -23,9 +22,9 @@
       when: ansible_os_family == "Archlinux"
       become: yes
       pacman:
-        package: "{{ item }}"
-      with_items:
-        - ca-certificates
+        package:
+          - pacaur
+          - ca-certificates
       tags:
         - pacman
         - download

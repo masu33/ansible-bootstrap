@@ -1,7 +1,6 @@
 ---
 
 passwords:
-  # ansible-vault encrypt_string "`python -c "from passlib.hash import sha512_crypt; import getpass; print(sha512_crypt.using(rounds=5000).hash(getpass.getpass()))"`"
   ansible: !vault |
     $ANSIBLE_VAULT;1.1;AES256
     33653231633465326331363736393162636533323061303035306262656266313364646361376363

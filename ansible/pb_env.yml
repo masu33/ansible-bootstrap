@@ -1,7 +1,7 @@
 ---
 
 - name: environment settings
-  hosts: mymachine
+  hosts: all
   tasks:
 
     - when: xkblayout is defined
