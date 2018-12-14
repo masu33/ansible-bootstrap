@@ -1,22 +1,24 @@
 ---
 
-- name: set up bashrc.d support (folder) for {{ user }}
+- assert:
+    that:
+      - user is mapping
+      - user.name is defined
+
+- name: Set up bashrc.d support (folder) for {{ user.name }}
   become: yes
   file:
-    path: "{{ user_homes[user] }}/.bashrc.d"
-    mode: "0755"
-    owner: "{{ user }}"
-    group: "{{ user }}"
+    path:  "{{ user.home | d('/home/' + user.name) }}/.bashrc.d"
+    mode:  "0755"
+    owner: "{{ user.name }}"
+    group: "{{ user.group | d(user.name) | d(omit) }}"
     state: directory
-  with_items: "{{ bashrcd_users }}"
-  loop_control:
-    loop_var: user
 
-- name: set up bashrc.d support (inclusion) for {{ user }}
+- name: set up bashrc.d support (inclusion) for {{ user.name }}
   become: yes
   blockinfile:
-    backup: yes
-    block: |
+    backup:      yes
+    block:       |
       if [[ $- != *i* ]] ; then
         return
       fi
@@ -27,15 +29,12 @@
           source $file
         done
       fi
-    create: yes
-    dest: "{{ user_homes[user] }}/.bashrc"
-    follow: yes
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    marker: "# ANSIBLE MANAGED: .bashrc.d {mark}"
-    state: present
-  with_items: "{{ bashrcd_users }}"
-  loop_control:
-    loop_var: user
+    create:      yes
+    dest:        "{{ user.home | d('/home/' + user.name) }}/.bashrc"
+    follow:      yes
+    owner:       "{{ user.name }}"
+    group:       "{{ user.group | d(user.name) | d(omit) }}"
+    marker:      "# ANSIBLE MANAGED: .bashrc.d {mark}"
+    state:       present
 
 ...

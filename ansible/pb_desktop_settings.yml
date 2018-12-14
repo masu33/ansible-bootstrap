@@ -1,0 +1,15 @@
+---
+
+- name: environment settings
+  hosts: all
+  roles:
+
+    # keyboard layout
+    - role: environment
+      xkblayout: hu
+      proxyport: 22344
+      tags:
+        - desktop
+        - language
+
+...

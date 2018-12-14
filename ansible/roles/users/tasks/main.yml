@@ -1,33 +1,17 @@
 ---
 
-- name: assert user and path config
-  assert:
+- assert:
     that:
-      - users is defined
-      - hidden_users is defined
-      - bashrcd_users is defined
-      - user_colors is defined
-      - paths is defined
-      - user_bookmarks is defined
-      - user_avatars is defined
+      - users is sequence
 
-- name: set user_homes fact
-  set_fact:
-    user_homes: |
-      {{
-        (user_homes | d({}))
-        | combine({user.name: user.home | d('/home/{}/'.format(user.name))})
-      }}
-  with_items: "{{ users }}"
+- # name:
+  become: yes
+  include_tasks: user.yml
+  with_items: "{{ users
+                | default_key('name')
+                | list
+               }}"
   loop_control:
     loop_var: user
-
-#- include: users.yml
-#- include: hide.yml
-#- include: bashrcd.yml
-#- include: bashstyle.yml
-#- include: paths.yml
-- include: bookmarks.yml
-#- include: avatar.yml
 
 ...

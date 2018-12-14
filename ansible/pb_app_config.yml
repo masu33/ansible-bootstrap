@@ -1,0 +1,23 @@
+---
+
+- name: netlimit
+  hosts: all
+  roles:
+    - role: netlimit
+      users:
+        - root
+        - masu
+      tags:
+        - security
+        - network
+
+- name: docker
+  hosts: all
+  roles:
+    - role: docker
+      users:
+        - masu
+      tags:
+        - docker
+
+...
