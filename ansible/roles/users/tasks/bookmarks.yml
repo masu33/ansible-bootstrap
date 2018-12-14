@@ -1,14 +1,57 @@
 ---
 
-- when: ansible_os_family in ['Archlinux', 'Debian']
-  include: "bookmarks_gtk.yml"
+- assert:
+    that:
+      - user.bookmarks is mapping
+      - user.bookmarks.bookmarks is sequence
+
+- assert:
+    that:
+      - item.uri is defined or item is string
+  with_items: "{{ user.bookmarks.bookmarks }}"
+
+- import_tasks: library/user_homes.yml
   vars:
-    user:      "{{ _bm.key }}"
-    bookmarks: "{{ _bm.value.bookmarks | d([])    }}"
-    top:       "{{ _bm.value.top       | d(false) }}"
-    override:  "{{ _bm.value.override  | d(false) }}"
-  with_dict: "{{ user_bookmarks }}"
+    user_name: "{{ user.name }}"
+
+- name: set bookmarks dir
+  become: yes
+  file:
+    path: "{{ path }}"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0700
+    state: directory
+  with_items:
+    - "{{ user_homes[user.name] }}/.config"
+    - "{{ user_homes[user.name] }}/.config/gtk-3.0"
   loop_control:
-    loop_var: _bm
+    loop_var: path
+
+- name: check if bookmarks file exists
+  become: yes
+  stat:
+    path: &bmfile
+      "{{ user_homes[user.name] }}/.config/gtk-3.0/bookmarks"
+  register: bmfile
+
+- when: bmfile.stat.exists
+  name: get file contents
+  become: yes
+  slurp:
+    path: *bmfile
+  register: bmfile
+
+- name: set bookmarks
+  become: yes
+  vars:
+    bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') | list }}"
+    orig: "{{ bmfile.content | d('') | b64decode }}"
+  template:
+    src: bookmarks.jinja2
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: 0664
+    dest: *bmfile
 
 ...
