@@ -17,6 +17,7 @@
         sudo: "{{ {
                 'Debian': 'sudo',
                 'Archlinux': 'wheel',
+                'RedHat': 'wheel',
               }[ansible_os_family] }}"
       tags:
         - user

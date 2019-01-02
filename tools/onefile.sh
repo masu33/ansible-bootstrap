@@ -22,8 +22,11 @@ if [ "${DISTRO}" == "ubuntu" ]; then
     sudo apt install -y git
 elif [ "${DISTRO}" == "manjaro" ]; then
     echo "Nothing to install"
+elif [ "${DISTRO}" == "ol" ]; then
+    sudo yum install -y git
 else
     echo "Unknown DISTRO: ${DISTRO}"
+    exit 1
 fi
 
 git clone "https://github.com/${GITUSER}/${GITHUBNAME}.git"

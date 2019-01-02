@@ -6,7 +6,7 @@
 
 - name: set iptables present
   package:
-    package: iptables
+    name: iptables
     state:   present
 
 - name: set netlimit groups

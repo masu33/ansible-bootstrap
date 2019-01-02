@@ -4,7 +4,9 @@
 
 - import_playbook: pb_users_paths.yml
   vars:
+
     users:
+
       - name: ansible
         state: present
         password: "{{ passwords.ansible }}"
@@ -60,6 +62,7 @@
         shell: /bin/bash
 
         hide: yes
+
     __paths:
       - &dirmasu
         owner: masu
@@ -75,6 +78,7 @@
       - &777masu
         <<: *dirmasu
         mode: "0777"
+
     paths:
       - <<: *755masu
         path: "/home/masu"
@@ -103,7 +107,12 @@
 
 - import_playbook: pb_repos_packages.yml
   vars:
-    ubuntu_repos:
+
+    redhat_python: python36
+    redhat_vbox: "VirtualBox-6.0.{{ ansible_architecture }}"
+    redhat_vagrant: https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.rpm
+
+    debian_repos:
       - id: deb-main
         state: present
       - id: deb-ext
@@ -123,7 +132,20 @@
         release: zesty  # TODO: reconsider release
       - id: chrome-gnome
         release: zesty  # TODO: reconsider release
-    ubuntu_absent_packages:
+    arch_repos: []
+    redhat_repos:
+      - ol7_latest
+      - ol7_optional_latest
+      - ol7_developer_EPEL
+      - ol7_UEKR4
+      - ol7_addons
+      - ol7_developer
+      - rar
+      - nux
+      - slack
+      - fedoraproject
+
+    debian_absent_packages:
       - account-plugin-facebook
       - account-plugin-flickr
       - aisleriot
@@ -150,7 +172,10 @@
       - totem-common
       - totem-plugins
       - wodim
-    manjaro_absent_packages: []
+    arch_absent_packages:
+      - brasero
+    redhat_absent_packages: []
+
     common_packages:
       # System
       - systemd
@@ -161,7 +186,6 @@
       - gparted
       - baobab
       - iptables
-      - macchanger
       - traceroute
       - htop
       - tree
@@ -173,32 +197,32 @@
       - "{{ {
           'Debian': 'telnet',
           'Archlinux': 'inetutils',
+          'RedHat': 'telnet',
         }[ansible_os_family] }}"
       - "{{ {
           'Debian': 'netcat',
           'Archlinux': 'gnu-netcat',
+          'RedHat': 'nc',
         }[ansible_os_family] }}"
       - "{{ {
           'Debian': 'bluez',
           'Archlinux': 'bluez-utils',
+          'RedHat': 'bluez',
         }[ansible_os_family] }}"
 
       # Programming
       - "{{ {
-          'Debian': 'python3',
+          'Debian': 'python3-dev',
           'Archlinux': 'python',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'python3-pip',
-          'Archlinux': 'python-pip',
+          'RedHat': redhat_python + '-devel',
         }[ansible_os_family] }}"
       - "{{ {
           'Debian': 'python3-setuptools',
           'Archlinux': 'python-setuptools',
+          'RedHat': redhat_python + '-setuptools',
         }[ansible_os_family] }}"
       - git
       - gawk
-      - phantomjs
 
       # Desktop
       - accountsservice
@@ -206,93 +230,105 @@
       - "{{ {
           'Debian': 'shutter',
           'Archlinux': 'spectacle',
+          'RedHat': 'ksnapshot',
         }[ansible_os_family] }}"
       - "{{ {
           'Debian': 'chromium-browser',
           'Archlinux': 'chromium',
+          'RedHat': 'chromium',
           }[ansible_os_family]
         }}"
       - "{{ {
-          'Debian': 'caffeine',
-          'Archlinux': 'caffeine-ng',
-        }[ansible_os_family] }}"
+          'Debian': 'slack',
+          'Archlinux': 'slack-desktop',
+          'RedHat': 'slack',
+          }[ansible_os_family]
+        }}"
 
       # Media
-      - clementine
-      - mplayer
       - smplayer
       - ffmpeg
       - vlc
+      - cheese
 
       # Virtual
-      - docker-compose
-      - virtualbox
-      - vagrant
       - "{{ {
           'Debian': 'docker.io',
           'Archlinux': 'docker',
+          'RedHat': 'docker-engine',
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'virtualbox',
+          'Archlinux': 'virtualbox',
+          'RedHat': redhat_vbox,
+        }[ansible_os_family] }}"
+      - "{{ {
+          'Debian': 'vagrant',
+          'Archlinux': 'vagrant',
+          'RedHat': redhat_vagrant,
         }[ansible_os_family] }}"
 
       # Office
       - vim
       - gedit
       - evince
-      - calibre
       - pinta
       - gimp
       - inkscape
       - "{{ {
           'Debian': 'hunspell-en-us',
           'Archlinux': 'hunspell',
+          'RedHat': 'hunspell',
         }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'libreoffice',
-          'Archlinux': 'libreoffice-fresh',
-        }[ansible_os_family] }}"
-    #  - pdftk  # TODO: check for ubuntu release
+#      - pdftk  # TODO: check for Ubuntu
 
       # Transmission
       - curl
       - wget
       - youtube-dl
       - deluge
-      - cheese
-      - "{{ {
-          'Debian': 'slack',
-          'Archlinux': 'slack-desktop',
-        }[ansible_os_family] }}"
-      - dropbox
-      - megasync
 
       # Remote
       - "{{ {
           'Debian': 'openssh-server',
           'Archlinux': 'openssh',
+          'RedHat': 'openssh',
         }[ansible_os_family] }}"
       - paprefs
       - rdesktop
       - synergy
-    ubuntu_packages:
+    debian_packages:
       - apt
       - aptitude
       - galternatives
       - network-manager-openvpn
       - network-manager-openvpn-gnome
-      - python3-dev
       - virtualenv
       - chrome-gnome-shell
       - gnome-shell-extensions
       - gnome-tweak-tool
-    manjaro_packages:
+      - dropbox
+      - megasync
+    arch_packages:
       - pdftk
       - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
-      - virtualbox-ext-oracle
+      - virtualbox-ext-
+      - dropbox
+      - megasync
+    redhat_packages:
+      - pdftk
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+      - kernel-devel
+
     python3_packages:
       # Dev
       - tqdm
       - pytz
       - cython
       - selenium
+      - xlrd
       - xlwt
       - jmespath
 
@@ -317,6 +353,7 @@
       - py4j
       - pyinstaller
       - thefuck
+      - caffeine-ng
 
 - import_playbook: pb_netlimit.yml
   vars:

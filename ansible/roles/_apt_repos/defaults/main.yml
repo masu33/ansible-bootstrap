@@ -1,10 +1,5 @@
 ---
 
-repos: []
-update_cache: yes
-force_update_cache: no
-empty_sources_list: no
-
 default_type: deb
 default_url: "http://archive.ubuntu.com/ubuntu"
 default_release: "{{ ansible_distribution_release }}"
