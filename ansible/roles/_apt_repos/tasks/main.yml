@@ -3,7 +3,6 @@
 - assert:
     that:
       - repos is sequence
-      - allowed_keys is sequence
 
 - include_tasks: key.yml
   with_items: "{{ repos

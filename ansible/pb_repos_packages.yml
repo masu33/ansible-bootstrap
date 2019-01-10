@@ -4,6 +4,7 @@
   hosts: all
 
   vars:
+
     ubuntu_repos:
       - id: deb-main
         state: present
@@ -29,19 +30,28 @@
 
     - assert:
         that:
-          - ubuntu_repos is defined
+          - debian_repos is defined
+          - arch_repos is defined
+          - redhat_repos is defined
 
   roles:
 
     - when: ansible_os_family == "Debian"
-      name: set repositories
-      role: apt_repos
-      repos: "{{ ubuntu_repos }}"
-      empty_sources_list: yes
-      update_cache: yes
+      name: set apt repositories
+      role: _apt_repos
+      repos: "{{ debian_repos }}"
       tags:
         - repository
         - apt
+        - download
+
+    - when: ansible_os_family == "RedHat"
+      name: set yum repositories
+      role: _yum_repos
+      repos: "{{ redhat_repos }}"
+      tags:
+        - repository
+        - yum
         - download
 
 - name: packages
@@ -246,12 +256,19 @@
 
     - assert:
         that:
+
+          - redhat_python is defined
+
           - common_packages is defined
-          - ubuntu_packages is defined
-          - manjaro_packages is defined
+          - debian_packages is defined
+          - arch_packages is defined
+          - redhat_packages is defined
+
           - python3_packages is defined
-          - ubuntu_absent_packages is defined
-          - manjaro_absent_packages is defined
+
+          - debian_absent_packages is defined
+          - arch_absent_packages is defined
+          - redhat_absent_packages is defined
 
   tasks:
 
@@ -267,7 +284,7 @@
       name: apt packages to remove
       become: yes
       apt:
-        name: "{{ ubuntu_absent_packages }}"
+        name: "{{ debian_absent_packages }}"
         state: absent
         purge: yes
       tags:
@@ -277,17 +294,26 @@
     - when: ansible_os_family == "Archlinux"
       name: pacman packages to remove
       pacman:
-        name: "{{ manjaro_absent_packages }}"
+        name: "{{ arch_absent_packages }}"
         state: absent
       tags:
         - package
         - pacman
 
+    - when: ansible_os_family == "RedHat"
+      name: yum packages to remove
+      yum:
+        name: "{{ redhat_absent_packages }}"
+        state: absent
+      tags:
+        - package
+        - yum
+
     - when: ansible_os_family == "Debian"
       name: apt packages
       become: yes
       apt:
-        name: "{{ common_packages + ubuntu_packages }}"
+        name: "{{ common_packages + debian_packages }}"
         state: present
       tags:
         - package
@@ -305,7 +331,58 @@
         - pacman
         - aur
         - download
-      with_items: "{{ common_packages + manjaro_packages }}"
+      with_items: "{{ common_packages + arch_packages }}"
+
+    - when: ansible_os_family == "RedHat"
+      name: yum packages
+      become: yes
+      yum:
+        name: "{{ common_packages + redhat_packages }}"
+        state: present
+      tags:
+        - package
+        - yum
+        - download
+
+    - when: ansible_os_family == "RedHat"
+      name: set pip3
+      become: yes
+      copy:
+        content: |
+          #!/bin/{{ redhat_python }}
+
+          # -*- coding: utf-8 -*-
+          import re
+          import sys
+
+          from pip._internal import main
+
+          if __name__ == '__main__':
+              sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+              sys.exit(main())
+
+        mode: 755
+        owner: root
+        group: root
+        dest: /usr/bin/pip3
+      tags:
+        - programming
+        - python
+        - package
+
+    - name: set python3 packages
+      become: yes
+      pip:
+        state: latest
+        executable: pip3
+        name:
+          - pip
+          - setuptools
+      tags:
+        - download
+        - programming
+        - python
+        - package
 
     - name: set python3 packages
       become: yes
@@ -342,6 +419,18 @@
       tags:
         - package
         - pacman
+        - network
+
+    - when: ansible_os_family == 'RedHat'
+      name: yum upgrade
+      become: yes
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      tags:
+        - package
+        - yum
         - network
 
 ...

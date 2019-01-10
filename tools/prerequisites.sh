@@ -12,6 +12,11 @@ if [ "${DISTRO}" == "ubuntu" ]; then
 elif [ "${DISTRO}" == "manjaro" ]; then
     yes | sudo pacman -S python3
     sudo pip3 install ansible
+elif [ "${DISTRO}" == "\"ol\"" ]; then
+    sudo yum-config-manager --enable ol*_developer_EPEL
+    sudo yum install -y python-pip
+    sudo pip install ansible
 else
     echo "Unknown DISTRO: ${DISTRO}"
+    exit 1
 fi

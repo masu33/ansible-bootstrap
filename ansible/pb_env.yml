@@ -1,0 +1,32 @@
+---
+
+- name: environment settings
+  hosts: mymachine
+  tasks:
+
+    - when: xkblayout is defined
+      name: set login keyboard layout folder
+      become: yes
+      file:
+        owner: root
+        group: root
+        mode: "0755"
+        path: /etc/default
+        state: directory
+      tags:
+        - desktop
+        - settings
+
+    - when: xkblayout is defined
+      name: set login keyboard layout
+      become: yes
+      lineinfile:
+        create: yes
+        path: /etc/default/keyboard
+        line: "XKBLAYOUT=\"{{xkblayout}}\""
+        regexp: ^XKBLAYOUT=.*$
+      tags:
+        - desktop
+        - settings
+
+...

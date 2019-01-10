@@ -2,8 +2,8 @@
 
 - name: users and paths
   hosts: all
-  roles:
-    - role: users
+  vars:
+
       sudo_group: |
         {{ {
           'Debian': 'sudo',
@@ -101,5 +101,37 @@
               name: Dropbox
       user_avatars:
         masu: masu_avatar.png
+
+  roles:
+
+    - role: users
+
+  post_tasks:
+
+    - name: Set up paths
+      become: yes
+      file:
+        attributes:    "{{ path.attributes    | d(omit) }}"
+        attr:          "{{ path.attr          | d(omit) }}"
+        follow:        "{{ path.follow        | d(omit) }}"
+        force:         "{{ path.force         | d(omit) }}"
+        group:         "{{ path.group         | d(omit) }}"
+        mode:          "{{ path.mode          | d(omit) }}"
+        owner:         "{{ path.owner         | d(omit) }}"
+        path:          "{{ path.path          | d(omit) }}"
+        recurse:       "{{ path.recurse       | d(omit) }}"
+        selevel:       "{{ path.selevel       | d(omit) }}"
+        serole:        "{{ path.serole        | d(omit) }}"
+        setype:        "{{ path.setype        | d(omit) }}"
+        seuser:        "{{ path.seuser        | d(omit) }}"
+        src:           "{{ path.src           | d(omit) }}"
+        state:         "{{ path.state         | d(omit) }}"
+        unsafe_writes: "{{ path.unsafe_writes | d(omit) }}"
+      with_items: "{{ paths }}"
+      loop_control:
+        loop_var: path
+      tags:
+        - user
+        - file
 
 ...

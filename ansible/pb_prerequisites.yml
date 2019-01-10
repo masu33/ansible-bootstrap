@@ -29,12 +29,13 @@
         - pacman
         - download
 
-    - name: "set {{ ansible_user }} nopasswd sudo package manager"
+    - name: "set ansible_user nopasswd sudo package manager"
       become: yes
       vars:
         pm: "{{ {
               'Debian': '/usr/bin/apt',
               'Archlinux': '/usr/bin/pacman',
+              'RedHat': '/usr/bin/yum',
             }[ansible_os_family] }}"
       copy:
         dest: /etc/sudoers.d/{{ ansible_user }}-allow-to-sudo-package-manager
