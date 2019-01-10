@@ -3,7 +3,7 @@
 - assert:
     that:
       - repo is mapping
-      - (repo | reject('in', allowed_keys)) | list == []
+      - (repo | reject('in', allowed_keys)) is empty
       - (repo | select('in', ['id', 'repo', 'name']) | list) | length > 0
 
 - name: set repo

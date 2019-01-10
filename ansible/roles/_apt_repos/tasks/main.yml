@@ -4,7 +4,8 @@
     that:
       - repos is sequence
 
-- include_tasks: key.yml
+- # name:
+  include_tasks: key.yml
   with_items: "{{ repos
                 | default_key('id')
                 | mass_table_join(repo_list, 'id')
@@ -13,7 +14,8 @@
   loop_control:
     loop_var: repo
 
-- include_tasks: repo.yml
+- # name:
+  include_tasks: repo.yml
   with_items: "{{ repos
                 | default_key('id')
                 | mass_table_join(repo_list, 'id')

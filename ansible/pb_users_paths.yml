@@ -1,114 +1,31 @@
 ---
 
 - name: users and paths
-  hosts: all
-  vars:
+  hosts: mymachine
 
-      sudo_group: |
-        {{ {
-          'Debian': 'sudo',
-          'Archlinux': 'wheel',
-        }[ansible_os_family] }}
-      users:
-        - name: ansible
-          password: "{{ passwords.ansible }}"
-          update_password: on_create
-          system: no
-          groups: "{{ sudo_group }}"
-          append: yes
-        - name: masu
-          password: "{{ passwords.masu }}"
-          update_password: on_create
-          system: no
-          groups: "{{ sudo_group }},ansible"
-          append: yes
-        - name: willow
-          password: "{{ passwords.willow }}"
-          update_password: on_create
-          system: no
-        - name: rstrct
-          password: "{{ passwords.rstrct }}"
-          home: /var/rstrct
-          update_password: on_create
-          system: no
-      hidden_users:
-        - willow
-        - ansible
-        - rstrct
-      bashrcd_users:
-        - masu
-        - willow
-      user_colors:
-        masu:
-          names: "1;49;34"
-          misc: "1;49;93"
-      __paths:
-        - &dirmasu
-          owner: masu
-          group: masu
-          state: directory
-          follow: no
-        - &755masu
-          <<: *dirmasu
-          mode: "0755"
-        - &700masu
-          <<: *dirmasu
-          mode: "0700"
-        - &777masu
-          <<: *dirmasu
-          mode: "0777"
-      paths:
-        - <<: *755masu
-          path: "/home/masu"
-        - <<: *700masu
-          path: "/home/masu/Downloads"
-        - <<: *755masu
-          path: "/home/masu/Pictures"
-        - <<: *777masu
-          path: "/home/masu/Willow"
-        - path: "/home/willow/Masu"
-          follow: no
-          force: yes
-          owner: "willow"
-          group: "willow"
-          src: "/home/masu/Willow"
-          state: link
-        - path: "/home/ansible/.ssh/"
-          mode: "0600"
-          state: directory
-        - path: "/var/rstrct/"
-          force: yes
-          mode: "0700"
-          owner: rstrct
-          group: rstrct
-          state: directory
-      user_bookmarks:
-        masu:
-          top: yes
-          override: no
-          bookmarks:
-            - path: /home/masu/Documents
-              name: Documents
-            - path: /home/masu/Downloads
-              name: Downloads
-            - path: /home/masu/IdeaProjects
-              name: Projects
-            - path: /home/masu/Desktop
-              name: Desktop
-            - path: /home/masu/MEGA
-              name: MEGA
-            - path: /home/masu/Dropbox
-              name: Dropbox
-      user_avatars:
-        masu: masu_avatar.png
+  pre_tasks:
+
+    - assert:
+        that:
+          - users is defined
+          - paths is defined
 
   roles:
 
-    - role: users
+    - role: _users
+      vars:
+        sudo: "{{ {
+                'Debian': 'sudo',
+                'Archlinux': 'wheel',
+                'RedHat': 'wheel',
+              }[ansible_os_family] }}"
+      tags:
+        - user
+        - password
 
   post_tasks:
 
-    - name: Set up paths
+    - name: Set up path
       become: yes
       file:
         attributes:    "{{ path.attributes    | d(omit) }}"
