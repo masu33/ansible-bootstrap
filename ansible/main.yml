@@ -314,6 +314,7 @@
       - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
       - dropbox
       - megasync
+      - dnsutils
     redhat_packages:
       - pdftk
       - yum-utils
