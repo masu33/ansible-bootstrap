@@ -15,7 +15,7 @@
 
     - when: ansible_os_family == "Debian"
       name: set apt repositories
-      role: _apt_repos
+      role: apt_repos
       repos: "{{ debian_repos }}"
       tags:
         - repository
@@ -24,7 +24,7 @@
 
     - when: ansible_os_family == "RedHat"
       name: set yum repositories
-      role: _yum_repos
+      role: yum_repos
       repos: "{{ redhat_repos }}"
       tags:
         - repository

@@ -12,7 +12,7 @@
 
   roles:
 
-    - role: _users
+    - role: users
       vars:
         sudo: "{{ {
                 'Debian': 'sudo',
