@@ -1,0 +1,7 @@
+---
+
+- assert:
+    that:
+      - repos | length == 0
+
+...

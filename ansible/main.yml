@@ -108,230 +108,104 @@
 - import_playbook: pb_repos_packages.yml
   vars:
 
-    redhat_python: python36
-    redhat_vbox: "VirtualBox-6.0.{{ ansible_architecture }}"
-    redhat_vagrant: https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.rpm
+    upgrade: yes
 
-    debian_repos:
-      - id: deb-main
-        state: present
-      - id: deb-ext
-        state: present
-      - id: deb-security-all
-        state: present
-      - id: deb-updates-all
-        state: present
-      - id: deb-backports-oss
-        state: present
-      - id: dropbox
-        release: xenial  # TODO: reconsider release
-      - mega
-      - webupd8team
-#      - bionic-pdf  # TODO: check for pdftk
-      - id: umake
-        release: zesty  # TODO: reconsider release
-      - id: chrome-gnome
-        release: zesty  # TODO: reconsider release
-    arch_repos: []
-    redhat_repos:
-      - ol7_latest
-      - ol7_optional_latest
-      - ol7_developer_EPEL
-      - ol7_UEKR4
-      - ol7_addons
-      - ol7_developer
-      - rar
-      - nux
-      - slack
-      - fedoraproject
+    repo_config:
+      Ubuntu:
+        - deb-main
+        - deb-ext
+        - deb-security-all
+        - deb-updates-all
+        - deb-backports-oss
+        - dropbox
+        - mega
+        - webupd8team
+      ManjaroLinux: []  # TODO: Aur pg keys
 
-    debian_absent_packages:
-      - account-plugin-facebook
-      - account-plugin-flickr
-      - aisleriot
-      - bogofilter
-      - bogofilter-common
-      - bogofilter-bdb
-      - brasero
-      - brasero-common
-      - brasero-cdrkit
-      - brltty
-      - dc
-      - dvd+rw-tools
-      - espeak-data
-      - genisoimg
-      - libbrasero-media3-1
-      - gnome-mahjongg
-      - gnome-orca
-      - gnome-sudoku
-      - rhythmbox
-      - rhythmbox-data
-      - rhythmbox-plugins
-      - rhythmbox-plugin-zeitgeist
-      - totem
-      - totem-common
-      - totem-plugins
-      - wodim
-    arch_absent_packages:
-      - brasero
-    redhat_absent_packages: []
-
-    common_packages:
+    package_config:
       # System
+      - gcc
+      - Ubuntu: build-essentials
+        ManjaroLinux: base-devel
       - systemd
-      - fakeroot
-      - file
-      - findutils
       - rsync
-      - gparted
-      - baobab
       - iptables
       - traceroute
       - htop
-      - tree
       - rar
-      - unrar
       - zip
-      - unzip
-      - openvpn
-      - "{{ {
-          'Debian': 'telnet',
-          'Archlinux': 'inetutils',
-          'RedHat': 'telnet',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'netcat',
-          'Archlinux': 'gnu-netcat',
-          'RedHat': 'nc',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'bluez',
-          'Archlinux': 'bluez-utils',
-          'RedHat': 'bluez',
-        }[ansible_os_family] }}"
+      - Ubuntu: telnet
+        ManjaroLinux: inetutils
+      - Ubuntu: netcat
+        ManjaroLinux: gnu-netcat
+      - Ubuntu: bluez
+        ManjaroLinux: bluez-utils
+      - Ubuntu: dnsutils  # TODO: check this
+        ManjaroLinux: dnsutils
+      - Ubuntu: apt
+      - Ubuntu: aptitude
+      - Ubuntu: galternatives
+      - fakeroot
 
       # Programming
-      - "{{ {
-          'Debian': 'python3-dev',
-          'Archlinux': 'python',
-          'RedHat': redhat_python + '-devel',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'python3-setuptools',
-          'Archlinux': 'python-setuptools',
-          'RedHat': redhat_python + '-setuptools',
-        }[ansible_os_family] }}"
+      - Ubuntu: python3-dev
+        ManjaroLinux: python
+      - Ubuntu: python3-setuptools
+        ManjaroLinux: python-setuptools
       - git
       - gawk
 
       # Desktop
       - accountsservice
       - firefox
-      - "{{ {
-          'Debian': 'shutter',
-          'Archlinux': 'spectacle',
-          'RedHat': 'ksnapshot',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'chromium-browser',
-          'Archlinux': 'chromium',
-          'RedHat': 'chromium',
-          }[ansible_os_family]
-        }}"
-      - "{{ {
-          'Debian': 'slack',
-          'Archlinux': 'slack-desktop',
-          'RedHat': 'slack',
-          }[ansible_os_family]
-        }}"
+      - Ubuntu: shutter
+        ManjaroLinux: spectacle
+      - Ubuntu: chromium-browser"
+        ManjaroLinux: chromium
+      - Ubuntu: slack
+        ManjaroLinux: slack-desktop
 
       # Media
       - smplayer
       - ffmpeg
       - vlc
-      - cheese
+      - Ubuntu:
+          name: rhythmbox rhythmbox-data rhythmbox-plugins rhythmbox-plugin-zeitgeist totem totem-common totem-plugins
+          state: absent
 
       # Virtual
-      - "{{ {
-          'Debian': 'docker.io',
-          'Archlinux': 'docker',
-          'RedHat': 'docker-engine',
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'virtualbox',
-          'Archlinux': 'virtualbox',
-          'RedHat': redhat_vbox,
-        }[ansible_os_family] }}"
-      - "{{ {
-          'Debian': 'vagrant',
-          'Archlinux': 'vagrant',
-          'RedHat': redhat_vagrant,
-        }[ansible_os_family] }}"
+      - Ubuntu: docker.io
+        ManjaroLinux: docker
+      - Ubuntu: virtualbox
+        ManjaroLinux: virtualbox
+      - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
+      - Ubuntu: vagrant
+        ManjaroLinux: vagrant
 
       # Office
       - vim
-      - gedit
-      - evince
+      - kate
       - pinta
-      - gimp
-      - inkscape
-      - "{{ {
-          'Debian': 'hunspell-en-us',
-          'Archlinux': 'hunspell',
-          'RedHat': 'hunspell',
-        }[ansible_os_family] }}"
-#      - pdftk  # TODO: check for Ubuntu
+      - Ubuntu: hunspell-en-us"
+        ManjaroLinux: hunspell
+        # TODO: pdftk
 
       # Transmission
       - curl
       - wget
-      - youtube-dl
       - deluge
+      - Ubuntu: dropbox
+        ManjaroLinux: dropbox
+      - Ubuntu: megasync
+        ManjaroLinux: megasync
 
       # Remote
-      - "{{ {
-          'Debian': 'openssh-server',
-          'Archlinux': 'openssh',
-          'RedHat': 'openssh',
-        }[ansible_os_family] }}"
-      - paprefs
+      - Ubuntu: openssh-server
+        ManjaroLinux: openssh
       - rdesktop
       - synergy
-    debian_packages:
-      - apt
-      - aptitude
-      - galternatives
-      - network-manager-openvpn
-      - network-manager-openvpn-gnome
-      - virtualenv
-      - chrome-gnome-shell
-      - gnome-shell-extensions
-      - gnome-tweak-tool
-      - dropbox
-      - megasync
-    arch_packages:
-      - pdftk
-      - "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
-      - dropbox
-      - megasync
-      - dnsutils
-    redhat_packages:
-      - pdftk
-      - yum-utils
-      - device-mapper-persistent-data
-      - lvm2
-      - kernel-devel
 
     python3_packages:
-      # Dev
-      - tqdm
-      - pytz
-      - cython
-      - selenium
-      - xlrd
-      - xlwt
-      - jmespath
-
       # Data science
       - numpy
       - scipy
@@ -340,7 +214,11 @@
       - pandas
       - matplotlib
       - seaborn
+
+      # Scrape
       - beautifulsoup4
+      - selenium
+      - jmespath
 
       # Interface
       - ipython
@@ -349,9 +227,14 @@
       - jupyter-declarativewidgets
 
       # Tools
-      - pymongo
-      - py4j
       - pyinstaller
+      - xlrd
+      - xlwt
+      - tqdm
+      - pytz
+      - cython
+
+      # Desktop
       - thefuck
       - caffeine-ng
 

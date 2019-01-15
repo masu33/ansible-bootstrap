@@ -1,0 +1,27 @@
+---
+
+- name: remove packages
+  pacaur:
+    name: "{{ item.name | d(item) }}"
+    state: absent
+    auronly: no
+  loop: "{{ packages_absent }}"
+  tags:
+    - package
+    - pacaur
+    - download
+
+- name: install packages
+  pacaur:
+    name: "{{ item.name | d(item) }}"
+    state: present
+    auronly: no
+  loop: "{{ packages }}"
+  tags:
+    - package
+    - pacaur
+    - download
+
+# TODO: pacman upgrade
+
+...

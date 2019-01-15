@@ -1,0 +1,33 @@
+---
+
+os_family: "{{ ansible_os_family }}"
+os_distro: "{{ ansible_lsb.id | d(ansible_distribution) }}"
+package_manager: "{{
+  {
+    'ManjaroLinux': 'pacaur',
+    'OracleLinux': 'yum',
+    'Ubuntu': 'apt',
+  }[os_distro]
+}}"
+
+packages_absent: "{{ packages
+                   | selectattr('state', 'defined')
+                   | selectattr('state', 'equalto', 'absent')
+                   | map(attribute='name')
+                   | list
+                  }}"
+packages: "{{
+            (
+               packages
+               | selectattr('state', 'defined')
+               | rejectattr('state', 'equalto', 'absent')
+               | map(attribute='name')
+               | list
+            ) + (
+               packages
+               | rejectattr('state', 'defined')
+               | list
+            )
+           }}"
+
+...

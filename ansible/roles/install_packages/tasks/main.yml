@@ -1,0 +1,12 @@
+---
+
+- assert:
+    that:
+      - packages is sequence
+
+- debug:
+    msg: "{{ package_manager }}.yml"
+
+- include_tasks: "{{ package_manager }}.yml"
+
+...

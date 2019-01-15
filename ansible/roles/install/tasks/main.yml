@@ -1,0 +1,74 @@
+---
+
+- assert:
+    that:
+      - repo_config is sequence
+      - repo_config is not mapping or
+          (repo_config.keys() | reject('in', distros) | list) == []
+      - repo_config is mapping or
+          (repo_config | selectattr('keys', 'defined') | list | combine | list | reject('in', distros) | list) == []
+      - package_config is sequence
+      - package_config is not mapping or
+          (package_config.keys() | reject('in', distros) | list) == []
+      - package_config is mapping or
+          (package_config | selectattr('keys', 'defined') | list | combine | list | reject('in', distros) | list) == []
+
+- name: set up repo_config
+  include_role:
+    name: "install_repos_{{ package_manager }}"
+  vars:
+    repos: "{%
+      if repo_config is mapping
+        %}{{
+          repo_config.get(os_family, []) + repo_config.get(os_distro, [])
+        }}{%
+      elif repo_config is sequence
+        %}{{ (
+          repo_config
+          | rejectattr('keys', 'defined')
+          | list
+        ) + (
+          repo_config
+          | selectattr(os_family, 'defined')
+          | map(attribute=os_family)
+          | list
+        ) + (
+          repo_config
+          | selectattr(os_distro, 'defined')
+          | map(attribute=os_distro)
+          | list
+        ) }}{%
+      endif
+        %}"
+
+- name: set up packages
+  include_role:
+    name: "install_packages"
+  vars:
+    packages: "{%
+      if package_config is mapping
+        %}{{
+          package_config.get(os_family, []) + package_config.get(os_distro, [])
+        }}{%
+      elif package_config is sequence
+        %}{{ (
+          package_config
+          | rejectattr('keys', 'defined')
+          | list
+        ) + (
+          package_config
+          | selectattr(os_family, 'defined')
+          | map(attribute=os_family)
+          | list
+        ) + (
+          package_config
+          | selectattr(os_distro, 'defined')
+          | map(attribute=os_distro)
+          | list
+        ) }}{%
+      endif
+        %}"
+
+# TODO: python3env
+
+...
