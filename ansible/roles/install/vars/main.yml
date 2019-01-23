@@ -4,7 +4,7 @@ os_family: "{{ ansible_os_family }}"
 os_distro: "{{ ansible_lsb.id | d(ansible_distribution) }}"
 package_manager: "{{
   {
-    'ManjaroLinux': 'pacaur',
+    'ManjaroLinux': 'yay',
     'OracleLinux': 'yum',
     'Ubuntu': 'apt',
   }[os_distro]

@@ -23,7 +23,7 @@
       become: yes
       pacman:
         package:
-          - pacaur
+          - yay
           - ca-certificates
       tags:
         - pacman

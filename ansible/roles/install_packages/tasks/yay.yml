@@ -1,27 +1,27 @@
 ---
 
 - name: remove packages
-  pacaur:
+  aur:
     name: "{{ item.name | d(item) }}"
     state: absent
     auronly: no
   loop: "{{ packages_absent }}"
   tags:
     - package
-    - pacaur
+    - yay
     - download
 
 - name: install packages
-  pacaur:
+  aur:
     name: "{{ item.name | d(item) }}"
     state: present
     auronly: no
+    skip_installed: "{{ not upgrade }}"
+    upgrade: "{{ upgrade }}"
   loop: "{{ packages }}"
   tags:
     - package
-    - pacaur
+    - yay
     - download
-
-# TODO: pacman upgrade
 
 ...
