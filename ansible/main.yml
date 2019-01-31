@@ -3,183 +3,183 @@
 - hosts: all
   roles:
 
-#    - role: users
-#      users:
-#        - name: masu
-#          state: present
-#          password: "{{ passwords.masu }}"
-#          update_password: always
-#          ssh_key_bits: 128
-#          ssh_key_comment: masu@$HOSTNAME
-#          ssh_key_passphrase: "{{ passphrases.masu }}"
-#          groups: "{{ sudo }},ansible"
-#          append: yes
-#          shell: /bin/bash
-#          hide: no
-#          bashrcd: yes
-#          bashstyle:
-#            names: "1;49;34"
-#            misc: "1;49;93"
-#          bookmarks:
-#            append: no
-#            bookmarks:
-#              - /home/masu/Documents
-#              - /home/masu/Downloads
-#              - ""
-#              - /home/masu/Desktop Desktop
-#              - /home/masu/MEGA MEGA
-#              - /home/masu/Dropbox Dropbox
-#        - name: willow
-#          state: present
-#          password: "{{ passwords.willow }}"
-#          update_password: on_create
-#          system: no
-#          shell: /bin/bash
-#          hide: yes
-#
-#    - role: install
-#      upgrade: yes
-#      repo_config:
-#        Ubuntu:
-#          - deb-main
-#          - deb-ext
-#          - deb-security-all
-#          - deb-updates-all
-#          - deb-backports-oss
-#          - dropbox
-#          - mega
-#          - webupd8team
-#        ManjaroLinux: []  # TODO: Aur pg keys
-#      package_config:
-#        # System
-#        - gcc
-#        - Ubuntu: build-essentials
-#          ManjaroLinux: base-devel
-#        - systemd
-#        - rsync
-#        - iptables
-#        - traceroute
-#        - htop
-#        - rar
-#        - zip
-#        - Ubuntu: telnet
-#          ManjaroLinux: inetutils
-#        - Ubuntu: netcat
-#          ManjaroLinux: gnu-netcat
-#        - Ubuntu: bluez
-#          ManjaroLinux: bluez-utils
-#        - Ubuntu: dnsutils  # TODO: check this
-#          ManjaroLinux: dnsutils
-#        - Ubuntu: apt
-#        - Ubuntu: aptitude
-#        - Ubuntu: galternatives
-#        - fakeroot
-#        # Programming
-#        - Ubuntu: python3-dev
-#          ManjaroLinux: python
-#        - Ubuntu: python3-setuptools
-#          ManjaroLinux: python-setuptools
-#        - git
-#        - gawk
-#        # Desktop
-#        - accountsservice
-#        - firefox
-#        - Ubuntu: shutter
-#          ManjaroLinux: spectacle
-#        - Ubuntu: chromium-browser"
-#          ManjaroLinux: chromium
-#        - Ubuntu: slack
-#          ManjaroLinux: slack-desktop
-#        # Media
-#        - smplayer
-#        - ffmpeg
-#        - vlc
-#        - Ubuntu:
-#            name: rhythmbox rhythmbox-data rhythmbox-plugins rhythmbox-plugin-zeitgeist totem totem-common totem-plugins
-#            state: absent
-#        # Virtual
-#        - Ubuntu: docker.io
-#          ManjaroLinux: docker
-#        - Ubuntu: virtualbox
-#          ManjaroLinux: virtualbox
-#        - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
-#        - Ubuntu: vagrant
-#          ManjaroLinux: vagrant
-#        # Office
-#        - vim
-#        - pinta
-#        - Ubuntu: hunspell-en-us"
-#          ManjaroLinux: hunspell
-#          # TODO: pdftk
-#        # Transmission
-#        - curl
-#        - wget
-#        - deluge
-#        - Ubuntu: dropbox
-#          ManjaroLinux: dropbox
-#        - Ubuntu: megasync
-#          ManjaroLinux: megasync
-#        # Remote
-#        - Ubuntu: openssh-server
-#          ManjaroLinux: openssh
-#        - rdesktop
-#        - synergy
-#      python_config:
-#        3:
-#          # Data science
-#          - numpy
-#          - scipy
-#          - scikit-learn
-#          - xgboost
-#          - pandas
-#          - matplotlib
-#          - seaborn
-#          # Scrape
-#          - beautifulsoup4
-#          - selenium
-#          - jmespath
-#          # Interface
-#          - ipython
-#          - ipywidgets
-#          - jupyter
-#          - jupyter-declarativewidgets
-#          # Tools
-#          - xlrd
-#          - xlwt
-#          - tqdm
-#          - pytz
-#          - cython
-#          - passlib
-#          # Desktop
-#          - thefuck
-#          - caffeine-ng
+    - role: users
+      users:
+        - name: masu
+          state: present
+          password: "{{ passwords.masu }}"
+          update_password: always
+          ssh_key_bits: 128
+          ssh_key_comment: masu@$HOSTNAME
+          ssh_key_passphrase: "{{ passphrases.masu }}"
+          groups: "{{ sudo }},ansible"
+          append: yes
+          shell: /bin/bash
+          hide: no
+          bashrcd: yes
+          bashstyle:
+            names: "1;49;34"
+            misc: "1;49;93"
+          bookmarks:
+            append: no
+            bookmarks:
+              - /home/masu/Documents
+              - /home/masu/Downloads
+              - ""
+              - /home/masu/Desktop Desktop
+              - /home/masu/MEGA MEGA
+              - /home/masu/Dropbox Dropbox
+        - name: willow
+          state: present
+          password: "{{ passwords.willow }}"
+          update_password: on_create
+          system: no
+          shell: /bin/bash
+          hide: yes
+
+    - role: install
+      upgrade: yes
+      repo_config:
+        Ubuntu:
+          - deb-main
+          - deb-ext
+          - deb-security-all
+          - deb-updates-all
+          - deb-backports-oss
+          - dropbox
+          - mega
+          - webupd8team
+        ManjaroLinux: []  # TODO: Aur pg keys
+      package_config:
+        # System
+        - gcc
+        - Ubuntu: build-essentials
+          ManjaroLinux: base-devel
+        - systemd
+        - rsync
+        - iptables
+        - traceroute
+        - htop
+        - rar
+        - zip
+        - Ubuntu: telnet
+          ManjaroLinux: inetutils
+        - Ubuntu: netcat
+          ManjaroLinux: gnu-netcat
+        - Ubuntu: bluez
+          ManjaroLinux: bluez-utils
+        - Ubuntu: dnsutils  # TODO: check this
+          ManjaroLinux: dnsutils
+        - Ubuntu: apt
+        - Ubuntu: aptitude
+        - Ubuntu: galternatives
+        - fakeroot
+        # Programming
+        - Ubuntu: python3-dev
+          ManjaroLinux: python
+        - Ubuntu: python3-setuptools
+          ManjaroLinux: python-setuptools
+        - git
+        - gawk
+        # Desktop
+        - accountsservice
+        - firefox
+        - Ubuntu: shutter
+          ManjaroLinux: spectacle
+        - Ubuntu: chromium-browser"
+          ManjaroLinux: chromium
+        - Ubuntu: slack
+          ManjaroLinux: slack-desktop
+        # Media
+        - smplayer
+        - ffmpeg
+        - vlc
+        - Ubuntu:
+            name: rhythmbox rhythmbox-data rhythmbox-plugins rhythmbox-plugin-zeitgeist totem totem-common totem-plugins
+            state: absent
+        # Virtual
+        - Ubuntu: docker.io
+          ManjaroLinux: docker
+        - Ubuntu: virtualbox
+          ManjaroLinux: virtualbox
+        - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
+        - Ubuntu: vagrant
+          ManjaroLinux: vagrant
+        # Office
+        - vim
+        - pinta
+        - Ubuntu: hunspell-en-us"
+          ManjaroLinux: hunspell
+          # TODO: pdftk
+        # Transmission
+        - curl
+        - wget
+        - deluge
+        - Ubuntu: dropbox
+          ManjaroLinux: dropbox
+        - Ubuntu: megasync
+          ManjaroLinux: megasync
+        # Remote
+        - Ubuntu: openssh-server
+          ManjaroLinux: openssh
+        - rdesktop
+        - synergy
+      python_config:
+        3:
+          # Data science
+          - numpy
+          - scipy
+          - scikit-learn
+          - xgboost
+          - pandas
+          - matplotlib
+          - seaborn
+          # Scrape
+          - beautifulsoup4
+          - selenium
+          - jmespath
+          # Interface
+          - ipython
+          - ipywidgets
+          - jupyter
+          - jupyter-declarativewidgets
+          # Tools
+          - xlrd
+          - xlwt
+          - tqdm
+          - pytz
+          - cython
+          - passlib
+          # Desktop
+          - thefuck
+          - caffeine-ng
 
     - role: netlimit
       users:
         - root
         - masu
 
-#  tasks:
-#
-#    - name: docker
-#      block:
-#        - name: docker group
-#          become: yes
-#          user:
-#            name: masu
-#            groups: docker
-#            append: yes
-#
-#        - name: dl command
-#          become: yes
-#          copy:
-#            content: !unsafe |
-#              #!/bin/bash
-#
-#              docker ps -l -q
-#            dest: /usr/bin/dlast
-#            owner: root
-#            group: root
-#            mode: 0755
+  tasks:
+
+    - name: docker
+      block:
+        - name: docker group
+          become: yes
+          user:
+            name: masu
+            groups: docker
+            append: yes
+
+        - name: dl command
+          become: yes
+          copy:
+            content: !unsafe |
+              #!/bin/bash
+
+              docker ps -l -q
+            dest: /usr/bin/dlast
+            owner: root
+            group: root
+            mode: 0755
 
 ...
