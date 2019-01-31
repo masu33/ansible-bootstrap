@@ -15,13 +15,14 @@
     state:          "{{ repo.state    | d(omit) }}"
     update_cache:   no
     validate_certs: "{{ repo.validate_certs | d(omit) }}"
-    repo: "{{ repo.repo
-            | d(' '.join([
-                repo.type    | d(default_type),
-                repo.url     | d(default_url),
-                repo.release | d(default_release),
-                repo.name    | d(default_name)
-              ]))
-           }}"
+    repo: |
+      {{ repo.repo
+       | d(' '.join([
+         repo.type    | d(default_type),
+         repo.url     | d(default_url),
+         repo.release | d(default_release),
+         repo.name    | d(default_name)
+       ]))
+      }}
 
 ...

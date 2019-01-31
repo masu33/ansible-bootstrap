@@ -1,0 +1,76 @@
+---
+
+os_family: "{{ ansible_os_family }}"
+
+os_distro: "{{ ansible_lsb.id | d(ansible_distribution) }}"
+
+package_manager: "{{
+    {
+      'ManjaroLinux': 'yay',
+      'Ubuntu': 'apt',
+    }[os_distro]
+  }}"
+
+packages_absent: |
+  {{ packages
+   | selectattr('state', 'defined')
+   | selectattr('state', 'equalto', 'absent')
+   | map(attribute='name')
+   | list
+  }}
+
+packages: |
+  {%
+    if package_config is mapping
+  %}{{
+      package_config.get(os_family, []) + package_config.get(os_distro, [])
+  }}{%
+    elif package_config is sequence
+  %}{{
+      (
+        package_config
+        | rejectattr('keys', 'defined')
+        | list
+      ) + (
+        package_config
+        | selectattr(os_family, 'defined')
+        | map(attribute=os_family)
+        | list
+      ) + (
+        package_config
+        | selectattr(os_distro, 'defined')
+        | map(attribute=os_distro)
+        | list
+      )
+  }}{%
+    endif
+  %}
+
+repos: |
+  {%
+    if repo_config is mapping
+  %}{{
+      repo_config.get(os_family, []) + repo_config.get(os_distro, [])
+  }}{%
+    elif repo_config is sequence
+  %}{{
+      (
+        repo_config
+        | rejectattr('keys', 'defined')
+        | list
+      ) + (
+        repo_config
+        | selectattr(os_family, 'defined')
+        | map(attribute=os_family)
+        | list
+      ) + (
+        repo_config
+        | selectattr(os_distro, 'defined')
+        | map(attribute=os_distro)
+        | list
+      )
+  }}{%
+    endif
+  %}
+
+...

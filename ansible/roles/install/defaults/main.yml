@@ -1,0 +1,17 @@
+---
+
+distros:
+  - Archlinux
+  - ManjaroLinux
+  - Debian
+  - Ubuntu
+
+repo_config: []
+
+package_config: []
+
+python_config: []
+
+upgrade: yes
+
+...

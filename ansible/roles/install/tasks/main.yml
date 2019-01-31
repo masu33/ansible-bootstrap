@@ -1,0 +1,28 @@
+---
+
+- assert:
+    that:
+      - repo_config is sequence
+      - repo_config is not mapping or
+          (repo_config.keys() | reject('in', distros) | list) == []
+      - repo_config is mapping or
+          (repo_config | selectattr('keys', 'defined') | list | combine | list | reject('in', distros) | list) == []
+      - package_config is sequence
+      - package_config is not mapping or
+          (package_config.keys() | reject('in', distros) | list) == []
+      - package_config is mapping or
+          (package_config | selectattr('keys', 'defined') | list | combine | list | reject('in', distros) | list) == []
+
+- name: set up repos
+  include_role:
+    name: "install_repos_{{ package_manager }}"
+
+- name: set up packages
+  include_role:
+    name: "install_packages_{{ package_manager }}"
+
+- name: set up python
+  include_role:
+    name: "install_python"
+
+...
