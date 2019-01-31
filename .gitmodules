@@ -1,1 +1,4 @@
 
+[submodule "ansible/library/external_modules/ansible-aur"]
+	path = ansible/library/external_modules/ansible-aur
+	url = git://github.com/kewlfft/ansible-aur.git
