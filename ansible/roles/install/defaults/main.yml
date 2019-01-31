@@ -10,4 +10,8 @@ repo_config: []
 
 package_config: []
 
+python_config: []
+
+upgrade: yes
+
 ...

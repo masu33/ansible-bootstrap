@@ -1,0 +1,34 @@
+---
+
+- assert:
+    that:
+      - packages is sequence
+
+- name: package manager present
+  become: yes
+  pacman:
+    name:
+      - yay
+      - ca-certificates
+    state: latest
+
+- name: remove packages
+  become: yes
+  pacman:
+    name: "{{ item.name | d(item) }}"
+    state: absent
+  loop: "{{ packages_absent }}"
+
+- name: install packages
+  aur:
+    name: "{{ item.name | d(item) }}"
+    aur_only: no
+    skip_installed: yes
+  loop: "{{ packages }}"
+
+- name: upgrade packages
+  when: upgrade
+  aur:
+    upgrade: yes
+
+...

@@ -1,0 +1,36 @@
+---
+
+- assert:
+    that:
+      - packages is sequence
+
+- name: package manager present
+  become: yes
+  apt:
+    name:
+      - apt
+      - ca-certificates
+      - apt-transport-https+
+      - locales
+    state: latest
+
+- name: remove packages
+  become: yes
+  apt:
+    name: "{{ item.name | d(item) }}"
+    state: absent
+  loop: "{{ packages_absent }}"
+
+- name: install packages
+  become: yes
+  apt:
+    name: "{{ item.name | d(item) }}"
+    state: "{{ upgrade | d('latest', 'present') }}"
+  loop: "{{ packages }}"
+
+- name: upgrade packages
+  when: upgrade
+  apt:
+    upgrade: yes
+
+...

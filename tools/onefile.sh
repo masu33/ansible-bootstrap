@@ -22,8 +22,6 @@ if [ "${DISTRO}" == "ubuntu" ]; then
     sudo apt install -y git
 elif [ "${DISTRO}" == "manjaro" ]; then
     echo "Nothing to install"
-elif [ "${DISTRO}" == "ol" ]; then
-    sudo yum install -y git
 else
     echo "Unknown DISTRO: ${DISTRO}"
     exit 1
@@ -36,6 +34,6 @@ if [ "${INSTALLIT}" == "n" ]; then
 else
     cd "${GITHUBNAME}"
     ./tools/prerequisites.sh
-    ./tools/bootstrap.sh
+    ./tools/bootstrap.sh --ask-vault-pass
     cd -
 fi

@@ -1,0 +1,20 @@
+---
+
+py2_os_packages: "{{ py2_os_packages_distro[os_distro] }}"
+py3_os_packages: "{{ py3_os_packages_distro[os_distro] }}"
+py2_pip: "{{ py2_pip_distro[os_distro] }}"
+py3_pip: "{{ py3_pip_distro[os_distro] }}"
+
+os_packages: |
+  {{
+    python_config.2 is defined | ternary(py2_os_packages, []) +
+    python_config.3 is defined | ternary(py3_os_packages, [])
+  }}
+
+pips: |
+  {{
+    python_config.2 is defined | ternary([py2_pip], []) +
+    python_config.3 is defined | ternary([py3_pip], [])
+  }}
+
+...

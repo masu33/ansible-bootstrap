@@ -1,0 +1,47 @@
+---
+
+- assert:
+    that:
+      - python_config is mapping
+      - python_config.keys() | reject('equalto', 2) | reject('equalto', 3) | list == []
+
+- debug: var=python_config
+
+- name: install python
+  when: os_packages
+  become: yes
+  pacman:
+    package: "{{ os_packages }}"
+    state: latest
+
+- name: pip latest
+  become: yes
+  pip:
+    executable: "{{ pip }}"
+    extra_args: --upgrade
+    name: pip
+  loop_control:
+    loop_var: pip
+  loop: "{{ pips }}"
+
+- name: install py2 packages
+  when: python_config.2 is defined
+  become: yes
+  pip:
+    executable: "{{ py2_pip }}"
+    name: "{{ package }}"
+  loop_control:
+    loop_var: package
+  loop: "{{ python_config.2 }}"
+
+- name: install py3 packages
+  when: python_config.3 is defined
+  become: yes
+  pip:
+    executable: "{{ py3_pip }}"
+    name: "{{ package }}"
+  loop_control:
+    loop_var: package
+  loop: "{{ python_config.3 }}"
+
+...
