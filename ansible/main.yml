@@ -104,6 +104,7 @@
           ManjaroLinux: virtualbox
         - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
         - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-guest-modules"
+        - ManjaroLinux: virtualbox-ext-oracle
         - Ubuntu: vagrant
           ManjaroLinux: vagrant
         # Office
