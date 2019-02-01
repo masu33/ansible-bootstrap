@@ -187,14 +187,20 @@
     - name: histcontrol ignorespace
       become: yes
       lineinfile:
-        mode: 0755
-        path: "{{ item }}"
+        owner: "{{ item.user }}"
+        group: "{{ item.user }}"
+        mode: 0700
+        path: "{{ item.path }}"
         line: HISTCONTROL=ignorespace
         regexp: "^HISTCONTROL=.*$"
       loop:
-        - ~root/.bashrc
-        - ~root/.bash_profile
-        - ~masu/.bashrc
-        - ~masu/.bash_profile
+        - user: root
+          path: ~root/.bashrc
+        - user: root
+          path: ~root/.bash_profile
+        - user: masu
+          path: ~masu/.bashrc
+        - user: masu
+          path: ~masu/.bash_profile
 
 ...
