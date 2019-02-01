@@ -103,6 +103,8 @@
         - Ubuntu: virtualbox
           ManjaroLinux: virtualbox
         - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-host-modules"
+        - ManjaroLinux: "linux{{ ansible_kernel.split('.')[:2] | join }}-virtualbox-guest-modules"
+        - ManjaroLinux: virtualbox-ext-oracle
         - Ubuntu: vagrant
           ManjaroLinux: vagrant
         # Office
@@ -163,6 +165,7 @@
 
     - name: docker
       block:
+
         - name: docker group
           become: yes
           user:
@@ -181,5 +184,24 @@
             owner: root
             group: root
             mode: 0755
+
+    - name: histcontrol ignorespace
+      become: yes
+      lineinfile:
+        owner: "{{ item.user }}"
+        group: "{{ item.user }}"
+        mode: 0700
+        path: "{{ item.path }}"
+        line: HISTCONTROL=ignorespace
+        regexp: "^HISTCONTROL=.*$"
+      loop:
+        - user: root
+          path: ~root/.bashrc
+        - user: root
+          path: ~root/.bash_profile
+        - user: masu
+          path: ~masu/.bashrc
+        - user: masu
+          path: ~masu/.bash_profile
 
 ...
