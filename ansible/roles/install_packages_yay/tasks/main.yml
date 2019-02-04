@@ -5,15 +5,15 @@
       - packages is sequence
 
 - name: package manager present
-  become: yes
+  become: true
   pacman:
     name:
-      - yay
+      - yayyes
       - ca-certificates
     state: latest
 
 - name: remove packages
-  become: yes
+  become: true
   pacman:
     name: "{{ item.name | d(item) }}"
     state: absent
@@ -22,13 +22,13 @@
 - name: install packages
   aur:
     name: "{{ item.name | d(item) }}"
-    aur_only: no
-    skip_installed: yes
+    aur_only: false
+    skip_installed: true
   loop: "{{ packages }}"
 
 - name: upgrade packages
   when: upgrade
   aur:
-    upgrade: yes
+    upgrade: true
 
 ...

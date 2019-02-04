@@ -6,7 +6,7 @@
       - user.name is defined
 
 - name: set up user
-  become: yes
+  become: true
   user:
     append:             "{{ user.append             | d(omit) }}"
     comment:            "{{ user.comment            | d(omit) }}"
@@ -43,10 +43,10 @@
   include_tasks: bashstyle.yml
 
 - name: set User part in AccountServices configuration
-  become: yes
+  become: true
   lineinfile:
-    backup:      no
-    create:      yes
+    backup:      false
+    create:      true
     dest:        "/var/lib/AccountsService/users/{{ user.name }}"
     group:       root
     insertafter: EOF
@@ -55,10 +55,10 @@
     state:       present
 
 - name: show/hide user's name at login
-  become: yes
+  become: true
   lineinfile:
-    backup:      no
-    create:      yes
+    backup:      false
+    create:      true
     dest:        "/var/lib/AccountsService/users/{{ user.name }}"
     group:       root
     insertafter: "[User]"
@@ -68,11 +68,11 @@
     state:       present
 
 - when: user.avatar is defined
-  become: yes
+  become: true
   include_tasks: avatar.yml
 
 - when: user.bookmarks is defined
-  become: yes
+  become: true
   include_tasks: bookmarks.yml
 
 ...

@@ -10,11 +10,11 @@
     state: present
 
 - name: set netlimit groups
-  become: yes
+  become: true
   group:
     name: "{{ group }}"
     state: present
-    system: yes
+    system: true
   loop_control:
     loop_var: group
   loop:
@@ -23,9 +23,9 @@
     - netlimit10
 
 - name: set iptables rules
-  become: yes
+  become: true
   blockinfile:
-    backup: yes
+    backup: true
     block: |
       -A OUTPUT -d 127.0.0.0/8 -m owner --gid-owner netlimit10 -j ACCEPT
       -A OUTPUT -d 127.0.0.0/8 -m owner --gid-owner netlimit192 -j ACCEPT
@@ -35,7 +35,7 @@
       -A OUTPUT -m owner --gid-owner netlimit10 -j REJECT --reject-with icmp-port-unreachable
       -A OUTPUT -m owner --gid-owner netlimit192 -j REJECT --reject-with icmp-port-unreachable
       -A OUTPUT -m owner --gid-owner netlimit127 -j REJECT --reject-with icmp-port-unreachable
-    create: yes
+    create: true
     insertafter: "\\*filter"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: NETLIMIT"
     path: /etc/iptables/iptables.rules
@@ -44,14 +44,14 @@
     - restart iptables
 
 - name: set netlimit commands
-  become: yes
+  become: true
   copy:
     content: |
       #!/bin/bash
       sg netlimit{{ group | d(127, True) }} "$1"
-    backup: yes
+    backup: true
     dest:   "/usr/bin/netlimit{{group}}"
-    follow: yes
+    follow: true
     force:  no
     mode:   "0755"
     owner:  root

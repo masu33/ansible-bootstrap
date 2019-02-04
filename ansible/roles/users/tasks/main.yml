@@ -5,7 +5,7 @@
       - users is sequence
 
 - # name:
-  become: yes
+  become: true
   include_tasks: user.yml
   with_items: "{{ users
                 | default_key('name')

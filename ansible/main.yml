@@ -13,15 +13,15 @@
           ssh_key_comment: masu@$HOSTNAME
           ssh_key_passphrase: "{{ passphrases.masu }}"
           groups: "{{ sudo }},ansible"
-          append: yes
+          append: true
           shell: /bin/bash
-          hide: no
-          bashrcd: yes
+          hide: false
+          bashrcd: true
           bashstyle:
             names: "1;49;34"
             misc: "1;49;93"
           bookmarks:
-            append: no
+            append: false
             bookmarks:
               - /home/masu/Documents
               - /home/masu/Downloads
@@ -33,12 +33,12 @@
           state: present
           password: "{{ passwords.willow }}"
           update_password: on_create
-          system: no
+          system: false
           shell: /bin/bash
-          hide: yes
+          hide: true
 
     - role: install
-      upgrade: yes
+      upgrade: true
       repo_config:
         Ubuntu:
           - deb-main
@@ -167,14 +167,14 @@
       block:
 
         - name: docker group
-          become: yes
+          become: true
           user:
             name: masu
             groups: docker
-            append: yes
+            append: true
 
         - name: dl command
-          become: yes
+          become: true
           copy:
             content: !unsafe |
               #!/bin/bash
@@ -186,7 +186,7 @@
             mode: 0755
 
     - name: histcontrol ignorespace
-      become: yes
+      become: true
       lineinfile:
         owner: "{{ item.user }}"
         group: "{{ item.user }}"

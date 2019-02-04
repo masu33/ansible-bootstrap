@@ -7,22 +7,22 @@
       - (repo | select('in', ['id', 'repo', 'name']) | list) | length > 0
 
 - name: set repo
-  become: yes
+  become: true
   apt_repository:
     codename:       "{{ repo.codename | d(omit) }}"
     filename:       "{{ repo.filename | d(omit) }}"
     mode:           "{{ repo.mode     | d(omit) }}"
     state:          "{{ repo.state    | d(omit) }}"
-    update_cache:   no
+    update_cache:   false
     validate_certs: "{{ repo.validate_certs | d(omit) }}"
-    repo: |
-      {{ repo.repo
+    repo: "{{
+       repo.repo
        | d(' '.join([
          repo.type    | d(default_type),
          repo.url     | d(default_url),
          repo.release | d(default_release),
          repo.name    | d(default_name)
        ]))
-      }}
+      }}"
 
 ...
