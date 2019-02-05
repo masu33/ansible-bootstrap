@@ -12,7 +12,7 @@
           ssh_key_bits: 128
           ssh_key_comment: masu@$HOSTNAME
           ssh_key_passphrase: "{{ passphrases.masu }}"
-          groups: "{{ sudo }},ansible"
+          groups: "{{ sudo }}"
           append: true
           shell: /bin/bash
           hide: false
