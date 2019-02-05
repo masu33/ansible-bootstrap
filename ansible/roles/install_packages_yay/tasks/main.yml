@@ -8,7 +8,7 @@
   become: true
   pacman:
     name:
-      - yayyes
+      - yay
       - ca-certificates
     state: latest
 

@@ -112,7 +112,8 @@
         - pinta
         - Ubuntu: hunspell-en-us"
           ManjaroLinux: hunspell
-          # TODO: pdftk
+        - # Ubuntu: pdftk
+          ManjaroLinux: pdftk-bin
         # Transmission
         - curl
         - wget

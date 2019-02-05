@@ -52,7 +52,7 @@
     backup: true
     dest:   "/usr/bin/netlimit{{group}}"
     follow: true
-    force:  no
+    force:  false
     mode:   "0755"
     owner:  root
   with_items:
