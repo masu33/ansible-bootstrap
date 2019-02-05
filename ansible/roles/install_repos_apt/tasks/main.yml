@@ -14,7 +14,7 @@
   loop_control:
     loop_var: repo
 
-- include_tasks: repos.yml
+- include_tasks: repo.yml
   with_items: |
     {{ repos
      | default_key('id')
