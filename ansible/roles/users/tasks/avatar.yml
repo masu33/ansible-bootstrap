@@ -1,7 +1,7 @@
 ---
 
 - name: create avatar folder
-  become: yes
+  become: true
   file:
     path: "/var/lib/AccountsService/icons/"
     owner: root
@@ -10,7 +10,7 @@
     state: directory
 
 - name: copy avatar
-  become: yes
+  become: true
   copy:
     src: "{{ user.avatar }}"
     dest: "/var/lib/AccountsService/icons/{{ user.name }}"
@@ -19,10 +19,10 @@
     mode: 0644
 
 - name: set avatar
-  become: yes
+  become: true
   lineinfile:
-    backup:      no
-    create:      yes
+    backup:      false
+    create:      true
     dest:        "/var/lib/AccountsService/users/{{ user.name }}"
     group:       root
     insertafter: "[User]"

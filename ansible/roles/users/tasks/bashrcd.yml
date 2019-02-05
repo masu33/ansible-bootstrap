@@ -6,7 +6,7 @@
       - user.name is defined
 
 - name: Set up bashrc.d support (folder) for {{ user.name }}
-  become: yes
+  become: true
   file:
     path:  "{{ user.home | d('/home/' + user.name) }}/.bashrc.d"
     mode:  "0755"
@@ -15,9 +15,9 @@
     state: directory
 
 - name: set up bashrc.d support (inclusion) for {{ user.name }}
-  become: yes
+  become: true
   blockinfile:
-    backup:      yes
+    backup:      true
     block:       |
       if [[ $- != *i* ]] ; then
         return
@@ -29,9 +29,9 @@
           source $file
         done
       fi
-    create:      yes
+    create:      true
     dest:        "{{ user.home | d('/home/' + user.name) }}/.bashrc"
-    follow:      yes
+    follow:      true
     owner:       "{{ user.name }}"
     group:       "{{ user.group | d(user.name) | d(omit) }}"
     marker:      "# ANSIBLE MANAGED: .bashrc.d {mark}"

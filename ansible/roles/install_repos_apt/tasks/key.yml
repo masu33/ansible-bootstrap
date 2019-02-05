@@ -1,7 +1,7 @@
 ---
 
 - when: repo.gpgkey is defined
-  become: yes
+  become: true
   name: set repository keys
   apt_key:
     state: "{{ repo.state  | d(omit) }}"
@@ -9,7 +9,7 @@
     id:    "{{ repo.key              }}"
 
 - when: repo.gpgkey is undefined and repo.keyserver is defined
-  become: yes
+  become: true
   name: set repository keys with keyserver
   apt_key:
     state:     "{{ repo.state     | d(omit) }}"
@@ -17,7 +17,7 @@
     id:        "{{ repo.key                 }}"
 
 - when: repo.gpgkey is undefined and repo.keyserver is undefined and repo.key_url is defined
-  become: yes
+  become: true
   name: set repository keys with key URL
   apt_key:
     state: "{{ repo.state   | d(omit) }}"

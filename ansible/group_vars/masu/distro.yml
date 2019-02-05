@@ -1,7 +1,0 @@
----
-
-os_family: "{{ ansible_os_family }}"
-
-os_distro: "{{ ansible_lsb.id | d(ansible_distribution) }}"
-
-...

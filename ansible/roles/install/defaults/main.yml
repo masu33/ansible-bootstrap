@@ -12,6 +12,6 @@ package_config: []
 
 python_config: []
 
-upgrade: yes
+upgrade: true
 
 ...

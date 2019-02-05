@@ -1,7 +1,7 @@
 ---
 
 - name: restart iptables
-  become: yes
+  become: true
   systemd:
     service: iptables
     state: restarted

@@ -13,7 +13,7 @@
   name: not yet checked user home
   block:
     - name: getent
-      become: yes
+      become: true
       getent:
         database: passwd
         key: "{{ user_name }}"

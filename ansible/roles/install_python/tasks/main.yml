@@ -9,13 +9,13 @@
 
 - name: install python
   when: os_packages
-  become: yes
+  become: true
   pacman:
     package: "{{ os_packages }}"
     state: latest
 
 - name: pip latest
-  become: yes
+  become: true
   pip:
     executable: "{{ pip }}"
     extra_args: --upgrade
@@ -26,7 +26,7 @@
 
 - name: install py2 packages
   when: python_config.2 is defined
-  become: yes
+  become: true
   pip:
     executable: "{{ py2_pip }}"
     name: "{{ package }}"
@@ -36,7 +36,7 @@
 
 - name: install py3 packages
   when: python_config.3 is defined
-  become: yes
+  become: true
   pip:
     executable: "{{ py3_pip }}"
     name: "{{ package }}"

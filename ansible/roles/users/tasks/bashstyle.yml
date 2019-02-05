@@ -5,10 +5,10 @@
       - user.bashstyle is defined
 
 - name: set bash coloring
-  become: yes
+  become: true
   lineinfile:
-    backup: no
-    create: yes
+    backup: false
+    create: true
     group: "{{ user.name }}"
     insertafter: EOF
     line: "export {{ item.key }}=\"{{ item.value }}\""

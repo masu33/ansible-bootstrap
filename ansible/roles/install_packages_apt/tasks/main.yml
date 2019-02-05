@@ -5,7 +5,7 @@
       - packages is sequence
 
 - name: package manager present
-  become: yes
+  become: true
   apt:
     name:
       - apt
@@ -15,14 +15,14 @@
     state: latest
 
 - name: remove packages
-  become: yes
+  become: true
   apt:
     name: "{{ item.name | d(item) }}"
     state: absent
   loop: "{{ packages_absent }}"
 
 - name: install packages
-  become: yes
+  become: true
   apt:
     name: "{{ item.name | d(item) }}"
     state: "{{ upgrade | d('latest', 'present') }}"
@@ -31,6 +31,6 @@
 - name: upgrade packages
   when: upgrade
   apt:
-    upgrade: yes
+    upgrade: true
 
 ...

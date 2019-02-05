@@ -15,7 +15,7 @@
     user_name: "{{ user.name }}"
 
 - name: set bookmarks dir
-  become: yes
+  become: true
   file:
     path: "{{ path }}"
     owner: "{{ user.name }}"
@@ -29,7 +29,7 @@
     loop_var: path
 
 - name: check if bookmarks file exists
-  become: yes
+  become: true
   stat:
     path: &bmfile
       "{{ user_homes[user.name] }}/.config/gtk-3.0/bookmarks"
@@ -37,13 +37,13 @@
 
 - when: bmfile.stat.exists
   name: get file contents
-  become: yes
+  become: true
   slurp:
     path: *bmfile
   register: bmfile
 
 - name: set bookmarks
-  become: yes
+  become: true
   vars:
     bookmarks: "{{ user.bookmarks.bookmarks | default_key('uri') | list }}"
     orig: "{{ bmfile.content | d('') | b64decode }}"
