@@ -10,7 +10,7 @@
     name:
       - apt
       - ca-certificates
-      - apt-transport-https+
+      - apt-transport-https
       - locales
     state: latest
 
@@ -25,11 +25,12 @@
   become: true
   apt:
     name: "{{ item.name | d(item) }}"
-    state: "{{ upgrade | d('latest', 'present') }}"
+    state: "{{ upgrade | ternary('latest', 'present') }}"
   loop: "{{ packages }}"
 
 - name: upgrade packages
   when: upgrade
+  become: yes
   apt:
     upgrade: true
 
