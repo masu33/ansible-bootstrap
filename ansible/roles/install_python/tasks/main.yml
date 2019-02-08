@@ -10,7 +10,7 @@
 - name: install python
   when: os_packages
   become: true
-  pacman:
+  package:
     package: "{{ os_packages }}"
     state: latest
 

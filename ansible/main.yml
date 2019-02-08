@@ -53,7 +53,7 @@
       package_config:
         # System
         - gcc
-        - Ubuntu: build-essentials
+        - Ubuntu: build-essential
           ManjaroLinux: base-devel
         - systemd
         - rsync
@@ -86,7 +86,7 @@
         - firefox
         - Ubuntu: shutter
           ManjaroLinux: spectacle
-        - Ubuntu: chromium-browser"
+        - Ubuntu: chromium-browser
           ManjaroLinux: chromium
         - Ubuntu: slack
           ManjaroLinux: slack-desktop
@@ -95,7 +95,14 @@
         - ffmpeg
         - vlc
         - Ubuntu:
-            name: rhythmbox rhythmbox-data rhythmbox-plugins rhythmbox-plugin-zeitgeist totem totem-common totem-plugins
+            name:
+              - rhythmbox
+              - rhythmbox-data
+              - rhythmbox-plugins
+              - rhythmbox-plugin-zeitgeist
+              - totem
+              - totem-common
+              - totem-plugins
             state: absent
         # Virtual
         - Ubuntu: docker.io
@@ -110,7 +117,7 @@
         # Office
         - vim
         - pinta
-        - Ubuntu: hunspell-en-us"
+        - Ubuntu: hunspell-en-us
           ManjaroLinux: hunspell
         - # Ubuntu: pdftk
           ManjaroLinux: pdftk-bin
@@ -189,6 +196,7 @@
     - name: histcontrol ignorespace
       become: true
       lineinfile:
+        create: true
         owner: "{{ item.user }}"
         group: "{{ item.user }}"
         mode: 0700
