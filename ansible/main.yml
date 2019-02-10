@@ -51,6 +51,9 @@
           - webupd8team
         ManjaroLinux: []  # TODO: Aur pg keys
       package_config:
+        - ManjaroLinux:
+            name: unrar
+            state: absent
         # System
         - gcc
         - Ubuntu: build-essentials

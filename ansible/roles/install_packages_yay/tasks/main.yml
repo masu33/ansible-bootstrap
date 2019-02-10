@@ -18,6 +18,7 @@
     name: "{{ item.name | d(item) }}"
     state: absent
   loop: "{{ packages_absent }}"
+  failed_when: false
 
 - name: install packages
   aur:
